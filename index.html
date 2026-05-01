@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeDrop</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
+body{background:#f5f5f5;color:#222}
+.app{max-width:480px;margin:0 auto;background:#fff;min-height:100vh;display:flex;flex-direction:column}
+header{background:#c0392b;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}
+header h1{font-size:20px;font-weight:700}
+nav{display:flex;border-bottom:1px solid #eee;background:#fff;position:sticky;top:0;z-index:100}
+nav button{flex:1;padding:11px 2px;border:none;background:transparent;font-size:12px;color:#888;cursor:pointer;border-bottom:2px solid transparent;transition:.2s}
+nav button.active{color:#c0392b;border-bottom-color:#c0392b;font-weight:600}
+.page{display:none;flex:1;flex-direction:column}
+.page.active{display:flex}
+
+.search-bar{padding:12px 14px;background:#fafafa;border-bottom:1px solid #eee;display:flex;gap:8px;flex-wrap:wrap}
+.search-bar select,.search-bar input{flex:1;min-width:90px;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff}
+.loc-row{display:flex;gap:6px;width:100%}
+.loc-row input{flex:1;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px}
+.gps-btn{padding:9px 11px;background:#2980b9;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap}
+.search-btn{padding:9px 16px;background:#c0392b;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600}
+#map{height:220px;width:100%}
+.results-list{flex:1;overflow-y:auto;padding:12px 14px}
+.results-list h3{font-size:12px;color:#888;margin-bottom:10px}
+.donor-card{background:#fff;border:1px solid #eee;border-radius:12px;padding:12px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.donor-card.featured{border-color:#c0392b;border-width:1.5px}
+.avatar{width:46px;height:46px;border-radius:50%;background:#fdecea;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#c0392b;flex-shrink:0;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.donor-info{flex:1;min-width:0}
+.donor-info h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.donor-info .meta{font-size:11px;color:#888;margin-bottom:5px}
+.blood-badge{display:inline-block;background:#c0392b;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:5px}
+.dist-badge{display:inline-block;background:#eee;color:#555;font-size:11px;padding:2px 7px;border-radius:20px}
+.stars{color:#f39c12;font-size:12px}
+.card-actions{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.btn-sm{padding:5px 11px;border-radius:7px;border:none;font-size:12px;cursor:pointer;font-weight:600}
+.btn-call{background:#27ae60;color:#fff}
+.btn-req{background:#c0392b;color:#fff}
+.btn-profile{background:#eee;color:#333}
+.no-results{text-align:center;padding:40px 20px;color:#aaa}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto}
+.modal-header{background:#c0392b;color:#fff;padding:13px 16px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-size:15px;font-weight:700}
+.modal-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1}
+.modal-body{padding:16px}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:#fdecea;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#c0392b;margin:0 auto 10px;overflow:hidden}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-name{text-align:center;font-size:17px;font-weight:700;margin-bottom:3px}
+.profile-blood{text-align:center;margin-bottom:11px}
+.profile-table{width:100%;font-size:13px;border-collapse:collapse;margin-bottom:11px}
+.profile-table td{padding:6px 4px;border-bottom:1px solid #f0f0f0}
+.profile-table td:first-child{color:#888;width:36%}
+.profile-table td:last-child{font-weight:500}
+.req-form{background:#fafafa;border-radius:10px;padding:12px;margin-top:8px}
+.req-form textarea{width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:none;height:65px;margin-bottom:7px}
+.req-form button{width:100%;padding:10px;background:#c0392b;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.social-links{display:flex;gap:7px;justify-content:center;margin-top:8px}
+.social-btn{padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid #ddd;background:#fff;cursor:pointer;color:#1877f2}
+
+.reg-page{padding:14px;flex:1;overflow-y:auto}
+.reg-page h2{font-size:17px;font-weight:700;margin-bottom:3px}
+.reg-page p{font-size:12px;color:#888;margin-bottom:14px}
+.form-group{margin-bottom:12px}
+.form-group label{font-size:12px;font-weight:600;color:#444;display:block;margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:9px;font-size:13px}
+.form-group textarea{height:60px;resize:none}
+.form-row{display:flex;gap:8px}
+.form-row .form-group{flex:1}
+.photo-upload{display:flex;gap:8px;align-items:center}
+.photo-upload input[type=file]{display:none}
+.photo-upload label.upload-btn{padding:9px 14px;border:1px dashed #c0392b;border-radius:9px;color:#c0392b;font-size:12px;font-weight:600;cursor:pointer;flex:1;text-align:center}
+.photo-preview{width:44px;height:44px;border-radius:50%;background:#fdecea;display:flex;align-items:center;justify-content:center;font-size:11px;color:#c0392b;overflow:hidden;flex-shrink:0;border:1px solid #eee}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+.gps-form-btn{display:flex;gap:7px;align-items:center}
+.gps-form-btn input{flex:1;padding:9px 11px;border:1px solid #ddd;border-radius:9px;font-size:13px}
+.gps-form-btn button{padding:9px 12px;background:#2980b9;color:#fff;border:none;border-radius:9px;font-size:12px;cursor:pointer;white-space:nowrap}
+.submit-btn{width:100%;padding:12px;background:#c0392b;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+.success-msg{display:none;text-align:center;padding:30px 20px}
+.success-msg .check{font-size:48px;color:#27ae60;margin-bottom:10px}
+
+.profile-page{padding:14px;flex:1;overflow-y:auto}
+.profile-page h2{font-size:17px;font-weight:700;margin-bottom:12px}
+.my-profile-card{background:#fff;border:1.5px solid #c0392b;border-radius:14px;padding:16px;margin-bottom:14px}
+.my-profile-top{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.my-avatar{width:60px;height:60px;border-radius:50%;background:#fdecea;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#c0392b;overflow:hidden;flex-shrink:0;border:2px solid #c0392b}
+.my-avatar img{width:100%;height:100%;object-fit:cover}
+.my-info h3{font-size:16px;font-weight:700}
+.my-info .sub{font-size:12px;color:#888;margin-top:2px}
+.edit-btn{width:100%;padding:10px;background:#fff;color:#c0392b;border:1.5px solid #c0392b;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px}
+.no-profile-msg{text-align:center;padding:40px 20px;color:#aaa}
+.no-profile-msg button{margin-top:12px;padding:10px 20px;background:#c0392b;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer}
+
+.edit-modal{background:#fff;border-radius:16px;width:100%;max-width:420px;max-height:92vh;overflow-y:auto}
+.edit-modal .modal-header{background:#c0392b;color:#fff;padding:13px 16px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center}
+.edit-body{padding:14px}
+
+.requests-page{padding:14px;flex:1;overflow-y:auto}
+.req-card{background:#fff;border:1px solid #eee;border-radius:12px;padding:13px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.req-card .status{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;display:inline-block;margin-bottom:5px}
+.status.pending{background:#fff3cd;color:#856404}
+.status.accepted{background:#d1f3e0;color:#155724}
+.rate-stars span{font-size:22px;cursor:pointer;color:#ddd}
+.rate-stars span.lit{color:#f39c12}
+.rate-submit{margin-top:7px;padding:7px 14px;background:#c0392b;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="app">
+  <header><span>🩸</span><h1>LifeDrop</h1><div style="margin-left:auto;display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.4)"><button id="lang-bn" onclick="setLang('bn')" style="padding:5px 11px;background:rgba(255,255,255,.3);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">বাং</button><button id="lang-en" onclick="setLang('en')" style="padding:5px 11px;background:transparent;color:rgba(255,255,255,.7);border:none;font-size:12px;font-weight:700;cursor:pointer">EN</button></div></header>
+  <nav>
+    <button class="active" onclick="showPage('search',this)">Find Blood</button>
+    <button onclick="showPage('register',this)">Donor হও</button>
+    <button onclick="showPage('myprofile',this)">My Profile</button>
+    <button onclick="showPage('requests',this)">Requests</button>
+  </nav>
+
+  <!-- SEARCH -->
+  <div class="page active" id="page-search">
+    <div class="search-bar">
+      <select id="blood-filter">
+        <option value="">Blood Group</option>
+        <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+        <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+      </select>
+      <div class="loc-row">
+        <input type="text" id="location-input" placeholder="তোমার এলাকা লিখো"/>
+        <button class="gps-btn" onclick="getGPS('search')">📍 GPS</button>
+        <button class="search-btn" onclick="searchDonors()">খুঁজি</button>
+      </div>
+    </div>
+    <div id="map"></div>
+    <div class="results-list" id="results-list"><h3>Blood group ও location দিয়ে search করো</h3></div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="page" id="page-register">
+    <div class="reg-page" id="reg-form-wrap">
+      <h2>Donor হিসেবে নিবন্ধন</h2>
+      <p>তোমার রক্ত কারো জীবন বাঁচাতে পারে।</p>
+      <div class="form-row">
+        <div class="form-group"><label>পুরো নাম *</label><input id="r-name" placeholder="তোমার নাম"/></div>
+        <div class="form-group"><label>Blood Group *</label>
+          <select id="r-blood"><option value="">Select</option>
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>ফোন নম্বর *</label><input id="r-phone" placeholder="+880..."/></div>
+      <div class="form-group"><label>ইমেইল (optional)</label><input id="r-email" placeholder="email@example.com"/></div>
+      <div class="form-group"><label>এলাকা / ঠিকানা *</label>
+        <select id="r-area-pick" onchange="if(this.value){document.getElementById('r-address').value=this.value}" style="width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:9px;font-size:13px;margin-bottom:6px">
+          <option value="">-- এলাকা বেছে নাও --</option>
+          <option>Mohammadpur</option><option>Shyamoli</option><option>Adabor</option>
+          <option>Lalmatia</option><option>Dhanmondi</option><option>Mirpur</option>
+          <option>Gulshan</option><option>Banani</option><option>Uttara</option>
+          <option>Motijheel</option><option>Rayer Bazar</option><option>Bosila</option>
+          <option>Azimpur</option><option>Lalbagh</option><option>Old Dhaka</option>
+          <option>Farmgate</option><option>Tejgaon</option><option>Badda</option>
+          <option>Khilgaon</option><option>Demra</option>
+        </select>
+        <input id="r-address" placeholder="অথবা নিজে লিখো — এলাকা, ঢাকা"/>
+      </div>
+      <div class="form-group"><label>WhatsApp নম্বর (optional)</label><input id="r-wa" placeholder="+880..."/></div>
+      <div class="form-group"><label>Facebook Profile Link (optional)</label><input id="r-fb" placeholder="fb.com/তোমার-নাম"/></div>
+      <div class="form-group"><label>Profile Photo</label>
+        <div class="photo-upload">
+          <label class="upload-btn" for="r-photo-file">📷 Gallery থেকে বেছে নাও</label>
+          <input type="file" id="r-photo-file" accept="image/*" onchange="previewPhoto(this,'r-preview','r-photodata')"/>
+          <div class="photo-preview" id="r-preview">ছবি</div>
+        </div>
+        <input type="hidden" id="r-photodata"/>
+      </div>
+      <button class="submit-btn" onclick="registerDonor()">Donor Profile তৈরি করো</button>
+    </div>
+    <div class="success-msg" id="reg-success">
+      <div class="check">✓</div>
+      <h3>Profile তৈরি হয়েছে!</h3>
+      <p>তুমি এখন LifeDrop-এর donor। রোগীরা তোমাকে খুঁজে পাবে।</p>
+      <button class="submit-btn" style="margin-top:14px" onclick="goToMyProfile()">My Profile দেখো</button>
+    </div>
+  </div>
+
+  <!-- MY PROFILE -->
+  <div class="page" id="page-myprofile">
+    <div class="profile-page">
+      <h2>My Profile</h2>
+      <div id="my-profile-content"></div>
+    </div>
+  </div>
+
+  <!-- REQUESTS -->
+  <div class="page" id="page-requests">
+    <div class="requests-page">
+      <h2 style="font-size:17px;font-weight:700;margin-bottom:12px">আমার Requests</h2>
+      <div id="requests-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DONOR PROFILE MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header"><h3>Donor Profile</h3>
+      <button class="modal-close" onclick="document.getElementById('modal-bg').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-bg" id="edit-modal-bg" onclick="closeEditModal(event)">
+  <div class="edit-modal">
+    <div class="modal-header"><h3>Profile Edit করো</h3>
+      <button class="modal-close" onclick="document.getElementById('edit-modal-bg').classList.remove('open')">×</button>
+    </div>
+    <div class="edit-body" id="edit-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let map, userMarker, donorMarkers=[], allDonors=[], myRequests=[], myProfile=null;
+let userLat=23.7644, userLng=90.3564, lang='bn';
+
+const T={
+  bn:{
+    findBlood:'Find Blood',donorHo:'Donor হও',myProfile:'My Profile',requests:'Requests',
+    bloodGroup:'Blood Group',yourArea:'তোমার এলাকা লিখো',gps:'📍 GPS',search:'খুঁজি',
+    searchPrompt:'Blood group ও location দিয়ে search করো',
+    foundDonors:(n,b)=>`${n} জন ${b} donor — দূরত্ব অনুযায়ী সাজানো`,
+    noDonor:b=>`কোনো <b>${b}</b> donor পাওয়া যায়নি`,
+    kmAway:k=>`${k} km দূরে`,call:'📞 Call',wantBlood:'রক্ত চাই',profile:'Profile',
+    donations:n=>`${n} বার দিয়েছেন`,noRating:'রেটিং নেই',
+    address:'📍 ঠিকানা',phone:'📞 ফোন',totalDonate:'🩸 মোট দান',times:'বার',email:'✉️ ইমেইল',
+    avgRating:'Average Rating',noRatingYet:'এখনো রেটিং নেই',sendReq:'🩸 রক্তের অনুরোধ পাঠাও',
+    reqPlaceholder:'কোন হাসপাতাল, কখন লাগবে, রোগীর অবস্থা...',sendBtn:'অনুরোধ পাঠাও',
+    regTitle:'Donor হিসেবে নিবন্ধন',regSubtitle:'তোমার রক্ত কারো জীবন বাঁচাতে পারে।',
+    fullName:'পুরো নাম *',bloodGrp:'Blood Group *',selectBG:'Select',
+    phoneLabel:'ফোন নম্বর *',emailLabel:'ইমেইল (optional)',areaLabel:'এলাকা / ঠিকানা *',
+    areaPlaceholder:'মোহাম্মদপুর, ঢাকা',gpsBtn:'📍 GPS নাও',
+    waLabel:'WhatsApp নম্বর (optional)',fbLabel:'Facebook Profile Link (optional)',
+    fbPlaceholder:'fb.com/তোমার-নাম',photoLabel:'Profile Photo',
+    uploadBtn:'📷 Gallery থেকে বেছে নাও',photoText:'ছবি',submitReg:'Donor Profile তৈরি করো',
+    fillAll:'সব * field পূরণ করো',regSuccess:'Profile তৈরি হয়েছে!',
+    regSuccessSub:'তুমি এখন LifeDrop-এর donor। রোগীরা তোমাকে খুঁজে পাবে।',
+    goMyProfile:'My Profile দেখো',
+    myProfileTitle:'My Profile',noProfileMsg:'তুমি এখনো donor হিসেবে নিবন্ধিত নও।',
+    becomeDonor:'Donor হও',editBtn:'✏️ Profile Edit করো',
+    editTitle:'Profile Edit করো',nameLabel:'পুরো নাম *',newPhoto:'📷 নতুন ছবি বেছে নাও',saveBtn:'Save করো',
+    profileUpdated:'✅ Profile update হয়েছে!',
+    myReqTitle:'আমার Requests',noReq:'এখনো কোনো request পাঠাওনি',
+    pending:'অপেক্ষায়',accepted:'গৃহীত ✓',rateTitle:'Rate দাও ও ধন্যবাদ জানাও',
+    submitRating:'Submit',ratedDone:'✓ Rating দেওয়া হয়েছে',selectStar:'Star select করো',
+    thankRating:'ধন্যবাদ! Rating দেওয়া হয়েছে।',
+    locating:'Location নেওয়া হচ্ছে...',locDone:'📍 Location নেওয়া হয়েছে',locFail:'Location নিতে পারিনি',
+    gpsNoSupport:'GPS supported না',calling:'Calling',reqSent:(n)=>`${n} কে অনুরোধ পাঠানো হয়েছে!`,
+    reqAccepted:(n)=>`✅ ${n} accept করেছেন!`,selectBG2:'Blood group select করো',
+    yourLoc:'তোমার অবস্থান',fbOpen:'Facebook খুলছে...',waOpen:'WhatsApp খুলছে...',
+    waBtn:'💬 WhatsApp',fbBtn:'📘 Facebook'
+  },
+  en:{
+    findBlood:'Find Blood',donorHo:'Be a Donor',myProfile:'My Profile',requests:'Requests',
+    bloodGroup:'Blood Group',yourArea:'Your area / location',gps:'📍 GPS',search:'Search',
+    searchPrompt:'Search by blood group and location',
+    foundDonors:(n,b)=>`${n} ${b} donors found — sorted by distance`,
+    noDonor:b=>`No <b>${b}</b> donor found`,
+    kmAway:k=>`${k} km away`,call:'📞 Call',wantBlood:'Request Blood',profile:'Profile',
+    donations:n=>`Donated ${n} times`,noRating:'No rating yet',
+    address:'📍 Address',phone:'📞 Phone',totalDonate:'🩸 Total Donations',times:'times',email:'✉️ Email',
+    avgRating:'Average Rating',noRatingYet:'No ratings yet',sendReq:'🩸 Send Blood Request',
+    reqPlaceholder:'Hospital name, when needed, patient condition...',sendBtn:'Send Request',
+    regTitle:'Register as Donor',regSubtitle:'Your blood can save a life.',
+    fullName:'Full Name *',bloodGrp:'Blood Group *',selectBG:'Select',
+    phoneLabel:'Phone Number *',emailLabel:'Email (optional)',areaLabel:'Area / Address *',
+    areaPlaceholder:'Mohammadpur, Dhaka',gpsBtn:'📍 Use GPS',
+    waLabel:'WhatsApp Number (optional)',fbLabel:'Facebook Profile Link (optional)',
+    fbPlaceholder:'fb.com/your-name',photoLabel:'Profile Photo',
+    uploadBtn:'📷 Choose from Gallery',photoText:'Photo',submitReg:'Create Donor Profile',
+    fillAll:'Please fill all * fields',regSuccess:'Profile Created!',
+    regSuccessSub:'You are now a LifeDrop donor. Patients can find you.',
+    goMyProfile:'View My Profile',
+    myProfileTitle:'My Profile',noProfileMsg:"You haven't registered as a donor yet.",
+    becomeDonor:'Become a Donor',editBtn:'✏️ Edit Profile',
+    editTitle:'Edit Profile',nameLabel:'Full Name *',newPhoto:'📷 Choose New Photo',saveBtn:'Save',
+    profileUpdated:'✅ Profile updated!',
+    myReqTitle:'My Requests',noReq:'No requests sent yet',
+    pending:'Pending',accepted:'Accepted ✓',rateTitle:'Rate & Thank the Donor',
+    submitRating:'Submit',ratedDone:'✓ Rated',selectStar:'Please select a star rating',
+    thankRating:'Thanks! Rating submitted.',
+    locating:'Getting location...',locDone:'📍 Location captured',locFail:'Could not get location',
+    gpsNoSupport:'GPS not supported',calling:'Calling',reqSent:(n)=>`Request sent to ${n}!`,
+    reqAccepted:(n)=>`✅ ${n} accepted your request!`,selectBG2:'Please select a blood group',
+    yourLoc:'Your location',fbOpen:'Opening Facebook...',waOpen:'Opening WhatsApp...',
+    waBtn:'💬 WhatsApp',fbBtn:'📘 Facebook'
+  }
+};
+function t(){return T[lang]}
+
+const seed=[
+  {id:1,name:"Rahim Uddin",blood:"A-",phone:"01711-223344",email:"rahim@gmail.com",address:"Mohammadpur, Dhaka",lat:23.768,lng:90.354,fb:"fb.com/rahimuddin",wa:"01711223344",donations:8,rating:4.8,raters:12,photo:""},
+  {id:2,name:"Nasrin Akter",blood:"A-",phone:"01812-334455",email:"",address:"Shyamoli, Dhaka",lat:23.771,lng:90.361,fb:"",wa:"01812334455",donations:3,rating:4.5,raters:5,photo:""},
+  {id:3,name:"Kamal Hossain",blood:"A-",phone:"01913-445566",email:"kamal@gmail.com",address:"Adabor, Dhaka",lat:23.760,lng:90.348,fb:"fb.com/kamalhossain",wa:"",donations:15,rating:5.0,raters:20,photo:""},
+  {id:4,name:"Sonia Islam",blood:"B+",phone:"01615-556677",email:"",address:"Rayer Bazar, Dhaka",lat:23.755,lng:90.359,fb:"",wa:"01615556677",donations:6,rating:4.7,raters:9,photo:""},
+  {id:5,name:"Tariq Ahmed",blood:"O+",phone:"01714-667788",email:"tariq@gmail.com",address:"Bosila, Mohammadpur",lat:23.762,lng:90.342,fb:"fb.com/tariqahmed",wa:"01714667788",donations:11,rating:4.9,raters:15,photo:""},
+  {id:6,name:"Mitu Begum",blood:"A-",phone:"01815-778899",email:"",address:"Lalmatia, Dhaka",lat:23.769,lng:90.368,fb:"",wa:"01815778899",donations:2,rating:4.0,raters:3,photo:""},
+  {id:7,name:"Farhan Khan",blood:"AB+",phone:"01916-889900",email:"farhan@gmail.com",address:"Iqbal Road, Mohammadpur",lat:23.7665,lng:90.355,fb:"fb.com/farhankhan",wa:"01916889900",donations:4,rating:4.6,raters:7,photo:""},
+];
+allDonors=[...seed];
+
+function setLang(l){
+  lang=l;
+  document.getElementById('lang-bn').style.background=l==='bn'?'rgba(255,255,255,.3)':'transparent';
+  document.getElementById('lang-bn').style.color=l==='bn'?'#fff':'rgba(255,255,255,.7)';
+  document.getElementById('lang-en').style.background=l==='en'?'rgba(255,255,255,.3)':'transparent';
+  document.getElementById('lang-en').style.color=l==='en'?'#fff':'rgba(255,255,255,.7)';
+  applyLang();
+}
+function applyLang(){
+  const L=t();
+  document.querySelectorAll('nav button')[0].textContent=L.findBlood;
+  document.querySelectorAll('nav button')[1].textContent=L.donorHo;
+  document.querySelectorAll('nav button')[2].textContent=L.myProfile;
+  document.querySelectorAll('nav button')[3].textContent=L.requests;
+  const bf=document.getElementById('blood-filter');
+  if(bf) bf.options[0].text=L.bloodGroup;
+  const li=document.getElementById('location-input');
+  if(li) li.placeholder=L.yourArea;
+  const gb=document.querySelector('.gps-btn');
+  if(gb) gb.textContent=L.gps;
+  const sb=document.querySelector('.search-btn');
+  if(sb) sb.textContent=L.search;
+  const rl=document.getElementById('results-list');
+  if(rl&&rl.querySelector('h3')&&rl.querySelector('h3').textContent===T['bn'].searchPrompt||rl&&rl.querySelector('h3')&&rl.querySelector('h3').textContent===T['en'].searchPrompt)
+    rl.querySelector('h3').textContent=L.searchPrompt;
+  renderRegForm();
+  renderMyProfile();
+  renderRequests();
+}
+function ini(n){return n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase()}
+function stars(r,sm){let s='',fs=sm?'12px':'14px';for(let i=1;i<=5;i++)s+=`<span style="color:${i<=Math.round(r)?'#f39c12':'#ddd'};font-size:${fs}">★</span>`;return s}
+function dist(la1,lo1,la2,lo2){const R=6371,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
+
+function avatarHtml(photo,name,size=46,fs=13){
+  if(photo) return `<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${photo}" style="width:100%;height:100%;object-fit:cover"/></div>`;
+  return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:#fdecea;display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:700;color:#c0392b;flex-shrink:0">${ini(name)}</div>`;
+}
+
+function getGPS(target){
+  if(!navigator.geolocation){toast(t().gpsNoSupport);return}
+  toast(t().locating);
+  navigator.geolocation.getCurrentPosition(pos=>{
+    userLat=pos.coords.latitude; userLng=pos.coords.longitude;
+    if(target==='search'){
+      document.getElementById('location-input').value=`${userLat.toFixed(4)}, ${userLng.toFixed(4)}`;
+      if(map) userMarker.setLatLng([userLat,userLng]).update();
+      map && map.setView([userLat,userLng],14);
+    } else if(target==='reg'){
+      document.getElementById('r-address').value=`${userLat.toFixed(4)}, ${userLng.toFixed(4)}`;
+    } else if(target==='edit'){
+      document.getElementById('e-address').value=`${userLat.toFixed(4)}, ${userLng.toFixed(4)}`;
+    }
+    toast(t().locDone);
+  },()=>toast(t().locFail));
+}
+
+function previewPhoto(inp,previewId,dataId){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const data=e.target.result;
+    if(dataId) document.getElementById(dataId).value=data;
+    const prev=document.getElementById(previewId);
+    if(prev) prev.innerHTML=`<img src="${data}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+  };
+  r.readAsDataURL(f);
+}
+
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='requests') renderRequests();
+  if(id==='myprofile') renderMyProfile();
+}
+
+function initMap(){
+  map=L.map('map',{zoomControl:true}).setView([userLat,userLng],14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OSM'}).addTo(map);
+  userMarker=L.marker([userLat,userLng],{icon:L.divIcon({className:'',html:'<div style="background:#c0392b;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 4px rgba(0,0,0,.4)"></div>',iconAnchor:[8,8]})}).addTo(map).bindPopup('তোমার অবস্থান');
+}
+
+function searchDonors(){
+  const bg=document.getElementById('blood-filter').value;
+  if(!bg){toast('Blood group select করো');return}
+  const filtered=allDonors.filter(d=>d.blood===bg);
+  const withDist=filtered.map(d=>({...d,distKm:dist(userLat,userLng,d.lat,d.lng)}));
+  withDist.sort((a,b)=>a.distKm-b.distKm);
+  donorMarkers.forEach(m=>map.removeLayer(m));donorMarkers=[];
+  userMarker.setLatLng([userLat,userLng]);
+  withDist.forEach(d=>{
+    const m=L.marker([d.lat,d.lng],{icon:L.divIcon({className:'',html:`<div style="background:#2980b9;color:#fff;font-size:10px;font-weight:700;padding:3px 6px;border-radius:10px;border:2px solid #fff;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.3)">${d.blood}</div>`,iconAnchor:[20,10]})}).addTo(map);
+    m.bindPopup(`<b>${d.name}</b><br>${d.blood} — ${d.address}`);
+    donorMarkers.push(m);
+  });
+  if(withDist.length>0){map.fitBounds(L.latLngBounds([[userLat,userLng],...withDist.map(d=>[d.lat,d.lng])]),{padding:[30,30]})}
+  renderResults(withDist,bg);
+}
+
+function renderResults(donors,bg){
+  const el=document.getElementById('results-list');
+  if(!donors.length){el.innerHTML=`<div class="no-results"><div style="font-size:36px">🩸</div><p style="margin-top:8px">কোনো <b>${bg}</b> donor পাওয়া যায়নি</p></div>`;return}
+  el.innerHTML=`<h3>${donors.length} জন ${bg} donor — দূরত্ব অনুযায়ী সাজানো</h3>`+
+  donors.map((d,i)=>`<div class="donor-card ${i===0?'featured':''}">
+    ${avatarHtml(d.photo,d.name,46,13)}
+    <div class="donor-info">
+      <h4>${d.name}</h4>
+      <div class="meta"><span class="blood-badge">${d.blood}</span><span class="dist-badge">${d.distKm.toFixed(1)} km দূরে</span></div>
+      <div style="font-size:11px;color:#666">${d.address}</div>
+      <div style="font-size:11px;color:#888;margin-top:2px">${stars(d.rating,true)} ${d.rating>0?d.rating.toFixed(1)+' ('+d.raters+')'  :'রেটিং নেই'} · ${d.donations} বার দিয়েছেন</div>
+      <div class="card-actions">
+        <button class="btn-sm btn-call" onclick="toast('Calling ${d.phone}...')">📞 Call</button>
+        <button class="btn-sm btn-req" onclick="openProfile(${d.id})">রক্ত চাই</button>
+        <button class="btn-sm btn-profile" onclick="openProfile(${d.id})">Profile</button>
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+function openProfile(id){
+  const d=allDonors.find(x=>x.id===id);if(!d)return;
+  document.getElementById('modal-body').innerHTML=`
+    <div style="text-align:center;margin-bottom:10px">${avatarHtml(d.photo,d.name,72,22)}</div>
+    <div class="profile-name">${d.name}</div>
+    <div class="profile-blood"><span class="blood-badge" style="font-size:13px;padding:3px 13px">${d.blood}</span></div>
+    <table class="profile-table">
+      <tr><td>📍 ঠিকানা</td><td>${d.address}</td></tr>
+      <tr><td>📞 ফোন</td><td>${d.phone}</td></tr>
+      <tr><td>🩸 মোট দান</td><td>${d.donations} বার</td></tr>
+      ${d.email?`<tr><td>✉️ ইমেইল</td><td>${d.email}</td></tr>`:''}
+    </table>
+    <div style="text-align:center;margin-bottom:10px">
+      <div style="font-size:11px;color:#888;margin-bottom:3px">Average Rating</div>
+      <div style="font-size:20px">${stars(d.rating)}</div>
+      <div style="font-size:12px;color:#888">${d.rating>0?d.rating.toFixed(1)+' / 5 ('+d.raters+' জন)':'এখনো রেটিং নেই'}</div>
+    </div>
+    ${d.fb||d.wa?`<div class="social-links">
+      ${d.fb?`<button class="social-btn" onclick="toast('Facebook খুলছে...')">📘 Facebook</button>`:''}
+      ${d.wa?`<button class="social-btn" style="color:#25d366" onclick="toast('WhatsApp খুলছে...')">💬 WhatsApp</button>`:''}
+    </div>`:''}
+    <div class="req-form">
+      <div style="font-size:13px;font-weight:600;margin-bottom:7px">🩸 রক্তের অনুরোধ পাঠাও</div>
+      <textarea id="req-msg" placeholder="কোন হাসপাতাল, কখন লাগবে, রোগীর অবস্থা..."></textarea>
+      <button onclick="sendRequest(${d.id},'${d.name}','${d.blood}')">অনুরোধ পাঠাও</button>
+    </div>`;
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal(e){if(e.target===document.getElementById('modal-bg'))document.getElementById('modal-bg').classList.remove('open')}
+function closeEditModal(e){if(e.target===document.getElementById('edit-modal-bg'))document.getElementById('edit-modal-bg').classList.remove('open')}
+
+function sendRequest(donorId,donorName,blood){
+  const msg=document.getElementById('req-msg').value.trim();
+  if(!msg){toast('অনুরোধের বিবরণ লিখুন');return}
+  const req={id:Date.now(),donorId,donorName,blood,msg,status:'pending',date:new Date().toLocaleDateString('bn-BD'),rated:false,myRating:0};
+  myRequests.push(req);
+  document.getElementById('modal-bg').classList.remove('open');
+  toast(`${donorName} কে অনুরোধ পাঠানো হয়েছে!`);
+  const donor=allDonors.find(d=>d.id===donorId);
+  if(donor) setTimeout(()=>{req.status='accepted';donor.donations+=1;toast(`✅ ${donorName} accept করেছেন!`);},3000);
+}
+
+function registerDonor(){
+  const name=document.getElementById('r-name').value.trim();
+  const blood=document.getElementById('r-blood').value;
+  const phone=document.getElementById('r-phone').value.trim();
+  const address=document.getElementById('r-address').value.trim();
+  if(!name||!blood||!phone||!address){toast('সব * field পূরণ করো');return}
+  const newDonor={
+    id:Date.now(),name,blood,phone,
+    email:document.getElementById('r-email').value,
+    address,
+    lat:userLat+(Math.random()-.5)*.01,
+    lng:userLng+(Math.random()-.5)*.01,
+    fb:document.getElementById('r-fb').value,
+    wa:document.getElementById('r-wa').value,
+    photo:document.getElementById('r-photodata').value,
+    donations:0,rating:0,raters:0
+  };
+  allDonors.push(newDonor);
+  myProfile={...newDonor};
+  document.getElementById('reg-form-wrap').style.display='none';
+  document.getElementById('reg-success').style.display='block';
+}
+
+function goToMyProfile(){
+  document.getElementById('reg-form-wrap').style.display='block';
+  document.getElementById('reg-success').style.display='none';
+  document.querySelector('nav button:nth-child(3)').click();
+}
+
+function renderMyProfile(){
+  const el=document.getElementById('my-profile-content');
+  if(!myProfile){
+    el.innerHTML=`<div class="no-profile-msg">
+      <div style="font-size:40px">👤</div>
+      <p style="margin-top:8px">তুমি এখনো donor হিসেবে নিবন্ধিত নও।</p>
+      <button onclick="document.querySelector('nav button:nth-child(2)').click()">Donor হও</button>
+    </div>`;return;
+  }
+  const d=myProfile;
+  el.innerHTML=`<div class="my-profile-card">
+    <div class="my-profile-top">
+      ${avatarHtml(d.photo,d.name,60,18)}
+      <div class="my-info">
+        <h3>${d.name}</h3>
+        <div class="sub"><span class="blood-badge">${d.blood}</span></div>
+        <div style="font-size:12px;color:#666;margin-top:4px">${d.address}</div>
+      </div>
+    </div>
+    <table class="profile-table">
+      <tr><td>📞 ফোন</td><td>${d.phone}</td></tr>
+      ${d.email?`<tr><td>✉️ ইমেইল</td><td>${d.email}</td></tr>`:''}
+      ${d.wa?`<tr><td>💬 WhatsApp</td><td>${d.wa}</td></tr>`:''}
+      ${d.fb?`<tr><td>📘 Facebook</td><td>${d.fb}</td></tr>`:''}
+      <tr><td>🩸 মোট দান</td><td>${d.donations} বার</td></tr>
+    </table>
+    <button class="edit-btn" onclick="openEditModal()">✏️ Profile Edit করো</button>
+  </div>`;
+}
+
+function openEditModal(){
+  const d=myProfile;
+  document.getElementById('edit-body').innerHTML=`
+    <div class="form-group"><label>পুরো নাম *</label><input id="e-name" value="${d.name}"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>Blood Group *</label>
+        <select id="e-blood">
+          ${['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(b=>`<option ${b===d.blood?'selected':''}>${b}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group"><label>ফোন *</label><input id="e-phone" value="${d.phone}"/></div>
+    </div>
+    <div class="form-group"><label>ঠিকানা *</label>
+      <div class="gps-form-btn">
+        <input id="e-address" value="${d.address}"/>
+        <button onclick="getGPS('edit')">📍 GPS</button>
+      </div>
+    </div>
+    <div class="form-group"><label>ইমেইল</label><input id="e-email" value="${d.email||''}"/></div>
+    <div class="form-group"><label>WhatsApp</label><input id="e-wa" value="${d.wa||''}"/></div>
+    <div class="form-group"><label>Facebook Link</label><input id="e-fb" value="${d.fb||''}"/></div>
+    <div class="form-group"><label>Profile Photo পরিবর্তন করো</label>
+      <div class="photo-upload">
+        <label class="upload-btn" for="e-photo-file">📷 নতুন ছবি বেছে নাও</label>
+        <input type="file" id="e-photo-file" accept="image/*" onchange="previewPhoto(this,'e-preview','e-photodata')"/>
+        <div class="photo-preview" id="e-preview">${d.photo?`<img src="${d.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`:'ছবি'}</div>
+      </div>
+      <input type="hidden" id="e-photodata" value="${d.photo||''}"/>
+    </div>
+    <button class="submit-btn" onclick="saveEdit()" style="margin-top:8px">Save করো</button>
+  `;
+  document.getElementById('edit-modal-bg').classList.add('open');
+}
+
+function saveEdit(){
+  const name=document.getElementById('e-name').value.trim();
+  const blood=document.getElementById('e-blood').value;
+  const phone=document.getElementById('e-phone').value.trim();
+  const address=document.getElementById('e-address').value.trim();
+  if(!name||!blood||!phone||!address){toast('সব * field পূরণ করো');return}
+  const photo=document.getElementById('e-photodata').value||myProfile.photo;
+  myProfile={...myProfile,name,blood,phone,address,
+    email:document.getElementById('e-email').value,
+    wa:document.getElementById('e-wa').value,
+    fb:document.getElementById('e-fb').value,
+    photo};
+  const idx=allDonors.findIndex(d=>d.id===myProfile.id);
+  if(idx>-1) allDonors[idx]={...allDonors[idx],...myProfile};
+  document.getElementById('edit-modal-bg').classList.remove('open');
+  renderMyProfile();
+  toast('✅ Profile update হয়েছে!');
+}
+
+function renderRequests(){
+  const el=document.getElementById('requests-list');
+  if(!myRequests.length){el.innerHTML='<div class="no-results"><div style="font-size:36px">📋</div><p style="margin-top:8px">এখনো কোনো request পাঠাওনি</p></div>';return}
+  el.innerHTML=myRequests.map(r=>`<div class="req-card">
+    <span class="status ${r.status}">${r.status==='pending'?'অপেক্ষায়':'গৃহীত ✓'}</span>
+    <h4 style="font-size:13px;font-weight:600">${r.donorName} <span class="blood-badge">${r.blood}</span></h4>
+    <div style="font-size:11px;color:#888">${r.date}</div>
+    <div style="font-size:12px;color:#666;margin-top:3px">"${r.msg}"</div>
+    ${r.status==='accepted'&&!r.rated?`<div style="margin-top:9px;padding-top:9px;border-top:1px solid #f0f0f0">
+      <div style="font-size:13px;font-weight:600">Rate দাও ও ধন্যবাদ জানাও</div>
+      <div class="rate-stars" id="stars-${r.id}">
+        ${[1,2,3,4,5].map(n=>`<span onclick="setRating(${r.id},${n})" data-v="${n}">★</span>`).join('')}
+      </div>
+      <button class="rate-submit" onclick="submitRating(${r.id},${r.donorId})">Submit</button>
+    </div>`:''}
+    ${r.rated?`<div style="margin-top:7px;font-size:12px;color:#27ae60;font-weight:600">✓ Rating দেওয়া হয়েছে</div>`:''}
+  </div>`).join('');
+}
+
+function setRating(reqId,val){
+  const req=myRequests.find(r=>r.id===reqId);if(!req)return;
+  req.myRating=val;
+  document.querySelectorAll(`#stars-${reqId} span`).forEach(s=>s.classList.toggle('lit',parseInt(s.dataset.v)<=val));
+}
+function submitRating(reqId,donorId){
+  const req=myRequests.find(r=>r.id===reqId);if(!req||!req.myRating){toast('Star select করো');return}
+  const donor=allDonors.find(d=>d.id===donorId);
+  if(donor){const tot=donor.rating*donor.raters+req.myRating;donor.raters+=1;donor.rating=tot/donor.raters}
+  req.rated=true;toast('ধন্যবাদ! Rating দেওয়া হয়েছে।');renderRequests();
+}
+
+window.onload=initMap;
+</script>
+</body>
+</html>
