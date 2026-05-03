@@ -629,5 +629,23 @@ function submitRating(reqId,donorId){
 
 window.onload=initMap;
 </script>
-</body>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
+    authDomain: "life-drop-d4784.firebaseapp.com",
+    projectId: "life-drop-d4784",
+    storageBucket: "life-drop-d4784.firebasestorage.app",
+    messagingSenderId: "671053363784",
+    appId: "1:671053363784:web:825fa9afa4f58a3ec2f67d"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script></body>
 </html>
