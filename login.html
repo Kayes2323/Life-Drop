@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeDrop — Login</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+<div class="auth-card">
+  <div class="auth-logo">🩸 LifeDrop</div>
+  <h2>Login</h2>
+  <div id="auth-error" class="error-msg" style="display:none"></div>
+
+  <div class="form-group">
+    <label>Email</label>
+    <input type="email" id="email" placeholder="your@email.com"/>
+  </div>
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="••••••••"/>
+  </div>
+  <button class="submit-btn" id="login-btn" onclick="loginUser()">Login</button>
+  <p class="auth-switch">New here? <a href="register.html">Register as Donor</a></p>
+</div>
+
+<script type="module">
+import { auth } from './firebase-config.js';
+import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+onAuthStateChanged(auth, user => {
+  if (user) window.location.href = 'index.html';
+});
+
+window.loginUser = async () => {
+  const email = document.getElementById('email').value.trim();
+  const pass  = document.getElementById('password').value;
+  const btn   = document.getElementById('login-btn');
+  const errEl = document.getElementById('auth-error');
+  errEl.style.display = 'none';
+
+  if (!email || !pass) { showErr('সব field পূরণ করো'); return; }
+
+  btn.textContent = 'Logging in...';
+  btn.disabled = true;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    window.location.href = 'index.html';
+  } catch(e) {
+    showErr(friendlyError(e.code));
+    btn.textContent = 'Login';
+    btn.disabled = false;
+  }
+};
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') loginUser();
+});
+
+function showErr(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function friendlyError(code) {
+  const map = {
+    'auth/invalid-credential'  : 'Email বা password ভুল।',
+    'auth/user-not-found'      : 'এই email দিয়ে কোনো account নেই।',
+    'auth/wrong-password'      : 'Password ভুল।',
+    'auth/too-many-requests'   : 'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে try করো।',
+    'auth/invalid-email'       : 'Valid email দাও।'
+  };
+  return map[code] || 'কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করো।';
+}
+</script>
+</body>
+</html>
