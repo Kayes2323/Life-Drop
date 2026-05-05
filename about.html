@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeDrop — আমাদের সম্পর্কে</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <a href="index.html" style="color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">←</a>
+      <span class="logo-drop">ℹ️</span>
+      <h1>আমাদের সম্পর্কে</h1>
+    </div>
+  </div>
+
+  <!-- SCROLL AREA -->
+  <div class="scr">
+
+    <!-- ABOUT LIFEDROP -->
+    <div class="acard">
+      <div class="acard-title">
+        <div class="acard-dot" style="background:#27ae60"></div>
+        <h3>LifeDrop সম্পর্কে</h3>
+      </div>
+      <p>LifeDrop একটি উদ্যোগ, যার লক্ষ্য জরুরি মুহূর্তে রক্তদাতা খুঁজে পাওয়ার প্রক্রিয়াকে দ্রুত, সহজ এবং কার্যকর করা। আমাদের বিশ্বাস — সঠিক সময়ে সঠিক তথ্য একটি জীবন বাঁচাতে পারে।</p>
+    </div>
+
+    <!-- কেন LifeDrop -->
+    <div class="acard">
+      <div class="acard-title">
+        <div class="acard-dot" style="background:#2980b9"></div>
+        <h3>কেন LifeDrop?</h3>
+      </div>
+      <p>জরুরি অবস্থায় রক্তের প্রয়োজন হলে সঠিক ডোনার খুঁজে পাওয়া কঠিন হয়ে যায়। বিভিন্ন গ্রুপে পোস্ট করেও জরুরি মুহূর্তে সাড়া পাওয়া যায় না। এই সমস্যার সমাধান করতেই LifeDrop তৈরি করা হয়েছে।</p>
+    </div>
+
+    <!-- আমরা কী করি -->
+    <div class="acard">
+      <div class="acard-title">
+        <div class="acard-dot" style="background:#f39c12"></div>
+        <h3>আমরা কী করি</h3>
+      </div>
+      <ul class="check-list">
+        <li>কাছাকাছি রক্তদাতা খুঁজে পেতে সহায়তা করি</li>
+        <li>জরুরি রক্তের অনুরোধ সহজভাবে জানানোর সুযোগ দিই</li>
+        <li>মানুষকে রক্তদানে উৎসাহিত করি</li>
+      </ul>
+    </div>
+
+    <!-- লক্ষ্য -->
+    <div class="acard">
+      <div class="acard-title">
+        <div class="acard-dot" style="background:#c0392b"></div>
+        <h3>আমাদের লক্ষ্য</h3>
+      </div>
+      <p>একটি নির্ভরযোগ্য ও কার্যকর প্ল্যাটফর্ম তৈরি করা, যেখানে জরুরি সময়ে কেউ রক্তের জন্য অপেক্ষায় না থাকে এবং মানুষ একে অপরের পাশে দাঁড়াতে পারে।</p>
+    </div>
+
+    <!-- FOUNDER -->
+    <div class="acard" style="text-align:center">
+      <div class="acard-title" style="justify-content:center;margin-bottom:14px">
+        <div class="acard-dot" style="background:#8e44ad"></div>
+        <h3>প্রতিষ্ঠাতা</h3>
+      </div>
+      <div class="founder-img" id="founder-img-wrap">
+        <img id="founder-photo" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%"/>
+        <span id="founder-placeholder">👤</span>
+      </div>
+      <div class="founder-name">Abdul Aziz Kayes</div>
+      <div class="founder-role">Founder, LifeDrop</div>
+      <p class="founder-bio">মানুষের উপকারে প্রযুক্তিকে ব্যবহার করার লক্ষ্য থেকেই এই প্ল্যাটফর্মটি তৈরি করেছি, যাতে সহজভাবে এবং দ্রুত একটি জীবন বাঁচাতে সাহায্য করা যায়।</p>
+
+      <!-- ADMIN PHOTO UPLOAD — শুধু secret URL দিয়ে দেখা যাবে -->
+      <div id="admin-upload" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0">
+        <p style="font-size:11px;color:#aaa;margin-bottom:8px;font-family:'Hind Siliguri',sans-serif">📸 ছবি আপলোড করুন</p>
+        <input type="file" id="photo-input" accept="image/*" onchange="uploadPhoto(this)" style="font-size:12px;font-family:'Hind Siliguri',sans-serif"/>
+      </div>
+    </div>
+
+    <!-- PROMISE — হালকা কালো background -->
+    <div class="acard" style="background:#2c2c2c;margin-bottom:16px">
+      <div class="acard-title">
+        <div class="acard-dot" style="background:#c0392b"></div>
+        <h3 style="color:#fff">আমাদের প্রতিশ্রুতি 🔐</h3>
+      </div>
+      <p style="color:rgba(255,255,255,.8)">LifeDrop একটি সচেতনতামূলক ও সহায়ক প্ল্যাটফর্ম। আমরা ব্যবহারকারীদের তথ্যের গোপনীয়তা ও নিরাপত্তা বজায় রাখার প্রতি প্রতিশ্রুতিবদ্ধ এবং একটি বিশ্বস্ত পরিবেশ তৈরি করতে কাজ করছি।</p>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <button class="bnav-item" onclick="window.location.href='index.html'">
+      <span class="bi">🏠</span><span class="bl">হোম</span>
+    </button>
+    <button class="bnav-item" onclick="window.location.href='search.html'">
+      <span class="bi">🔍</span><span class="bl">খুঁজুন</span>
+    </button>
+    <button class="bnav-center" onclick="window.location.href='request.html'">
+      <div class="bc-btn">🆘</div>
+      <span class="bl">অনুরোধ</span>
+    </button>
+    <button class="bnav-item active">
+      <span class="bi">ℹ️</span><span class="bl">About</span>
+    </button>
+    <button class="bnav-item" onclick="window.location.href='profile.html'">
+      <span class="bi">👤</span><span class="bl">Profile</span>
+    </button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<style>
+.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.acard{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.acard-title{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.acard-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.acard-title h3{font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif}
+.acard p{font-size:12px;color:#555;font-family:'Hind Siliguri',sans-serif;line-height:1.8}
+.check-list{list-style:none;padding:0}
+.check-list li{font-size:12px;color:#555;font-family:'Hind Siliguri',sans-serif;line-height:1.8;padding:4px 0;display:flex;align-items:flex-start;gap:8px}
+.check-list li::before{content:'✓';color:#27ae60;font-weight:700;flex-shrink:0;margin-top:1px}
+.founder-img{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#fdecea,#fde);border:3px solid #c0392b;margin:0 auto 12px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:32px}
+.founder-name{font-size:16px;font-weight:800;font-family:'Inter',sans-serif;color:#222;margin-bottom:3px}
+.founder-role{font-size:11px;color:#c0392b;font-weight:600;font-family:'Inter',sans-serif;margin-bottom:10px}
+.founder-bio{font-size:12px;color:#666;font-family:'Hind Siliguri',sans-serif;line-height:1.7;text-align:left}
+</style>
+
+<script type="module">
+import { db } from './firebase-config.js';
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// SECRET ADMIN CHECK
+const params = new URLSearchParams(window.location.search);
+if(params.get('admin') === 'lifedrop2024') {
+  document.getElementById('admin-upload').style.display = 'block';
+}
+
+// LOAD FOUNDER PHOTO FROM FIRESTORE
+async function loadPhoto() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'founder'));
+    if(snap.exists() && snap.data().photo) {
+      const photo = snap.data().photo;
+      document.getElementById('founder-photo').src = photo;
+      document.getElementById('founder-photo').style.display = 'block';
+      document.getElementById('founder-placeholder').style.display = 'none';
+    }
+  } catch(e) {}
+}
+loadPhoto();
+
+// UPLOAD PHOTO — admin only
+window.uploadPhoto = (input) => {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result;
+    try {
+      await setDoc(doc(db, 'settings', 'founder'), { photo: base64 });
+      document.getElementById('founder-photo').src = base64;
+      document.getElementById('founder-photo').style.display = 'block';
+      document.getElementById('founder-placeholder').style.display = 'none';
+      showToast('✅ ছবি আপলোড হয়েছে!');
+    } catch(err) {
+      showToast('Error: ' + err.message);
+    }
+  };
+  reader.readAsDataURL(file);
+};
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2700);
+}
+</script>
+</body>
+</html>

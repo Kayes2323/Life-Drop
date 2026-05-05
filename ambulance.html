@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অ্যাম্বুলেন্স খুঁজুন - LifeDrop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f4f7f6; color: #333; }
+        .app { max-width: 500px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; padding-bottom: 70px; }
+        
+        .header { background: #8e1b1b; padding: 15px; display: flex; align-items: center; justify-content: space-between; color: white; }
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .header h1 { font-size: 16px; font-weight: 700; font-family: 'Inter', sans-serif; }
+        .login-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 20px; font-size: 12px; color: white; text-decoration: none; }
+
+        .container { padding: 15px; }
+
+        .filter-box { display: flex; gap: 8px; margin-bottom: 15px; }
+        .filter-box select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 13px; font-family: 'Hind Siliguri'; outline: none; background: #fff; }
+        .search-btn { background: #8e1b1b; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+
+        .card-red { background: linear-gradient(135deg, #c0392b, #e74c3c); padding: 15px; border-radius: 12px; color: white; margin-bottom: 15px; }
+        .card-tag { background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 4px; font-size: 10px; display: inline-block; margin-bottom: 8px; }
+        .card-title { font-size: 15px; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+        .card-desc { font-size: 12px; opacity: 0.9; margin-bottom: 15px; line-height: 1.4; }
+        .phone-display { background: rgba(0,0,0,0.15); border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px dashed rgba(255,255,255,0.3); margin-bottom: 12px; }
+        .phone-num { font-size: 16px; font-weight: 700; }
+        .copy-btn { background: white; color: #c0392b; border: none; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
+        .call-now { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; text-align: center; text-decoration: none; display: block; }
+
+        .card-green { background: linear-gradient(135deg, #16a085, #1abc9c); padding: 15px; border-radius: 12px; color: white; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .plus-icon { background: rgba(255,255,255,0.2); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 20px; }
+        .card-green-text h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+        .card-green-text p { font-size: 11px; opacity: 0.9; }
+
+        .bnav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .bnav-item { text-align: center; text-decoration: none; color: #888; flex: 1; }
+        .bnav-item.active { color: #8e1b1b; }
+        .bi { display: block; font-size: 18px; margin-bottom: 2px; }
+        .bl { font-size: 11px; font-weight: 600; }
+        .bnav-center { position: relative; top: -15px; }
+        .bc-btn { background: #8e1b1b; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 10px rgba(142,27,27,0.3); margin: 0 auto 5px; }
+
+        .divider { text-align: center; font-size: 12px; color: #999; margin: 20px 0; position: relative; }
+        .divider::before, .divider::after { content: ""; position: absolute; top: 50%; width: 20%; height: 1px; background: #ddd; }
+        .divider::before { left: 10%; } .divider::after { right: 10%; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="header">
+        <div class="header-left">
+            <a href="index.html" style="color:white; text-decoration:none;">←</a>
+            <h1>🚑 অ্যাম্বুলেন্স খুঁজুন</h1>
+        </div>
+        <a href="profile.html" class="login-btn">লগইন করুন</a>
+    </div>
+
+    <div class="container">
+        <div class="filter-box">
+            <select id="division">
+                <option value="">বিভাগ নির্বাচন করুন</option>
+                <option>ঢাকা</option><option>চট্টগ্রাম</option><option>রাজশাহী</option><option>খুলনা</option>
+                <option>বরিশাল</option><option>সিলেট</option><option>রংপুর</option><option>ময়মনসিংহ</option>
+            </select>
+            <select id="district">
+                <option value="">জেলা নির্বাচন করুন</option>
+                <!-- ঢাকা বিভাগ -->
+                <option>ঢাকা</option><option>গাজীপুর</option><option>নারায়ণগঞ্জ</option><option>নরসিংদী</option><option>মানিকগঞ্জ</option><option>মুন্সিগঞ্জ</option><option>ফরিদপুর</option><option>মাদারীপুর</option><option>গোপালগঞ্জ</option><option>রাজবাড়ী</option><option>শরীয়তপুর</option><option>টাঙ্গাইল</option><option>কিশোরগঞ্জ</option>
+                <!-- চট্টগ্রাম বিভাগ -->
+                <option>চট্টগ্রাম</option><option>কক্সবাজার</option><option>রাঙ্গামাটি</option><option>বান্দরবান</option><option>খাগড়াছড়ি</option><option>ফেনী</option><option>লক্ষ্মীপুর</option><option>নোয়াখালী</option><option>কুমিল্লা</option><option>ব্রাহ্মণবাড়িয়া</option><option>চাঁদপুর</option>
+                <!-- রাজশাহী বিভাগ -->
+                <option>রাজশাহী</option><option>চাঁপাইনবাবগঞ্জ</option><option>নাটোর</option><option>নওগাঁ</option><option>পাবনা</option><option>সিরাজগঞ্জ</option><option>বগুড়া</option><option>জয়পুরহাট</option>
+                <!-- খুলনা বিভাগ -->
+                <option>খুলনা</option><option>বাগেরহাট</option><option>সাতক্ষীরা</option><option>যশোর</option><option>মাগুরা</option><option>নড়াইল</option><option>কুষ্টিয়া</option><option>চুয়াডাঙ্গা</option><option>মেহেরপুর</option><option>ঝিনাইদহ</option>
+                <!-- বরিশাল বিভাগ -->
+                <option>বরিশাল</option><option>ভোলা</option><option>পটুয়াখালী</option><option>পিরোজপুর</option><option>বরগুনা</option><option>ঝালকাঠি</option>
+                <!-- সিলেট বিভাগ -->
+                <option>সিলেট</option><option>মৌলভীবাজার</option><option>হবিগঞ্জ</option><option>সুনামগঞ্জ</option>
+                <!-- রংপুর বিভাগ -->
+                <option>রংপুর</option><option>পঞ্চগড়</option><option>দিনাজপুর</option><option>ঠাকুরগাঁও</option><option>নীলফামারী</option><option>লালমনিরহাট</option><option>কুড়িগ্রাম</option><option>গাইবান্ধা</option>
+                <!-- ময়মনসিংহ বিভাগ -->
+                <option>ময়মনসিংহ</option><option>শেরপুর</option><option>জামালপুর</option><option>নেত্রকোণা</option>
+            </select>
+            <button class="search-btn">🔍 খুঁজুন</button>
+        </div>
+
+        <div class="card-red">
+            <span class="card-tag">✦ LifeDrop</span>
+            <div class="card-title">🚑 LifeDrop অ্যাম্বুলেন্স</div>
+            <p class="card-desc">জরুরি প্রয়োজনে সরাসরি call করুন — সার্বক্ষণিক সেবা</p>
+            <div class="phone-display">
+                <span class="phone-num">01700-000000</span>
+                <button class="copy-btn">📋 Copy</button>
+            </div>
+            <a href="tel:01700000000" class="call-now">এখনই Call করুন</a>
+        </div>
+
+        <div class="card-green">
+            <div class="plus-icon">+</div>
+            <div class="card-green-text">
+                <h3>অ্যাম্বুলেন্স নম্বর যোগ করুন</h3>
+                <p>আপনার এলাকার পরিচিত অ্যাম্বুলেন্স নম্বর দিয়ে সহায়তা করুন</p>
+            </div>
+            <span style="margin-left:auto; opacity:0.8;">›</span>
+        </div>
+
+        <div class="divider">— এলাকাভিত্তিক তালিকা —</div>
+
+        <div style="text-align:center; padding:30px; opacity:0.4;">
+            <span style="font-size:40px; display:block;">🔍</span>
+            <p style="font-size:13px;">বিভাগ ও জেলা দিয়ে<br>অ্যাম্বুলেন্স খুঁজুন</p>
+        </div>
+    </div>
+
+    <div class="bnav">
+        <a href="index.html" class="bnav-item">
+            <span class="bi">🏠</span><span class="bl">হোম</span>
+        </a>
+        <a href="search.html" class="bnav-item">
+            <span class="bi">🔍</span><span class="bl">খুঁজুন</span>
+        </a>
+        <a href="request.html" class="bnav-item bnav-center">
+            <div class="bc-btn">🆘</div><span class="bl">অনুরোধ</span>
+        </a>
+        <a href="ambulance.html" class="bnav-item active">
+            <span class="bi">🚑</span><span class="bl">অ্যাম্বুলেন্স</span>
+        </a>
+        <a href="profile.html" class="bnav-item">
+            <span class="bi">👤</span><span class="bl">প্রোফাইল</span>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

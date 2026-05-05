@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeDrop — Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <span class="logo-drop">👤</span>
+      <h1>আমার Profile</h1>
+    </div>
+    <div class="header-right">
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="scr" id="profile-content">
+    <div style="text-align:center;padding:40px 20px;color:#bbb;font-family:'Hind Siliguri',sans-serif">
+      <div class="spinner" style="margin:0 auto 12px"></div>
+      লোড হচ্ছে...
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <a class="bnav-item" href="index.html"><span class="bi">🏠</span><span class="bl">হোম</span></a>
+    <a class="bnav-item" href="search.html"><span class="bi">🔍</span><span class="bl">খুঁজুন</span></a>
+    <a class="bnav-center" href="request.html"><div class="bc-btn">🆘</div><span class="bl">অনুরোধ</span></a>
+    <a class="bnav-item" href="about.html"><span class="bi">ℹ️</span><span class="bl">About</span></a>
+    <a class="bnav-item active" href="profile.html"><span class="bi">👤</span><span class="bl">Profile</span></a>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-bg" id="edit-modal" onclick="if(event.target===this)closeEdit()">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Profile Edit করুন</h3>
+      <button class="modal-close" onclick="closeEdit()">×</button>
+    </div>
+    <div class="modal-body" id="edit-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="loading" class="loading-overlay"><div class="spinner"></div></div>
+
+<style>
+.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.not-donor-box{background:#fff;border-radius:16px;padding:24px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.not-donor-box .nd-icon{font-size:48px;margin-bottom:12px}
+.not-donor-box h3{font-size:16px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:6px}
+.not-donor-box p{font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:16px;line-height:1.6}
+.become-btn{display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 14px rgba(192,57,43,.3)}
+</style>
+
+<script>
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2700);
+}
+function setLoading(v){ document.getElementById('loading').classList.toggle('show',v); }
+function closeEdit(){ document.getElementById('edit-modal').classList.remove('open'); }
+
+// AVAILABILITY TOGGLE
+window.toggleAvail = async (val) => {
+  try {
+    const { db, auth } = await getFirebase();
+    const { updateDoc, doc } = await getFirestore();
+    await updateDoc(doc(db,'users',auth.currentUser.uid),{ available: val });
+    showToast(val ? '✅ রক্ত দিতে প্রস্তুত' : '❌ রক্ত দিতে অপ্রস্তুত');
+    renderProfile();
+  } catch(e){ showToast('Error: '+e.message); }
+};
+</script>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import {
+  onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  doc, getDoc, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let currentUser = null, userData = null;
+
+// AUTH GUARD
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    window.location.href = 'login.html?redirect=profile.html';
+    return;
+  }
+  currentUser = user;
+  await loadUserData();
+  renderProfile();
+});
+
+async function loadUserData() {
+  const snap = await getDoc(doc(db, 'users', currentUser.uid));
+  userData = snap.exists() ? snap.data() : null;
+}
+
+// RENDER PROFILE
+window.renderProfile = async () => {
+  if (!userData) { await loadUserData(); }
+  const el = document.getElementById('profile-content');
+
+  // NOT A DONOR YET
+  if (!userData || !userData.isDonor) {
+    el.innerHTML = `
+      <div class="profile-hero">
+        <div class="p-avatar-wrap" onclick="pickPhoto()">
+          <div class="p-avatar" id="p-avatar-el">
+            ${userData?.photo
+              ? `<img src="${userData.photo}" alt=""/>`
+              : `<span style="font-size:30px">👤</span>`}
+          </div>
+          <div class="p-camera">📷</div>
+          <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)"/>
+        </div>
+        <div class="p-name">${currentUser.displayName || 'ব্যবহারকারী'}</div>
+        <div class="p-location">📧 ${currentUser.email}</div>
+      </div>
+      <div class="not-donor-box">
+        <div class="nd-icon">🩸</div>
+        <h3>আপনি এখনো Donor হননি</h3>
+        <p>Donor হিসেবে নিবন্ধন করুন এবং মানুষের জীবন বাঁচাতে সাহায্য করুন।</p>
+        <a href="register.html" class="become-btn">🩸 Donor হোন</a>
+      </div>`;
+    return;
+  }
+
+  const d = userData;
+  const available = d.available || false;
+
+  el.innerHTML = `
+    <!-- PROFILE HERO -->
+    <div class="profile-hero">
+      <div class="p-avatar-wrap" onclick="pickPhoto()">
+        <div class="p-avatar" id="p-avatar-el">
+          ${d.photo
+            ? `<img src="${d.photo}" alt=""/>`
+            : `<span style="font-size:28px;font-weight:800;color:#c0392b">${ini(d.name)}</span>`}
+        </div>
+        <div class="p-camera">📷</div>
+        <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)"/>
+      </div>
+      <div class="p-name">${d.name}</div>
+      <div style="margin-bottom:5px"><span class="p-blood">${d.blood}</span></div>
+      <div class="p-location">📌 ${d.area ? d.area+', ' : ''}${d.district || ''}, ${d.division || ''}</div>
+    </div>
+
+    <!-- AVAILABILITY TOGGLE -->
+    <div class="avail-card ${available?'on':'off'}" id="avail-card">
+      <div class="avail-text">
+        <div class="avail-t1">${available ? '✅ রক্ত দিতে প্রস্তুত' : '❌ রক্ত দিতে অপ্রস্তুত'}</div>
+        <div class="avail-t2">${available
+          ? 'আপনার নম্বর ও profile সবাই দেখতে পাচ্ছে'
+          : 'আপনার নম্বর অন্যরা দেখতে পাচ্ছে না'}</div>
+      </div>
+      <button class="tog ${available?'on':'off'}" onclick="handleToggle(${!available})">
+        <div class="tog-circle"></div>
+      </button>
+    </div>
+
+    <!-- INFO CARD -->
+    <div class="info-card">
+      <div class="info-title">📋 ব্যক্তিগত তথ্য</div>
+      <div class="info-row">
+        <span class="info-ico">📞</span>
+        <span class="info-label">ফোন</span>
+        <span class="info-val ${available?'':'na'}">${available ? (d.phone||'—') : 'Phone number is not available'}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-ico">✉️</span>
+        <span class="info-label">ইমেইল</span>
+        <span class="info-val">${d.email||currentUser.email}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-ico">🩸</span>
+        <span class="info-label">Blood Group</span>
+        <span class="info-val">${d.blood}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-ico">📅</span>
+        <span class="info-label">শেষ দান</span>
+        <span class="info-val">${d.lastDonation || (d.neverDonated ? 'এখনো দেননি' : '—')}</span>
+      </div>
+      ${d.wa ? `<div class="info-row">
+        <span class="info-ico">💬</span>
+        <span class="info-label">WhatsApp</span>
+        <span class="info-val">${d.wa}</span>
+      </div>` : ''}
+    </div>
+
+    <!-- DONATION HISTORY -->
+    <div class="history-card">
+      <div class="info-title">🩸 রক্তদানের ইতিহাস</div>
+      <div class="hist-row">
+        <div class="hist-num">${d.donations || ০}</div>
+        <div class="hist-info">
+          <h4>মোট ${d.donations || '০'} বার রক্ত দিয়েছেন</h4>
+          <p>শেষ দান: ${d.lastDonation || (d.neverDonated ? 'এখনো দেননি' : '—')}</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="edit-btn" onclick="openEdit()">✏️ Profile Edit করুন</button>
+  `;
+};
+
+// TOGGLE
+window.handleToggle = async (val) => {
+  try {
+    await updateDoc(doc(db,'users',currentUser.uid),{ available: val });
+    userData.available = val;
+    showToast(val ? '✅ রক্ত দিতে প্রস্তুত' : '❌ অপ্রস্তুত হিসেবে চিহ্নিত');
+    renderProfile();
+  } catch(e){ showToast('Error: '+e.message); }
+};
+
+// PHOTO UPLOAD
+window.pickPhoto = () => document.getElementById('photo-input')?.click();
+window.uploadPhoto = (input) => {
+  const file = input.files[0]; if(!file) return;
+  if(file.size > 2*1024*1024){ showToast('ছবি ২MB এর বেশি হবে না'); return; }
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result;
+    setLoading(true);
+    try {
+      await updateDoc(doc(db,'users',currentUser.uid),{ photo: base64 });
+      userData.photo = base64;
+      showToast('✅ ছবি আপলোড হয়েছে!');
+      renderProfile();
+    } catch(err){ showToast('Error: '+err.message); }
+    finally{ setLoading(false); }
+  };
+  reader.readAsDataURL(file);
+};
+
+// EDIT PROFILE
+window.openEdit = () => {
+  const d = userData;
+  document.getElementById('edit-body').innerHTML = `
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div class="form-group">
+        <label>পূর্ণ নাম *</label>
+        <div class="input-group"><span class="input-icon">👤</span><input id="e-name" value="${d.name||''}"/></div>
+      </div>
+      <div class="form-group">
+        <label>ফোন নম্বর *</label>
+        <div class="input-group"><span class="input-icon">📞</span><input id="e-phone" value="${d.phone||''}"/></div>
+      </div>
+      <div class="form-group">
+        <label>WhatsApp (optional)</label>
+        <div class="input-group"><span class="input-icon">💬</span><input id="e-wa" value="${d.wa||''}"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Blood Group</label>
+          <div class="input-group">
+            <select id="e-blood" style="flex:1;border:none;background:transparent;padding:13px 0;font-size:14px;outline:none;font-family:'Hind Siliguri',sans-serif">
+              ${['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(b=>`<option ${b===d.blood?'selected':''}>${b}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>এলাকা</label>
+          <div class="input-group"><span class="input-icon">📌</span><input id="e-area" value="${d.area||''}"/></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>সর্বশেষ রক্তদানের তারিখ</label>
+        <div class="input-group"><span class="input-icon">📅</span><input type="date" id="e-lastdate" value="${d.lastDonation||''}"/></div>
+      </div>
+      <button class="submit-btn" onclick="saveEdit()">✅ Save করুন</button>
+    </div>`;
+  document.getElementById('edit-modal').classList.add('open');
+};
+
+window.saveEdit = async () => {
+  const name     = document.getElementById('e-name').value.trim();
+  const phone    = document.getElementById('e-phone').value.trim();
+  const wa       = document.getElementById('e-wa').value.trim();
+  const blood    = document.getElementById('e-blood').value;
+  const area     = document.getElementById('e-area').value.trim();
+  const lastDate = document.getElementById('e-lastdate').value;
+  if(!name||!phone){ showToast('নাম ও ফোন দিন'); return; }
+  setLoading(true);
+  try {
+    await updateDoc(doc(db,'users',currentUser.uid),{name,phone,wa,blood,area,lastDonation:lastDate||null});
+    Object.assign(userData,{name,phone,wa,blood,area,lastDonation:lastDate||null});
+    closeEdit();
+    showToast('✅ Profile update হয়েছে!');
+    renderProfile();
+  } catch(e){ showToast('Error: '+e.message); }
+  finally{ setLoading(false); }
+};
+
+window.doLogout = async () => {
+  await signOut(auth);
+  window.location.href = 'index.html';
+};
+
+function ini(n){ return (n||'U').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+</script>
+</body>
+</html>
