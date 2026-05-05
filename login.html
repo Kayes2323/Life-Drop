@@ -1,80 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LifeDrop — Login</title>
+<title>LifeDrop — লগইন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="auth-page">
-<div class="auth-card">
-  <div class="auth-logo">🩸 LifeDrop</div>
-  <h2>Login</h2>
-  <div id="auth-error" class="error-msg" style="display:none"></div>
 
-  <div class="form-group">
-    <label>Email</label>
-    <input type="email" id="email" placeholder="your@email.com"/>
+<div class="auth-hero">
+  <div class="hero-icon">🩸</div>
+  <h1>LifeDrop</h1>
+  <p>Your Blood Saves Lives</p>
+</div>
+
+<div class="auth-card">
+  <div id="err" class="error-msg" style="display:none"></div>
+
+  <!-- GOOGLE LOGIN -->
+  <button class="google-btn" id="google-btn" onclick="loginGoogle()">
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+    </svg>
+    Google দিয়ে লগইন করুন
+  </button>
+
+  <!-- DIVIDER -->
+  <div style="display:flex;align-items:center;gap:10px;margin:16px 0">
+    <hr style="flex:1;border:none;border-top:1px solid #eee">
+    <span style="font-size:12px;color:#ccc;font-family:'Inter',sans-serif">অথবা</span>
+    <hr style="flex:1;border:none;border-top:1px solid #eee">
   </div>
-  <div class="form-group">
-    <label>Password</label>
-    <input type="password" id="password" placeholder="••••••••"/>
+
+  <!-- EMAIL LOGIN -->
+  <div style="font-size:12px;font-weight:600;color:#888;margin-bottom:8px;font-family:'Hind Siliguri',sans-serif">ইমেইল দিয়ে লগইন</div>
+  <div class="input-group">
+    <span class="input-icon">✉️</span>
+    <input type="email" id="email" placeholder="ই-মেইল ঠিকানা"/>
   </div>
-  <button class="submit-btn" id="login-btn" onclick="loginUser()">Login</button>
-  <p class="auth-switch">New here? <a href="register.html">Register as Donor</a></p>
+  <div class="input-group">
+    <span class="input-icon">🔒</span>
+    <input type="password" id="pass" placeholder="পাসওয়ার্ড"/>
+    <button class="eye-btn" onclick="toggleEye()">👁</button>
+  </div>
+  <button class="submit-btn" id="email-btn" onclick="loginEmail()">→ লগইন করুন</button>
+
+  <!-- REGISTER LINK -->
+  <div style="margin-top:18px;background:#fafafa;border:1.5px solid #f0f0f0;border-radius:14px;padding:14px;text-align:center">
+    <p style="font-size:13px;color:#444;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:10px">নতুন রক্তদাতা?</p>
+    <a href="register.html" style="display:block;padding:11px;background:#fff;color:#c0392b;border:1.5px solid #c0392b;border-radius:11px;font-size:13px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif">নিবন্ধন করুন</a>
+  </div>
+
+  <p style="text-align:center;margin-top:14px;font-size:12px;color:#bbb;font-family:'Hind Siliguri',sans-serif">
+    লগইন না করেও
+    <a href="index.html" style="color:#c0392b;font-weight:600;text-decoration:none">LifeDrop ঘুরে দেখুন</a>
+  </p>
 </div>
 
 <script type="module">
-import { auth } from './firebase-config.js';
-import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { auth, db } from './firebase-config.js';
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-onAuthStateChanged(auth, user => {
-  if (user) window.location.href = 'index.html';
+const provider = new GoogleAuthProvider();
+
+// redirect if already logged in
+onAuthStateChanged(auth, u => {
+  if (u) {
+    const redir = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
+    window.location.href = redir;
+  }
 });
 
-window.loginUser = async () => {
-  const email = document.getElementById('email').value.trim();
-  const pass  = document.getElementById('password').value;
-  const btn   = document.getElementById('login-btn');
-  const errEl = document.getElementById('auth-error');
-  errEl.style.display = 'none';
-
-  if (!email || !pass) { showErr('সব field পূরণ করো'); return; }
-
-  btn.textContent = 'Logging in...';
-  btn.disabled = true;
-
+// GOOGLE LOGIN
+window.loginGoogle = async () => {
+  const btn = document.getElementById('google-btn');
+  btn.textContent = 'অপেক্ষা করুন...'; btn.disabled = true;
   try {
-    await signInWithEmailAndPassword(auth, email, pass);
-    window.location.href = 'index.html';
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    // create user doc if first time
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (!snap.exists()) {
+      await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid,
+        name: user.displayName || '',
+        email: user.email,
+        photo: user.photoURL || '',
+        isDonor: false,
+        available: false,
+        donations: 0,
+        rating: 0, raters: 0,
+        createdAt: serverTimestamp()
+      });
+    }
+    const redir = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
+    window.location.href = redir;
   } catch(e) {
-    showErr(friendlyError(e.code));
-    btn.textContent = 'Login';
+    showErr('Google লগইন ব্যর্থ হয়েছে।');
+    btn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Google দিয়ে লগইন করুন`;
     btn.disabled = false;
   }
 };
 
-// Enter key support
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') loginUser();
-});
+// EMAIL LOGIN
+window.loginEmail = async () => {
+  const email = document.getElementById('email').value.trim();
+  const pass  = document.getElementById('pass').value;
+  if (!email || !pass) { showErr('ইমেইল ও পাসওয়ার্ড দিন'); return; }
+  const btn = document.getElementById('email-btn');
+  btn.textContent = 'অপেক্ষা করুন...'; btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    const redir = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
+    window.location.href = redir;
+  } catch(e) {
+    showErr(errMsg(e.code));
+    btn.textContent = '→ লগইন করুন'; btn.disabled = false;
+  }
+};
+
+window.toggleEye = () => {
+  const el = document.getElementById('pass');
+  el.type = el.type === 'password' ? 'text' : 'password';
+};
 
 function showErr(msg) {
-  const el = document.getElementById('auth-error');
-  el.textContent = msg;
-  el.style.display = 'block';
+  const el = document.getElementById('err');
+  el.textContent = msg; el.style.display = 'block';
+}
+function errMsg(code) {
+  return {
+    'auth/invalid-credential': 'ইমেইল বা পাসওয়ার্ড ভুল।',
+    'auth/user-not-found': 'একাউন্ট পাওয়া যায়নি।',
+    'auth/wrong-password': 'পাসওয়ার্ড ভুল।',
+    'auth/too-many-requests': 'কিছুক্ষণ পরে চেষ্টা করুন।'
+  }[code] || 'কিছু একটা সমস্যা হয়েছে।';
 }
 
-function friendlyError(code) {
-  const map = {
-    'auth/invalid-credential'  : 'Email বা password ভুল।',
-    'auth/user-not-found'      : 'এই email দিয়ে কোনো account নেই।',
-    'auth/wrong-password'      : 'Password ভুল।',
-    'auth/too-many-requests'   : 'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে try করো।',
-    'auth/invalid-email'       : 'Valid email দাও।'
-  };
-  return map[code] || 'কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করো।';
-}
+document.addEventListener('keydown', e => { if(e.key==='Enter') loginEmail(); });
 </script>
 </body>
 </html>

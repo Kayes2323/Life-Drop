@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeDrop — রক্তদাতা খুঁজুন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <a href="index.html" style="color:#fff;font-size:20px;text-decoration:none;margin-right:4px">←</a>
+      <span class="logo-drop">🩸</span>
+      <h1>রক্তদাতা খুঁজুন</h1>
+    </div>
+    <div class="header-right" id="auth-header-btn"></div>
+  </div>
+
+  <!-- SEARCH BAR -->
+  <div class="search-top">
+    <div class="search-row">
+      <div class="sel-wrap">
+        <select id="blood-filter">
+          <option value="">গ্রুপ</option>
+          <option>A+</option><option>A-</option>
+          <option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option>
+          <option>O+</option><option>O-</option>
+        </select>
+      </div>
+      <div class="sel-wrap">
+        <select id="div-filter" onchange="fillSearchDistricts()">
+          <option value="">বিভাগ</option>
+          <option>ঢাকা</option><option>চট্টগ্রাম</option><option>খুলনা</option>
+          <option>রাজশাহী</option><option>রংপুর</option><option>সিলেট</option>
+          <option>বরিশাল</option><option>ময়মনসিংহ</option>
+        </select>
+      </div>
+      <div class="sel-wrap">
+        <select id="dist-filter">
+          <option value="">জেলা</option>
+        </select>
+      </div>
+    </div>
+    <button class="search-btn" onclick="searchDonors()">🔍 রক্তদাতা খুঁজুন</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="scr" id="results-list">
+    <div class="hint-box">
+      <div style="font-size:40px">🩸</div>
+      <p>Blood group ও বিভাগ দিয়ে search করুন</p>
+      <p style="font-size:11px;color:#bbb;margin-top:4px">Login ছাড়াই খোঁজা যাবে</p>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <button class="bnav-item" onclick="window.location.href='index.html'">
+      <span class="bi">🏠</span><span class="bl">হোম</span>
+    </button>
+    <button class="bnav-item active">
+      <span class="bi">🔍</span><span class="bl">খুঁজুন</span>
+    </button>
+    <button class="bnav-center" onclick="window.location.href='request.html'">
+      <div class="bc-btn">🆘</div>
+      <span class="bl">অনুরোধ</span>
+    </button>
+    <button class="bnav-item" onclick="window.location.href='about.html'">
+      <span class="bi">ℹ️</span><span class="bl">About</span>
+    </button>
+    <button class="bnav-item" onclick="window.location.href='profile.html'">
+      <span class="bi">👤</span><span class="bl">Profile</span>
+    </button>
+  </div>
+</div>
+
+<!-- REQUEST MODAL -->
+<div class="modal-bg" id="req-modal" onclick="if(event.target===this)closeReqModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="req-modal-title">রক্তের অনুরোধ</h3>
+      <button class="modal-close" onclick="closeReqModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="req-donor-id"/>
+      <div class="form-group">
+        <label>আপনার নাম *</label>
+        <div class="input-wrap"><span class="iico">👤</span><input type="text" id="req-name" placeholder="আপনার নাম"/></div>
+      </div>
+      <div class="form-group">
+        <label>আপনার ফোন *</label>
+        <div class="input-wrap"><span class="iico">📞</span><input type="tel" id="req-phone" placeholder="01XXXXXXXXX"/></div>
+      </div>
+      <div class="form-group">
+        <label>হাসপাতাল ও বিবরণ *</label>
+        <textarea id="req-msg" placeholder="কোন হাসপাতাল, কখন লাগবে, রোগীর অবস্থা..." style="width:100%;padding:11px;border:1.5px solid #eee;border-radius:12px;font-size:13px;resize:none;height:75px;font-family:'Hind Siliguri',sans-serif;outline:none"></textarea>
+      </div>
+      <button class="submit-btn" id="req-submit-btn" onclick="submitRequest()">🩸 অনুরোধ পাঠান</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="loading" class="loading-overlay"><div class="spinner"></div><p style="color:#c0392b;font-weight:600;font-size:13px">লোড হচ্ছে...</p></div>
+
+<script>
+const DISTRICTS = {
+  'ঢাকা'      :['ঢাকা','গাজীপুর','নারায়ণগঞ্জ','মানিকগঞ্জ','মুন্সীগঞ্জ','নরসিংদী','ফরিদপুর','গোপালগঞ্জ','মাদারীপুর','রাজবাড়ী','শরীয়তপুর','কিশোরগঞ্জ','টাঙ্গাইল'],
+  'চট্টগ্রাম':['চট্টগ্রাম','কক্সবাজার','কুমিল্লা','ফেনী','নোয়াখালী','লক্ষ্মীপুর','চাঁদপুর','ব্রাহ্মণবাড়িয়া','রাঙামাটি','খাগড়াছড়ি','বান্দরবান'],
+  'খুলনা'    :['খুলনা','বাগেরহাট','সাতক্ষীরা','যশোর','নড়াইল','মাগুরা','ঝিনাইদহ','কুষ্টিয়া','মেহেরপুর','চুয়াডাঙ্গা'],
+  'রাজশাহী'  :['রাজশাহী','নাটোর','নওগাঁ','চাঁপাইনবাবগঞ্জ','পাবনা','সিরাজগঞ্জ','বগুড়া','জয়পুরহাট'],
+  'রংপুর'    :['রংপুর','গাইবান্ধা','কুড়িগ্রাম','লালমনিরহাট','নীলফামারী','ঠাকুরগাঁও','পঞ্চগড়','দিনাজপুর'],
+  'সিলেট'    :['সিলেট','মৌলভীবাজার','হবিগঞ্জ','সুনামগঞ্জ'],
+  'বরিশাল'   :['বরিশাল','ভোলা','পটুয়াখালী','পিরোজপুর','ঝালকাঠি','বরগুনা'],
+  'ময়মনসিংহ':['ময়মনসিংহ','জামালপুর','শেরপুর','নেত্রকোণা']
+};
+
+window.fillSearchDistricts = () => {
+  const div = document.getElementById('div-filter').value;
+  const sel = document.getElementById('dist-filter');
+  sel.innerHTML = '<option value="">জেলা</option>';
+  (DISTRICTS[div]||[]).forEach(d => sel.innerHTML += `<option>${d}</option>`);
+};
+
+function ini(n){ return n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+function starsHtml(r){
+  let s='';
+  for(let i=1;i<=5;i++) s+=`<span style="color:${i<=Math.round(r)?'#f39c12':'#ddd'};font-size:11px">★</span>`;
+  return s;
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2700);
+}
+function setLoading(v){ document.getElementById('loading').classList.toggle('show',v); }
+
+// REQUEST MODAL
+let currentDonorId = null;
+window.openReqModal = (donorId, donorName, blood) => {
+  currentDonorId = donorId;
+  document.getElementById('req-modal-title').textContent = `${donorName} (${blood}) কে অনুরোধ`;
+  document.getElementById('req-modal').classList.add('open');
+};
+window.closeReqModal = () => document.getElementById('req-modal').classList.remove('open');
+
+window.submitRequest = async () => {
+  const name  = document.getElementById('req-name').value.trim();
+  const phone = document.getElementById('req-phone').value.trim();
+  const msg   = document.getElementById('req-msg').value.trim();
+  if(!name||!phone||!msg){ showToast('সব তথ্য পূরণ করুন'); return; }
+  const btn = document.getElementById('req-submit-btn');
+  btn.textContent='পাঠানো হচ্ছে...'; btn.disabled=true;
+  try {
+    const { db } = await import('./firebase-config.js');
+    const { addDoc, collection, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    await addDoc(collection(db,'requests'),{
+      donorId: currentDonorId, seekerName: name,
+      seekerPhone: phone, msg, status:'pending',
+      createdAt: serverTimestamp()
+    });
+    closeReqModal();
+    showToast('✅ অনুরোধ পাঠানো হয়েছে!');
+  } catch(e){ showToast('Error: '+e.message); }
+  finally{ btn.textContent='🩸 অনুরোধ পাঠান'; btn.disabled=false; }
+};
+</script>
+
+<script type="module">
+import { db } from './firebase-config.js';
+import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { auth } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+onAuthStateChanged(auth, user => {
+  const el = document.getElementById('auth-header-btn');
+  if(user) {
+    el.innerHTML=`<span style="font-size:12px;color:#fff;opacity:.85">${user.displayName||'User'}</span>`;
+  } else {
+    el.innerHTML=`<a href="login.html" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;padding:5px 11px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;font-family:'Hind Siliguri',sans-serif">লগইন করুন</a>`;
+  }
+});
+
+window.searchDonors = async () => {
+  const blood = document.getElementById('blood-filter').value;
+  const div   = document.getElementById('div-filter').value;
+  const dist  = document.getElementById('dist-filter').value;
+  if(!blood){ showToast('রক্তের গ্রুপ বেছে নিন'); return; }
+  if(!div)  { showToast('বিভাগ বেছে নিন'); return; }
+
+  setLoading(true);
+  try {
+    let q = query(collection(db,'users'), where('blood','==',blood), where('division','==',div));
+    if(dist) q = query(collection(db,'users'), where('blood','==',blood), where('division','==',div), where('district','==',dist));
+    const snap = await getDocs(q);
+    const donors = [];
+    snap.forEach(d => donors.push({id:d.id,...d.data()}));
+
+    // active first, then inactive
+    donors.sort((a,b) => (b.available?1:0)-(a.available?1:0));
+    renderResults(donors, blood, div);
+  } catch(e){
+    showToast('Error: '+e.message);
+  } finally { setLoading(false); }
+};
+
+function renderResults(donors, blood, div) {
+  const el = document.getElementById('results-list');
+  if(!donors.length){
+    el.innerHTML=`<div class="hint-box"><div style="font-size:36px">🩸</div><p><b>${blood}</b> donor ${div}-এ পাওয়া যায়নি।</p></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="result-header" style="padding:10px 12px 4px;font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif">${donors.length} জন ${blood} donor পাওয়া গেছে</div>` +
+  donors.map((d,i) => {
+    const active = d.available;
+    return `
+    <div class="dcard ${i===0&&active?'featured':''}" style="margin:0 10px 9px">
+      <div class="dcard-top">
+        <div class="avatar" style="${!active?'background:#f5f5f5;color:#ccc;border-color:#eee':''}">
+          ${ini(d.name)}
+        </div>
+        <div class="dinfo">
+          <div class="dname" style="${!active?'color:#aaa':''}">${d.name}</div>
+          <div class="dbadges">
+            <span class="badge blood">${d.blood}</span>
+            ${d.urgentReady&&active?'<span class="badge urgent">⚡ জরুরি</span>':''}
+            ${!active?'<span class="badge inactive">⏸ অপ্রস্তুত</span>':''}
+          </div>
+          <div class="dloc">📌 ${d.area?d.area+', ':''}${d.district}, ${d.division}</div>
+          <div>${starsHtml(d.rating||0)} · ${d.donations||0} বার দান করেছেন</div>
+        </div>
+      </div>
+
+      ${active
+        ? `<div class="phone-row">
+             <span>📞 ${d.phone}</span>
+             <button class="phone-copy" onclick="navigator.clipboard.writeText('${d.phone}');showToast('নম্বর কপি হয়েছে!')">📋</button>
+           </div>
+           <div class="dactions">
+             <a class="abtn call" href="tel:${d.phone}">📞 Call</a>
+             ${d.wa?`<a class="abtn wa" href="https://wa.me/${d.wa.replace(/\D/g,'')}" target="_blank">💬 WA</a>`:''}
+             <button class="abtn req" onclick="openReqModal('${d.id}','${d.name}','${d.blood}')">🩸 অনুরোধ</button>
+           </div>`
+        : `<div class="phone-hidden">
+             <span>🔒 <b style="color:#c0392b">Donor রক্ত দিতে প্রস্তুত নন</b></span>
+           </div>
+           <div class="dactions">
+             <button class="abtn disabled" disabled>📞 Call</button>
+             <button class="abtn disabled" disabled>💬 WA</button>
+             <button class="abtn req" onclick="openReqModal('${d.id}','${d.name}','${d.blood}')">🩸 অনুরোধ</button>
+           </div>`
+      }
+    </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>

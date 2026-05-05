@@ -1,105 +1,220 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🩸 LifeDrop</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 <div class="app">
 
   <!-- HEADER -->
-  <header>
-    <span>🩸</span>
-    <h1>LifeDrop</h1>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-      <span id="user-name" style="font-size:12px;opacity:.85;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-      <button id="logout-btn" style="padding:5px 10px;background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:7px;font-size:11px;cursor:pointer;font-weight:600">Logout</button>
+  <div class="header">
+    <div class="header-left">
+      <span class="logo-drop">🩸</span>
+      <h1>LifeDrop</h1>
     </div>
-  </header>
-
-  <!-- NAV -->
-  <nav>
-    <button class="active" onclick="showPage('search',this)">🔍 Find Blood</button>
-    <button onclick="showPage('requests',this);loadMyRequests()">📋 My Requests</button>
-    <button onclick="showPage('myprofile',this)">👤 My Profile</button>
-  </nav>
-
-  <!-- FIND BLOOD PAGE -->
-  <div class="page active" id="page-search">
-    <div class="search-bar">
-      <select id="blood-filter">
-        <option value="">Blood Group</option>
-        <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
-        <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
-      </select>
-      <button class="search-btn" onclick="searchDonors()">খুঁজি</button>
-    </div>
-    <div id="map"></div>
-    <div class="results-list" id="results-list">
-      <h3>Blood group দিয়ে search করো</h3>
+    <div class="header-right" id="auth-header-btn">
+      <a href="login.html" class="login-chip">লগইন করুন</a>
     </div>
   </div>
 
-  <!-- MY REQUESTS PAGE -->
-  <div class="page" id="page-requests">
-    <div class="requests-page">
-      <h2 style="font-size:17px;font-weight:700;margin-bottom:12px">আমার Requests</h2>
-      <div id="requests-list">
-        <p style="color:#aaa;text-align:center;padding:20px">লোড হচ্ছে...</p>
+  <!-- SCROLLABLE HOME CONTENT -->
+  <div class="scr" style="gap:0">
+
+    <!-- BANNER SLIDER -->
+    <div class="banner">
+      <div class="slider-wrap">
+        <div class="slide active" id="slide-0">
+          <div class="slide-tag">📖 কুরআনের বাণী</div>
+          <h2>যে একজনের প্রাণ বাঁচালো, সে যেন পুরো মানবজাতিকে বাঁচালো</h2>
+          <div class="ref">— সূরা আল-মায়েদা: ৩২</div>
+        </div>
+        <div class="slide" id="slide-1">
+          <div class="slide-tag">🩸 আমাদের আহ্বান</div>
+          <h2>Donor হোন — মানবতার কল্যাণে যুক্ত হন</h2>
+          <div class="ref">— LifeDrop</div>
+        </div>
+        <div class="slide" id="slide-2">
+          <div class="slide-tag">📢 নোটিশ</div>
+          <h2>লাইফড্রপ আসছে দ্রুত রক্তদাতা খুঁজে দিতে</h2>
+          <div class="ref">— LifeDrop Team</div>
+        </div>
+      </div>
+      <div class="slider-dots">
+        <div class="sdot active"></div>
+        <div class="sdot"></div>
+        <div class="sdot"></div>
       </div>
     </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="section" style="padding:12px 12px 0">
+      <div class="sec-title">দ্রুত একশন</div>
+      <div class="action-grid">
+        <button class="ac red" onclick="window.location.href='search.html'">
+          <div class="ac-bg">🔍</div>
+          <div class="ac-icon">🔍</div>
+          <div class="ac-label">রক্তদাতা খুঁজুন</div>
+        </button>
+        <button class="ac orange" onclick="window.location.href='request.html'">
+          <div class="ac-bg">🆘</div>
+          <div class="ac-icon">🆘</div>
+          <div class="ac-label">জরুরি অনুরোধ</div>
+        </button>
+        <button class="ac teal" onclick="window.location.href='ambulance.html'">
+          <div class="ac-bg">🚑</div>
+          <div class="ac-icon">🚑</div>
+          <div class="ac-label">অ্যাম্বুলেন্স খুঁজুন</div>
+        </button>
+        <button class="ac green" onclick="goToDonorReg()">
+          <div class="ac-bg">🩸</div>
+          <div class="ac-icon">🩸</div>
+          <div class="ac-label">Donor হোন</div>
+        </button>
+        <button class="ac blue full" onclick="window.location.href='about.html'">
+          <div class="ac-icon">ℹ️</div>
+          <div class="ac-label">আমাদের সম্পর্কে জানুন</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="section" style="padding:0 12px">
+      <div class="sec-title">আমাদের পরিসংখ্যান</div>
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-n" id="stat-donors">১৫ জন</div>
+          <div class="stat-l">সক্রিয় Donor</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n" id="stat-donations">০</div>
+          <div class="stat-l">রক্তদান সম্পন্ন</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n">৬৪টি</div>
+          <div class="stat-l">জেলায় সেবা</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHY DONATE -->
+    <div class="section" style="padding:0 12px">
+      <div class="sec-title">কেন রক্ত দেবেন?</div>
+      <div class="why-card">
+        <div class="why-ico" style="background:#fdecea">❤️</div>
+        <div>
+          <h4>জীবন বাঁচায়</h4>
+          <p>একটি রক্তদান সর্বোচ্চ ৩টি জীবন বাঁচাতে পারে</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <div class="why-ico" style="background:#d5f5e3">🛡️</div>
+        <div>
+          <h4>স্বাস্থ্য উপকারিতা</h4>
+          <p>হৃদরোগ ও ক্যান্সারের ঝুঁকি কমায়</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREP LIST -->
+    <div class="section" style="padding:0 12px;margin-bottom:16px">
+      <div class="sec-title">🩸 রক্তদানের পূর্বপ্রস্তুতি</div>
+      <div class="prep-list">
+        <div class="prep-item"><div class="prep-dot"></div><p>খালি পেটে যাবেন না — হালকা পুষ্টিকর খাবার খান</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>আগের দানের কমপক্ষে <b>৪ মাস</b> পর রক্ত দিন</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>আত্মবিশ্বাসী থাকুন — ভয়ের কিছু নেই</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>সর্বোচ্চ <b>~৪৫০ মি.লি.</b> রক্ত দেওয়া নিরাপদ</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>রক্ত দেওয়ার পর কিছুক্ষণ বিশ্রাম নিন</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>ডাবের পানি / ওরস্যালাইন পান করুন</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>রোগীর জন্য প্রার্থনা করুন</p></div>
+        <div class="prep-item"><div class="prep-dot" style="background:#c0392b"></div>
+          <p><b>কোনো বিনিময় ছাড়া মানবতার সেবায় রক্ত দেওয়াই সর্বোত্তম</b></p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /scr -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <a class="bnav-item active" href="index.html">
+      <span class="bi">🏠</span><span class="bl">হোম</span>
+    </a>
+    <a class="bnav-item" href="search.html">
+      <span class="bi">🔍</span><span class="bl">খুঁজুন</span>
+    </a>
+    <a class="bnav-center" href="request.html">
+      <div class="bc-btn">🆘</div>
+      <span class="bl">অনুরোধ</span>
+    </a>
+    <a class="bnav-item" href="about.html">
+      <span class="bi">ℹ️</span><span class="bl">About</span>
+    </a>
+    <a class="bnav-item" href="profile.html">
+      <span class="bi">👤</span><span class="bl">Profile</span>
+    </a>
   </div>
 
-  <!-- MY PROFILE PAGE -->
-  <div class="page" id="page-myprofile">
-    <div class="profile-page">
-      <h2>My Profile</h2>
-      <div id="my-profile-content"></div>
-    </div>
-  </div>
+</div><!-- /app -->
 
-</div>
-
-<!-- REQUEST MODAL -->
-<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="modal">
-    <div class="modal-header">
-      <h3 id="modal-title">রক্তের অনুরোধ</h3>
-      <button class="modal-close" onclick="document.getElementById('modal-bg').classList.remove('open')">×</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="req-donor-id"/>
-      <input type="hidden" id="req-donor-name"/>
-      <input type="hidden" id="req-blood"/>
-      <p style="font-size:13px;color:#666;margin-bottom:8px">কোন হাসপাতাল, কখন লাগবে, রোগীর অবস্থা লিখুন:</p>
-      <textarea id="req-msg" placeholder="যেমন: Dhaka Medical, আজ রাত ৮টার মধ্যে, O+ blood urgent..."></textarea>
-      <button id="req-submit-btn" class="submit-btn" onclick="sendRequest()">পাঠাও</button>
-    </div>
-  </div>
-</div>
-
-<!-- LOADING OVERLAY -->
-<div id="loading" class="loading-overlay">
-  <div class="spinner"></div>
-  <p style="color:#c0392b;font-weight:600;font-size:13px">লোড হচ্ছে...</p>
-</div>
-
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  btn.classList.add('active');
+// SLIDER
+let cur = 0, total = 3;
+function goSlide(n) {
+  document.getElementById('slide-'+cur).classList.remove('active');
+  document.querySelectorAll('.sdot')[cur].classList.remove('active');
+  cur = (n + total) % total;
+  document.getElementById('slide-'+cur).classList.add('active');
+  document.querySelectorAll('.sdot')[cur].classList.add('active');
+}
+setInterval(() => goSlide(cur + 1), 4000);
+
+// DONOR BUTTON — login check
+function goToDonorReg() {
+  window.location.href = 'register.html';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2700);
 }
 </script>
 
-<script type="module" src="app.js"></script>
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// AUTH — update header
+onAuthStateChanged(auth, user => {
+  const el = document.getElementById('auth-header-btn');
+  if (user) {
+    el.innerHTML = `
+      <span style="font-size:12px;color:#fff;opacity:.9;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${user.displayName || 'User'}</span>
+      <a href="profile.html" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;font-family:'Hind Siliguri',sans-serif">Profile</a>`;
+  } else {
+    el.innerHTML = `<a href="login.html" class="login-chip">লগইন করুন</a>`;
+  }
+});
+
+// LIVE STATS
+async function loadStats() {
+  try {
+    const donorsSnap = await getDocs(query(collection(db,'users'), where('available','==',true)));
+    document.getElementById('stat-donors').textContent = donorsSnap.size || '০';
+
+    let totalDonations = 0;
+    donorsSnap.forEach(d => { totalDonations += (d.data().donations || 0); });
+    document.getElementById('stat-donations').textContent = totalDonations || '০';
+  } catch(e) {}
+}
+loadStats();
+</script>
 </body>
 </html>
