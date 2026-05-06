@@ -6,11 +6,74 @@
 <title>LifeDrop — Profile</title>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.profile-hero{background:#fff;border-radius:16px;padding:18px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.p-avatar-wrap{position:relative;width:84px;height:84px;margin:0 auto 13px;cursor:pointer}
+.p-avatar{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,#fdecea,#fde);border:3px solid #c0392b;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#c0392b;overflow:hidden}
+.p-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.p-camera{position:absolute;bottom:0;right:0;background:#c0392b;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid #fff}
+.p-name{font-size:18px;font-weight:800;font-family:'Inter',sans-serif;color:#222;margin-bottom:5px}
+.p-blood{display:inline-block;background:#c0392b;color:#fff;font-size:12px;font-weight:700;padding:3px 14px;border-radius:20px;margin-bottom:6px;font-family:'Inter',sans-serif}
+.p-location{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif}
+.avail-card{border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px}
+.avail-card.on{background:linear-gradient(135deg,#d5f5e3,#eafaf1);border:1.5px solid #27ae60}
+.avail-card.off{background:linear-gradient(135deg,#fdecea,#fff5f5);border:1.5px solid #e74c3c}
+.avail-text{flex:1}
+.avail-t1{font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:2px}
+.avail-card.on .avail-t1{color:#1e8449}
+.avail-card.off .avail-t1{color:#c0392b}
+.avail-t2{font-size:11px;font-family:'Hind Siliguri',sans-serif}
+.avail-card.on .avail-t2{color:#27ae60}
+.avail-card.off .avail-t2{color:#e74c3c}
+.tog{width:50px;height:28px;border-radius:28px;position:relative;cursor:pointer;transition:.3s;flex-shrink:0;border:none;outline:none}
+.tog.on{background:#27ae60}
+.tog.off{background:#ddd}
+.tog-circle{position:absolute;width:22px;height:22px;background:#fff;border-radius:50%;top:3px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.tog.on .tog-circle{left:auto;right:3px}
+.tog.off .tog-circle{left:3px}
+.info-card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.info-title{font-size:12px;font-weight:700;color:#c0392b;margin-bottom:11px;padding-bottom:8px;border-bottom:1px solid #fde;font-family:'Hind Siliguri',sans-serif}
+.info-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.info-row:last-child{border-bottom:none}
+.info-ico{font-size:16px;flex-shrink:0;width:24px;text-align:center}
+.info-label{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;flex-shrink:0;width:85px}
+.info-val{font-size:12px;font-weight:600;color:#333;font-family:'Hind Siliguri',sans-serif;flex:1}
+.info-val.na{color:#bbb;font-style:italic;font-weight:400;font-size:11px}
+.history-card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.hist-row{display:flex;align-items:center;gap:11px;background:#fafafa;border-radius:11px;padding:11px}
+.hist-num{width:40px;height:40px;background:#c0392b;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;flex-shrink:0}
+.hist-info h4{font-size:13px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:2px}
+.hist-info p{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif}
+.edit-btn{width:100%;padding:12px;background:#fff;color:#c0392b;border:1.5px solid #c0392b;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;margin-bottom:16px}
+.not-donor-box{background:#fff;border-radius:16px;padding:24px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:flex-end;justify-content:center;padding:0}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding-bottom:20px}
+.modal-header{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;padding:14px 16px;border-radius:24px 24px 0 0;display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-size:15px;font-weight:700;font-family:'Hind Siliguri',sans-serif}
+.modal-close{background:none;border:none;color:#fff;font-size:24px;cursor:pointer}
+.modal-body{padding:16px}
+.form-group{margin-bottom:12px}
+.form-group label{font-size:12px;font-weight:600;color:#666;display:block;margin-bottom:5px;font-family:'Hind Siliguri',sans-serif}
+.iw{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:12px;padding:0 13px;margin-bottom:0;transition:.2s}
+.iw:focus-within{border-color:#c0392b;background:#fff}
+.iw input,.iw select{flex:1;border:none;background:transparent;padding:12px 0;font-size:14px;outline:none;font-family:'Hind Siliguri',sans-serif}
+.form-row{display:flex;gap:8px}
+.form-row .form-group{flex:1}
+.submit-btn{width:100%;padding:13px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.submit-btn:disabled{background:#e0a0a0;cursor:not-allowed}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:9999;align-items:center;justify-content:center}
+.loading-overlay.show{display:flex}
+.spinner{width:38px;height:38px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;font-family:'Hind Siliguri',sans-serif}
+.toast.show{opacity:1}
+</style>
 </head>
 <body>
 <div class="app">
 
-  <!-- HEADER -->
   <div class="header">
     <div class="header-left">
       <span class="logo-drop">👤</span>
@@ -21,15 +84,13 @@
     </div>
   </div>
 
-  <!-- CONTENT -->
   <div class="scr" id="profile-content">
-    <div style="text-align:center;padding:40px 20px;color:#bbb;font-family:'Hind Siliguri',sans-serif">
-      <div class="spinner" style="margin:0 auto 12px"></div>
-      লোড হচ্ছে...
+    <div style="display:flex;align-items:center;justify-content:center;flex:1;flex-direction:column;gap:12px;padding:40px">
+      <div class="spinner"></div>
+      <p style="color:#bbb;font-family:'Hind Siliguri',sans-serif;font-size:13px">লোড হচ্ছে...</p>
     </div>
   </div>
 
-  <!-- BOTTOM NAV -->
   <div class="bnav">
     <a class="bnav-item" href="index.html"><span class="bi">🏠</span><span class="bl">হোম</span></a>
     <a class="bnav-item" href="search.html"><span class="bi">🔍</span><span class="bl">খুঁজুন</span></a>
@@ -43,148 +104,109 @@
 <div class="modal-bg" id="edit-modal" onclick="if(event.target===this)closeEdit()">
   <div class="modal">
     <div class="modal-header">
-      <h3>Profile Edit করুন</h3>
+      <h3>✏️ Profile Edit করুন</h3>
       <button class="modal-close" onclick="closeEdit()">×</button>
     </div>
     <div class="modal-body" id="edit-body"></div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
 <div id="loading" class="loading-overlay"><div class="spinner"></div></div>
-
-<style>
-.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
-.not-donor-box{background:#fff;border-radius:16px;padding:24px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-.not-donor-box .nd-icon{font-size:48px;margin-bottom:12px}
-.not-donor-box h3{font-size:16px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:6px}
-.not-donor-box p{font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:16px;line-height:1.6}
-.become-btn{display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 14px rgba(192,57,43,.3)}
-</style>
-
-<script>
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2700);
-}
-function setLoading(v){ document.getElementById('loading').classList.toggle('show',v); }
-function closeEdit(){ document.getElementById('edit-modal').classList.remove('open'); }
-
-// AVAILABILITY TOGGLE
-window.toggleAvail = async (val) => {
-  try {
-    const { db, auth } = await getFirebase();
-    const { updateDoc, doc } = await getFirestore();
-    await updateDoc(doc(db,'users',auth.currentUser.uid),{ available: val });
-    showToast(val ? '✅ রক্ত দিতে প্রস্তুত' : '❌ রক্ত দিতে অপ্রস্তুত');
-    renderProfile();
-  } catch(e){ showToast('Error: '+e.message); }
-};
-</script>
+<div class="toast" id="toast"></div>
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import {
-  onAuthStateChanged, signOut
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  doc, getDoc, updateDoc, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let currentUser = null, userData = null;
+let CU = null, UD = null, DD = null;
 
-// AUTH GUARD
+// ── AUTH ─────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
-  if (!user) {
-    window.location.href = 'login.html?redirect=profile.html';
-    return;
-  }
-  currentUser = user;
-  await loadUserData();
-  renderProfile();
+  if (!user) { window.location.href = 'login.html?redirect=profile.html'; return; }
+  CU = user;
+  await loadData();
+  render();
 });
 
-async function loadUserData() {
-  const snap = await getDoc(doc(db, 'users', currentUser.uid));
-  userData = snap.exists() ? snap.data() : null;
+async function loadData() {
+  try {
+    const uSnap = await getDoc(doc(db, 'users', CU.uid));
+    UD = uSnap.exists() ? uSnap.data() : { name: CU.displayName||'', email: CU.email, isDonor: false };
+    const dSnap = await getDoc(doc(db, 'donors', CU.uid));
+    DD = dSnap.exists() ? dSnap.data() : null;
+  } catch(e) {
+    console.error('loadData error:', e);
+    UD = { name: CU.displayName||'', email: CU.email, isDonor: false };
+    DD = null;
+  }
 }
 
-// RENDER PROFILE
-window.renderProfile = async () => {
-  if (!userData) { await loadUserData(); }
+// ── RENDER ───────────────────────────────────────────────────
+function render() {
   const el = document.getElementById('profile-content');
 
-  // NOT A DONOR YET
-  if (!userData || !userData.isDonor) {
+  // NOT A DONOR
+  if (!DD) {
     el.innerHTML = `
       <div class="profile-hero">
         <div class="p-avatar-wrap" onclick="pickPhoto()">
-          <div class="p-avatar" id="p-avatar-el">
-            ${userData?.photo
-              ? `<img src="${userData.photo}" alt=""/>`
-              : `<span style="font-size:30px">👤</span>`}
+          <div class="p-avatar" id="p-av">
+            ${UD?.photo ? `<img src="${UD.photo}"/>` : ini(UD?.name||'U')}
           </div>
           <div class="p-camera">📷</div>
-          <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)"/>
+          <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="uploadPhoto(this)"/>
         </div>
-        <div class="p-name">${currentUser.displayName || 'ব্যবহারকারী'}</div>
-        <div class="p-location">📧 ${currentUser.email}</div>
+        <div class="p-name">${CU.displayName || UD?.name || 'ব্যবহারকারী'}</div>
+        <div class="p-location">📧 ${CU.email}</div>
       </div>
       <div class="not-donor-box">
-        <div class="nd-icon">🩸</div>
-        <h3>আপনি এখনো Donor হননি</h3>
-        <p>Donor হিসেবে নিবন্ধন করুন এবং মানুষের জীবন বাঁচাতে সাহায্য করুন।</p>
-        <a href="register.html" class="become-btn">🩸 Donor হোন</a>
+        <div style="font-size:48px;margin-bottom:12px">🩸</div>
+        <h3 style="font-size:16px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:8px">আপনি এখনো Donor হননি</h3>
+        <p style="font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:16px;line-height:1.6">Donor হিসেবে নিবন্ধন করুন এবং মানুষের জীবন বাঁচাতে সাহায্য করুন।</p>
+        <a href="register.html" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif">🩸 Donor হোন</a>
       </div>`;
     return;
   }
 
-  const d = userData;
-  const available = d.available || false;
+  const d = DD;
+  const av = d.available || false;
 
   el.innerHTML = `
-    <!-- PROFILE HERO -->
     <div class="profile-hero">
       <div class="p-avatar-wrap" onclick="pickPhoto()">
-        <div class="p-avatar" id="p-avatar-el">
-          ${d.photo
-            ? `<img src="${d.photo}" alt=""/>`
-            : `<span style="font-size:28px;font-weight:800;color:#c0392b">${ini(d.name)}</span>`}
+        <div class="p-avatar" id="p-av">
+          ${d.photo||UD?.photo ? `<img src="${d.photo||UD?.photo}"/>` : ini(d.name)}
         </div>
         <div class="p-camera">📷</div>
-        <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)"/>
+        <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="uploadPhoto(this)"/>
       </div>
       <div class="p-name">${d.name}</div>
       <div style="margin-bottom:5px"><span class="p-blood">${d.blood}</span></div>
-      <div class="p-location">📌 ${d.area ? d.area+', ' : ''}${d.district || ''}, ${d.division || ''}</div>
+      <div class="p-location">📌 ${[d.area,d.district,d.division].filter(Boolean).join(', ')}</div>
     </div>
 
-    <!-- AVAILABILITY TOGGLE -->
-    <div class="avail-card ${available?'on':'off'}" id="avail-card">
+    <div class="avail-card ${av?'on':'off'}">
       <div class="avail-text">
-        <div class="avail-t1">${available ? '✅ রক্ত দিতে প্রস্তুত' : '❌ রক্ত দিতে অপ্রস্তুত'}</div>
-        <div class="avail-t2">${available
-          ? 'আপনার নম্বর ও profile সবাই দেখতে পাচ্ছে'
-          : 'আপনার নম্বর অন্যরা দেখতে পাচ্ছে না'}</div>
+        <div class="avail-t1">${av?'✅ রক্ত দিতে প্রস্তুত':'❌ রক্ত দিতে অপ্রস্তুত'}</div>
+        <div class="avail-t2">${av?'আপনার নম্বর সবাই দেখতে পাচ্ছে':'আপনার নম্বর লুকানো আছে'}</div>
       </div>
-      <button class="tog ${available?'on':'off'}" onclick="handleToggle(${!available})">
+      <button class="tog ${av?'on':'off'}" onclick="handleToggle(${!av})">
         <div class="tog-circle"></div>
       </button>
     </div>
 
-    <!-- INFO CARD -->
     <div class="info-card">
       <div class="info-title">📋 ব্যক্তিগত তথ্য</div>
       <div class="info-row">
         <span class="info-ico">📞</span>
         <span class="info-label">ফোন</span>
-        <span class="info-val ${available?'':'na'}">${available ? (d.phone||'—') : 'Phone number is not available'}</span>
+        <span class="info-val ${av?'':'na'}">${av?(d.phone||'—'):'Phone number is not available'}</span>
       </div>
       <div class="info-row">
         <span class="info-ico">✉️</span>
         <span class="info-label">ইমেইল</span>
-        <span class="info-val">${d.email||currentUser.email}</span>
+        <span class="info-val">${d.email||CU.email}</span>
       </div>
       <div class="info-row">
         <span class="info-ico">🩸</span>
@@ -194,126 +216,105 @@ window.renderProfile = async () => {
       <div class="info-row">
         <span class="info-ico">📅</span>
         <span class="info-label">শেষ দান</span>
-        <span class="info-val">${d.lastDonation || (d.neverDonated ? 'এখনো দেননি' : '—')}</span>
+        <span class="info-val">${d.lastDonation||(d.neverDonated?'এখনো দেননি':'—')}</span>
       </div>
-      ${d.wa ? `<div class="info-row">
-        <span class="info-ico">💬</span>
-        <span class="info-label">WhatsApp</span>
-        <span class="info-val">${d.wa}</span>
-      </div>` : ''}
+      ${d.wa?`<div class="info-row"><span class="info-ico">💬</span><span class="info-label">WhatsApp</span><span class="info-val">${d.wa}</span></div>`:''}
     </div>
 
-    <!-- DONATION HISTORY -->
     <div class="history-card">
       <div class="info-title">🩸 রক্তদানের ইতিহাস</div>
       <div class="hist-row">
-        <div class="hist-num">${d.donations || ০}</div>
+        <div class="hist-num">${d.donations||0}</div>
         <div class="hist-info">
-          <h4>মোট ${d.donations || '০'} বার রক্ত দিয়েছেন</h4>
-          <p>শেষ দান: ${d.lastDonation || (d.neverDonated ? 'এখনো দেননি' : '—')}</p>
+          <h4>মোট ${d.donations||0} বার রক্ত দিয়েছেন</h4>
+          <p>শেষ দান: ${d.lastDonation||(d.neverDonated?'এখনো দেননি':'—')}</p>
         </div>
       </div>
     </div>
 
-    <button class="edit-btn" onclick="openEdit()">✏️ Profile Edit করুন</button>
-  `;
-};
+    <button class="edit-btn" onclick="openEdit()">✏️ Profile Edit করুন</button>`;
+}
 
-// TOGGLE
+// ── TOGGLE ───────────────────────────────────────────────────
 window.handleToggle = async (val) => {
   try {
-    await updateDoc(doc(db,'users',currentUser.uid),{ available: val });
-    userData.available = val;
-    showToast(val ? '✅ রক্ত দিতে প্রস্তুত' : '❌ অপ্রস্তুত হিসেবে চিহ্নিত');
-    renderProfile();
-  } catch(e){ showToast('Error: '+e.message); }
+    await updateDoc(doc(db,'donors',CU.uid),{ available: val });
+    await updateDoc(doc(db,'users',CU.uid),{ available: val });
+    DD.available = val;
+    toast(val?'✅ রক্ত দিতে প্রস্তুত':'❌ অপ্রস্তুত হিসেবে চিহ্নিত');
+    render();
+  } catch(e){ toast('Error: '+e.message); }
 };
 
-// PHOTO UPLOAD
-window.pickPhoto = () => document.getElementById('photo-input')?.click();
-window.uploadPhoto = (input) => {
-  const file = input.files[0]; if(!file) return;
-  if(file.size > 2*1024*1024){ showToast('ছবি ২MB এর বেশি হবে না'); return; }
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const base64 = e.target.result;
-    setLoading(true);
+// ── PHOTO ─────────────────────────────────────────────────────
+window.pickPhoto = () => document.getElementById('photo-inp')?.click();
+window.uploadPhoto = (inp) => {
+  const f = inp.files[0]; if(!f) return;
+  if(f.size>2*1024*1024){toast('ছবি ২MB এর বেশি হবে না');return;}
+  const r = new FileReader();
+  r.onload = async e => {
+    setLoad(true);
     try {
-      await updateDoc(doc(db,'users',currentUser.uid),{ photo: base64 });
-      userData.photo = base64;
-      showToast('✅ ছবি আপলোড হয়েছে!');
-      renderProfile();
-    } catch(err){ showToast('Error: '+err.message); }
-    finally{ setLoading(false); }
+      const b64 = e.target.result;
+      await updateDoc(doc(db,'donors',CU.uid),{photo:b64});
+      await updateDoc(doc(db,'users',CU.uid),{photo:b64});
+      DD.photo = b64; toast('✅ ছবি আপলোড হয়েছে!'); render();
+    } catch(err){toast('Error: '+err.message);}
+    finally{setLoad(false);}
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(f);
 };
 
-// EDIT PROFILE
+// ── EDIT ──────────────────────────────────────────────────────
 window.openEdit = () => {
-  const d = userData;
+  const d = DD;
   document.getElementById('edit-body').innerHTML = `
     <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
-      <div class="form-group">
-        <label>পূর্ণ নাম *</label>
-        <div class="input-group"><span class="input-icon">👤</span><input id="e-name" value="${d.name||''}"/></div>
-      </div>
-      <div class="form-group">
-        <label>ফোন নম্বর *</label>
-        <div class="input-group"><span class="input-icon">📞</span><input id="e-phone" value="${d.phone||''}"/></div>
-      </div>
-      <div class="form-group">
-        <label>WhatsApp (optional)</label>
-        <div class="input-group"><span class="input-icon">💬</span><input id="e-wa" value="${d.wa||''}"/></div>
-      </div>
+      <div class="form-group"><label>পূর্ণ নাম *</label>
+        <div class="iw"><input id="e-name" value="${d.name||''}"/></div></div>
+      <div class="form-group"><label>ফোন নম্বর *</label>
+        <div class="iw"><input id="e-phone" value="${d.phone||''}"/></div></div>
+      <div class="form-group"><label>WhatsApp (optional)</label>
+        <div class="iw"><input id="e-wa" value="${d.wa||''}"/></div></div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Blood Group</label>
-          <div class="input-group">
-            <select id="e-blood" style="flex:1;border:none;background:transparent;padding:13px 0;font-size:14px;outline:none;font-family:'Hind Siliguri',sans-serif">
-              ${['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(b=>`<option ${b===d.blood?'selected':''}>${b}</option>`).join('')}
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>এলাকা</label>
-          <div class="input-group"><span class="input-icon">📌</span><input id="e-area" value="${d.area||''}"/></div>
-        </div>
+        <div class="form-group"><label>Blood Group</label>
+          <div class="iw"><select id="e-blood">
+            ${['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(b=>`<option ${b===d.blood?'selected':''}>${b}</option>`).join('')}
+          </select></div></div>
+        <div class="form-group"><label>এলাকা</label>
+          <div class="iw"><input id="e-area" value="${d.area||''}"/></div></div>
       </div>
-      <div class="form-group">
-        <label>সর্বশেষ রক্তদানের তারিখ</label>
-        <div class="input-group"><span class="input-icon">📅</span><input type="date" id="e-lastdate" value="${d.lastDonation||''}"/></div>
-      </div>
+      <div class="form-group"><label>সর্বশেষ রক্তদানের তারিখ</label>
+        <div class="iw"><input type="date" id="e-last" value="${d.lastDonation||''}"/></div></div>
       <button class="submit-btn" onclick="saveEdit()">✅ Save করুন</button>
     </div>`;
   document.getElementById('edit-modal').classList.add('open');
 };
+window.closeEdit = () => document.getElementById('edit-modal').classList.remove('open');
 
 window.saveEdit = async () => {
-  const name     = document.getElementById('e-name').value.trim();
-  const phone    = document.getElementById('e-phone').value.trim();
-  const wa       = document.getElementById('e-wa').value.trim();
-  const blood    = document.getElementById('e-blood').value;
-  const area     = document.getElementById('e-area').value.trim();
-  const lastDate = document.getElementById('e-lastdate').value;
-  if(!name||!phone){ showToast('নাম ও ফোন দিন'); return; }
-  setLoading(true);
+  const name=document.getElementById('e-name').value.trim();
+  const phone=document.getElementById('e-phone').value.trim();
+  const wa=document.getElementById('e-wa').value.trim();
+  const blood=document.getElementById('e-blood').value;
+  const area=document.getElementById('e-area').value.trim();
+  const last=document.getElementById('e-last').value;
+  if(!name||!phone){toast('নাম ও ফোন দিন');return;}
+  setLoad(true);
   try {
-    await updateDoc(doc(db,'users',currentUser.uid),{name,phone,wa,blood,area,lastDonation:lastDate||null});
-    Object.assign(userData,{name,phone,wa,blood,area,lastDonation:lastDate||null});
-    closeEdit();
-    showToast('✅ Profile update হয়েছে!');
-    renderProfile();
-  } catch(e){ showToast('Error: '+e.message); }
-  finally{ setLoading(false); }
+    await updateDoc(doc(db,'donors',CU.uid),{name,phone,wa,blood,area,lastDonation:last||null});
+    await updateDoc(doc(db,'users',CU.uid),{name,phone,blood});
+    Object.assign(DD,{name,phone,wa,blood,area,lastDonation:last||null});
+    closeEdit(); toast('✅ Profile update হয়েছে!'); render();
+  } catch(e){toast('Error: '+e.message);}
+  finally{setLoad(false);}
 };
 
-window.doLogout = async () => {
-  await signOut(auth);
-  window.location.href = 'index.html';
-};
+window.doLogout = async () => { await signOut(auth); window.location.href='index.html'; };
 
 function ini(n){ return (n||'U').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
+function setLoad(v){ document.getElementById('loading').classList.toggle('show',v); }
 </script>
 </body>
 </html>

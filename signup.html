@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeDrop — Sign Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.auth-page{background:#c0392b;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.auth-hero{text-align:center;padding:36px 20px 22px;color:#fff;width:100%}
+.hero-icon{font-size:46px;margin-bottom:8px}
+.auth-hero h1{font-size:26px;font-weight:800;font-family:'Inter',sans-serif}
+.auth-hero p{font-size:12px;margin-top:5px;opacity:.85;font-family:'Hind Siliguri',sans-serif}
+.auth-card{background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:480px;flex:1;padding:24px 20px 40px;overflow-y:auto}
+.input-group{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:12px;padding:0 13px;margin-bottom:11px;transition:.2s}
+.input-group:focus-within{border-color:#c0392b;background:#fff}
+.input-icon{font-size:15px;margin-right:10px;opacity:.6}
+.input-group input,.input-group select{flex:1;border:none;background:transparent;padding:13px 0;font-size:14px;outline:none;font-family:'Hind Siliguri',sans-serif}
+.eye-btn{background:none;border:none;cursor:pointer;font-size:15px;opacity:.4;padding:4px}
+.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;margin-top:4px}
+.submit-btn:disabled{background:#e0a0a0;cursor:not-allowed}
+.error-msg{background:#fdecea;color:#c0392b;padding:11px 14px;border-radius:11px;font-size:13px;margin-bottom:14px;border-left:3px solid #c0392b;font-family:'Hind Siliguri',sans-serif;display:none}
+.sec-label{font-size:12px;font-weight:700;color:#888;margin-bottom:8px;margin-top:4px;font-family:'Hind Siliguri',sans-serif}
+</style>
+</head>
+<body class="auth-page">
+
+<div class="auth-hero">
+  <div class="hero-icon">🩸</div>
+  <h1>একাউন্ট তৈরি করুন</h1>
+  <p>LifeDrop এ যোগ দিন</p>
+</div>
+
+<div class="auth-card">
+  <div id="err" class="error-msg"></div>
+
+  <div class="sec-label">আপনার তথ্য</div>
+  <div class="input-group">
+    <span class="input-icon">👤</span>
+    <input type="text" id="name" placeholder="পূর্ণ নাম *"/>
+  </div>
+  <div class="input-group">
+    <span class="input-icon">✉️</span>
+    <input type="email" id="email" placeholder="ই-মেইল *"/>
+  </div>
+  <div class="input-group">
+    <span class="input-icon">📞</span>
+    <input type="tel" id="phone" placeholder="ফোন নম্বর *"/>
+  </div>
+  <div class="input-group">
+    <span class="input-icon">🔒</span>
+    <input type="password" id="pass" placeholder="পাসওয়ার্ড * (কমপক্ষে ৬ অক্ষর)"/>
+    <button class="eye-btn" onclick="toggleEye()">👁</button>
+  </div>
+
+  <button class="submit-btn" id="signup-btn" onclick="doSignup()">✅ একাউন্ট তৈরি করুন</button>
+
+  <p style="text-align:center;margin-top:14px;font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif">
+    আগেই একাউন্ট আছে? <a href="login.html" style="color:#c0392b;font-weight:700;text-decoration:none">লগইন করুন</a>
+  </p>
+</div>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { createUserWithEmailAndPassword, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+onAuthStateChanged(auth, u => { if(u) window.location.href = 'index.html'; });
+
+window.toggleEye = () => {
+  const el = document.getElementById('pass');
+  el.type = el.type === 'password' ? 'text' : 'password';
+};
+
+window.doSignup = async () => {
+  const name  = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const pass  = document.getElementById('pass').value;
+  const btn   = document.getElementById('signup-btn');
+
+  if(!name||!email||!phone||!pass){ showErr('সব তথ্য পূরণ করুন'); return; }
+  if(pass.length < 6){ showErr('পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে'); return; }
+
+  btn.textContent = 'তৈরি হচ্ছে...'; btn.disabled = true;
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      uid: cred.user.uid,
+      name, email, phone,
+      photo: '', isDonor: false,
+      available: false, donations: 0,
+      rating: 0, raters: 0,
+      createdAt: serverTimestamp()
+    });
+    window.location.href = 'index.html';
+  } catch(e) {
+    showErr(errMsg(e.code));
+    btn.textContent = '✅ একাউন্ট তৈরি করুন';
+    btn.disabled = false;
+  }
+};
+
+function showErr(m){ const e=document.getElementById('err'); e.textContent=m; e.style.display='block'; }
+function errMsg(c){ return {'auth/email-already-in-use':'এই ইমেইলে আগেই একাউন্ট আছে। লগইন করুন।','auth/invalid-email':'সঠিক ইমেইল দিন।','auth/weak-password':'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর।'}[c]||'সমস্যা হয়েছে।'; }
+document.addEventListener('keydown', e => { if(e.key==='Enter') doSignup(); });
+</script>
+</body>
+</html>

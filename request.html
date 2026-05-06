@@ -189,6 +189,8 @@ function setLoading(v){ document.getElementById('loading').classList.toggle('sho
 </script>
 
 <script type="module">
+  import { requireLogin } from './auth-guard.js';
+const currentUser = await requireLogin();
 import { db } from './firebase-config.js';
 import {
   collection, addDoc, onSnapshot,
