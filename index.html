@@ -6,6 +6,17 @@
 <title>🩸 LifeDrop</title>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+/* LOGIN REQUIRED OVERLAY */
+.login-required{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:20px}
+.login-required.show{display:flex}
+.lr-card{background:#fff;border-radius:20px;padding:28px 22px;text-align:center;max-width:320px;width:100%}
+.lr-icon{font-size:48px;margin-bottom:12px}
+.lr-card h3{font-size:17px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:8px}
+.lr-card p{font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:18px;line-height:1.6}
+.lr-login{display:block;padding:12px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif;margin-bottom:10px}
+.lr-close{background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+</style>
 </head>
 <body>
 <div class="app">
@@ -16,15 +27,15 @@
       <span class="logo-drop">🩸</span>
       <h1>LifeDrop</h1>
     </div>
-    <div class="header-right" id="auth-header-btn">
+    <div class="header-right" id="auth-btn">
       <a href="login.html" class="login-chip">লগইন করুন</a>
     </div>
   </div>
 
-  <!-- SCROLLABLE HOME CONTENT -->
+  <!-- SCROLL CONTENT -->
   <div class="scr" style="gap:0">
 
-    <!-- BANNER SLIDER -->
+    <!-- SLIDER -->
     <div class="banner">
       <div class="slider-wrap">
         <div class="slide active" id="slide-0">
@@ -38,8 +49,8 @@
           <div class="ref">— LifeDrop</div>
         </div>
         <div class="slide" id="slide-2">
-          <div class="slide-tag">📢 নোটিশ</div>
-          <h2>লাইফড্রপ আসছে দ্রুত রক্তদাতা খুঁজে দিতে</h2>
+          <div class="slide-tag">📢 মনে রাখুন</div>
+          <h2>আপনার একটি রক্তদান তিনটি জীবন বাঁচাতে পারে</h2>
           <div class="ref">— LifeDrop Team</div>
         </div>
       </div>
@@ -54,22 +65,22 @@
     <div class="section" style="padding:12px 12px 0">
       <div class="sec-title">দ্রুত একশন</div>
       <div class="action-grid">
-        <button class="ac red" onclick="window.location.href='search.html'">
+        <button class="ac red" onclick="goProtected('search.html')">
           <div class="ac-bg">🔍</div>
           <div class="ac-icon">🔍</div>
           <div class="ac-label">রক্তদাতা খুঁজুন</div>
         </button>
-        <button class="ac orange" onclick="window.location.href='request.html'">
+        <button class="ac orange" onclick="goProtected('request.html')">
           <div class="ac-bg">🆘</div>
           <div class="ac-icon">🆘</div>
           <div class="ac-label">জরুরি অনুরোধ</div>
         </button>
-        <button class="ac teal" onclick="window.location.href='ambulance.html'">
+        <button class="ac teal" onclick="goProtected('ambulance.html')">
           <div class="ac-bg">🚑</div>
           <div class="ac-icon">🚑</div>
           <div class="ac-label">অ্যাম্বুলেন্স খুঁজুন</div>
         </button>
-        <button class="ac green" onclick="goToDonorReg()">
+        <button class="ac green" onclick="window.location.href='register.html'">
           <div class="ac-bg">🩸</div>
           <div class="ac-icon">🩸</div>
           <div class="ac-label">Donor হোন</div>
@@ -86,7 +97,7 @@
       <div class="sec-title">আমাদের পরিসংখ্যান</div>
       <div class="stats-row">
         <div class="stat">
-          <div class="stat-n" id="stat-donors">১৫ জন</div>
+          <div class="stat-n" id="stat-donors">০</div>
           <div class="stat-l">সক্রিয় Donor</div>
         </div>
         <div class="stat">
@@ -94,8 +105,8 @@
           <div class="stat-l">রক্তদান সম্পন্ন</div>
         </div>
         <div class="stat">
-          <div class="stat-n">৬৪টি</div>
-          <div class="stat-l">জেলায় সেবা</div>
+          <div class="stat-n">৮</div>
+          <div class="stat-l">বিভাগে সেবা</div>
         </div>
       </div>
     </div>
@@ -105,21 +116,15 @@
       <div class="sec-title">কেন রক্ত দেবেন?</div>
       <div class="why-card">
         <div class="why-ico" style="background:#fdecea">❤️</div>
-        <div>
-          <h4>জীবন বাঁচায়</h4>
-          <p>একটি রক্তদান সর্বোচ্চ ৩টি জীবন বাঁচাতে পারে</p>
-        </div>
+        <div><h4>জীবন বাঁচায়</h4><p>একটি রক্তদান সর্বোচ্চ ৩টি জীবন বাঁচাতে পারে</p></div>
       </div>
       <div class="why-card">
         <div class="why-ico" style="background:#d5f5e3">🛡️</div>
-        <div>
-          <h4>স্বাস্থ্য উপকারিতা</h4>
-          <p>হৃদরোগ ও ক্যান্সারের ঝুঁকি কমায়</p>
-        </div>
+        <div><h4>স্বাস্থ্য উপকারিতা</h4><p>হৃদরোগ ও ক্যান্সারের ঝুঁকি কমায়</p></div>
       </div>
     </div>
 
-    <!-- PREP LIST -->
+    <!-- PREP -->
     <div class="section" style="padding:0 12px;margin-bottom:16px">
       <div class="sec-title">🩸 রক্তদানের পূর্বপ্রস্তুতি</div>
       <div class="prep-list">
@@ -136,85 +141,107 @@
       </div>
     </div>
 
-  </div><!-- /scr -->
+  </div>
 
   <!-- BOTTOM NAV -->
   <div class="bnav">
-    <a class="bnav-item active" href="index.html">
-      <span class="bi">🏠</span><span class="bl">হোম</span>
-    </a>
-    <a class="bnav-item" href="search.html">
-      <span class="bi">🔍</span><span class="bl">খুঁজুন</span>
-    </a>
-    <a class="bnav-center" href="request.html">
-      <div class="bc-btn">🆘</div>
-      <span class="bl">অনুরোধ</span>
-    </a>
-    <a class="bnav-item" href="about.html">
-      <span class="bi">ℹ️</span><span class="bl">About</span>
-    </a>
-    <a class="bnav-item" href="profile.html">
-      <span class="bi">👤</span><span class="bl">Profile</span>
-    </a>
+    <a class="bnav-item active" href="index.html"><span class="bi">🏠</span><span class="bl">হোম</span></a>
+    <a class="bnav-item" href="#" onclick="goProtected('search.html');return false"><span class="bi">🔍</span><span class="bl">খুঁজুন</span></a>
+    <a class="bnav-center" href="#" onclick="goProtected('request.html');return false"><div class="bc-btn">🆘</div><span class="bl">অনুরোধ</span></a>
+    <a class="bnav-item" href="about.html"><span class="bi">ℹ️</span><span class="bl">About</span></a>
+    <a class="bnav-item" href="profile.html"><span class="bi">👤</span><span class="bl">Profile</span></a>
   </div>
+</div>
 
-</div><!-- /app -->
+<!-- LOGIN REQUIRED OVERLAY -->
+<div class="login-required" id="lr-overlay">
+  <div class="lr-card">
+    <div class="lr-icon">🔒</div>
+    <h3>লগইন প্রয়োজন</h3>
+    <p>এই সেবা ব্যবহার করতে লগইন করুন</p>
+    <a href="login.html" class="lr-login" id="lr-link">লগইন করুন</a>
+    <button class="lr-close" onclick="closeOverlay()">বাতিল করুন</button>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 // SLIDER
-let cur = 0, total = 3;
-function goSlide(n) {
+let cur=0;
+function goSlide(n){
   document.getElementById('slide-'+cur).classList.remove('active');
   document.querySelectorAll('.sdot')[cur].classList.remove('active');
-  cur = (n + total) % total;
+  cur=(n+3)%3;
   document.getElementById('slide-'+cur).classList.add('active');
   document.querySelectorAll('.sdot')[cur].classList.add('active');
 }
-setInterval(() => goSlide(cur + 1), 4000);
+setInterval(()=>goSlide(cur+1),4000);
 
-// DONOR BUTTON — login check
-function goToDonorReg() {
-  window.location.href = 'register.html';
-}
+// PROTECTED NAVIGATION
+let pendingPage = null;
+window.goProtected = (page) => {
+  if(window._loggedIn){
+    window.location.href = page;
+  } else {
+    pendingPage = page;
+    document.getElementById('lr-link').href = 'login.html?redirect='+page;
+    document.getElementById('lr-overlay').classList.add('show');
+  }
+};
+window.closeOverlay = () => {
+  document.getElementById('lr-overlay').classList.remove('show');
+};
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2700);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2700);
 }
 </script>
 
 <script type="module">
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// AUTH — update header
+const cfg = {
+  apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
+  authDomain:"life-drop-d4784.firebaseapp.com",
+  projectId:"life-drop-d4784",
+  storageBucket:"life-drop-d4784.firebasestorage.app",
+  messagingSenderId:"671053363784",
+  appId:"1:671053363784:web:825fa9afa4f58a3ec2f67d"
+};
+const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
 onAuthStateChanged(auth, user => {
-  const el = document.getElementById('auth-header-btn');
-  if (user) {
+  window._loggedIn = !!user;
+  const el = document.getElementById('auth-btn');
+  if(user){
+    const photo = user.photoURL;
+    const name  = user.displayName?.split(' ')[0] || 'Profile';
     el.innerHTML = `
-      <span style="font-size:12px;color:#fff;opacity:.9;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${user.displayName || 'User'}</span>
-      <a href="profile.html" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;font-family:'Hind Siliguri',sans-serif">Profile</a>`;
+      <a href="profile.html" style="display:flex;align-items:center;gap:6px;text-decoration:none">
+        <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">
+          ${photo ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover"/>` : name[0].toUpperCase()}
+        </div>
+        <span style="font-size:11px;color:#fff;font-weight:600;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Hind Siliguri',sans-serif">${name}</span>
+      </a>`;
   } else {
-    el.innerHTML = `<a href="login.html" class="login-chip">লগইন করুন</a>`;
+    el.innerHTML = `<a href="login.html" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;padding:6px 13px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;font-family:'Hind Siliguri',sans-serif">লগইন করুন</a>`;
   }
 });
 
-// LIVE STATS
-async function loadStats() {
-  try {
-    const donorsSnap = await getDocs(query(collection(db,'users'), where('available','==',true)));
-    document.getElementById('stat-donors').textContent = donorsSnap.size || '০';
-
-    let totalDonations = 0;
-    donorsSnap.forEach(d => { totalDonations += (d.data().donations || 0); });
-    document.getElementById('stat-donations').textContent = totalDonations || '০';
-  } catch(e) {}
-}
-loadStats();
+// Live stats from donors
+onSnapshot(query(collection(db,'donors'), where('available','==',true)), snap => {
+  document.getElementById('stat-donors').textContent = snap.size || '০';
+  let total = 0;
+  snap.forEach(d => total += (d.data().donations || 0));
+  document.getElementById('stat-donations').textContent = total || '০';
+});
 </script>
 </body>
 </html>
