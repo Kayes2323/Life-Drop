@@ -163,9 +163,6 @@ function setLoading(v){ document.getElementById('loading').classList.toggle('sho
 </script>
 
 <script type="module">
-// register.html এর <script type="module"> এর ভেতরে
-// পুরো script টা এই দিয়ে replace করো
-
 import { auth, db } from './firebase-config.js';
 import { createUserWithEmailAndPassword, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
