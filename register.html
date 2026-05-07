@@ -163,9 +163,12 @@ function setLoading(v){ document.getElementById('loading').classList.toggle('sho
 </script>
 
 <script type="module">
+// register.html এর <script type="module"> এর ভেতরে
+// পুরো script টা এই দিয়ে replace করো
+
 import { auth, db } from './firebase-config.js';
 import { createUserWithEmailAndPassword, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, setDoc, updateDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const COORDS = {
   'ঢাকা':{lat:23.8103,lng:90.4125},'গাজীপুর':{lat:23.9999,lng:90.4203},
@@ -177,9 +180,6 @@ const COORDS = {
   'যশোর':{lat:23.1664,lng:89.2082},'দিনাজপুর':{lat:25.6279,lng:88.6338},
   'কক্সবাজার':{lat:21.4272,lng:92.0058},'ফরিদপুর':{lat:23.6070,lng:89.8429}
 };
-
-let loggedInUser = null;
-onAuthStateChanged(auth, u => { loggedInUser = u; });
 
 window.registerDonor = async () => {
   const name     = document.getElementById('r-name').value.trim();
@@ -200,71 +200,69 @@ window.registerDonor = async () => {
   }
   if(pass.length < 6){ showErr('পাসওয়ার্ড কমপক্ষে ৬ অক্ষর'); return; }
 
-  btn.textContent = 'নিবন্ধন হচ্ছে...'; btn.disabled = true;
+  btn.textContent = 'নিবন্ধন হচ্ছে...';
+  btn.disabled = true;
   setLoading(true);
 
   try {
+    // Step 1: Firebase Auth এ account তৈরি
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+
+    const uid = cred.user.uid;
     const coords = COORDS[district] || COORDS[division] || {lat:23.8103,lng:90.4125};
-    const donorData = {
-      name, email, phone, blood,
+
+    // Step 2: ✅ DONORS collection এ save — search এখান থেকে হবে
+    await setDoc(doc(db, 'donors', uid), {
+      uid, name, email, phone, blood,
       division, district, area,
       lat: coords.lat + (Math.random()-.5)*.04,
       lng: coords.lng + (Math.random()-.5)*.04,
-      lastDonation: lastDate || null,
-      neverDonated: never,
-      urgentReady: urgent,
-      available: true,
-      isDonor: true,
-      donations: 0, rating: 0, raters: 0,
-      createdAt: serverTimestamp()
-    };
-
-    // যদি আগে থেকেই logged in থাকে — শুধু donor info update করো
-    if(loggedInUser) {
-      const existingSnap = await getDoc(doc(db,'donors',loggedInUser.uid));
-      if(existingSnap.exists()) {
-        showErr('আপনি আগেই Donor হিসেবে নিবন্ধিত।'); return;
-      }
-      await setDoc(doc(db,'donors',loggedInUser.uid), {
-        uid: loggedInUser.uid, ...donorData
-      });
-      await updateDoc(doc(db,'users',loggedInUser.uid), {
-        isDonor: true, available: true, blood, phone, division, district, area
-      });
-      window.location.href = 'profile.html';
-      return;
-    }
-
-    // নতুন user — account তৈরি করো
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(cred.user, { displayName: name });
-    // users collection এ save
-    await setDoc(doc(db,'users',cred.user.uid), {
-      uid: cred.user.uid, name, email, phone, photo:'',
-      isDonor: true, available: true,
-      donations: 0, rating: 0, raters: 0,
-      createdAt: serverTimestamp()
+      lastDonation : lastDate || null,
+      neverDonated : never,
+      urgentReady  : urgent,
+      available    : true,
+      isDonor      : true,
+      photo        : '',
+      donations    : 0,
+      rating       : 0,
+      raters       : 0,
+      createdAt    : serverTimestamp()
     });
-    // donors collection এ save — search এখান থেকে করবে
-    await setDoc(doc(db,'donors',cred.user.uid), {
-      uid: cred.user.uid, ...donorData
+
+    // Step 3: ✅ USERS collection এ save — auth info
+    await setDoc(doc(db, 'users', uid), {
+      uid, name, email, phone,
+      photo     : '',
+      isDonor   : true,
+      available : true,
+      blood,
+      donations : 0,
+      rating    : 0,
+      raters    : 0,
+      createdAt : serverTimestamp()
     });
+
     window.location.href = 'index.html';
 
   } catch(e) {
-    if(e.code === 'auth/email-already-in-use') {
+    if(e.code === 'auth/email-already-in-use'){
       showErr('এই ইমেইলে আগেই একাউন্ট আছে। লগইন করুন।');
     } else {
       showErr('Error: ' + e.message);
     }
-    btn.textContent = '🩸 নিবন্ধন করুন'; btn.disabled = false;
-  } finally { setLoading(false); }
+    btn.textContent = '🩸 নিবন্ধন করুন';
+    btn.disabled = false;
+  } finally {
+    setLoading(false);
+  }
 };
 
 function showErr(msg) {
   const el = document.getElementById('err');
-  el.textContent = msg; el.style.display = 'block';
-  window.scrollTo(0,0);
+  el.textContent = msg;
+  el.style.display = 'block';
+  window.scrollTo(0, 0);
 }
 </script>
 </body>
