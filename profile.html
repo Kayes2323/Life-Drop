@@ -5,17 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LifeDrop — Profile</title>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
 <style>
-.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
-.profile-hero{background:#fff;border-radius:16px;padding:18px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-.p-avatar-wrap{position:relative;width:84px;height:84px;margin:0 auto 13px;cursor:pointer}
-.p-avatar{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,#fdecea,#fde);border:3px solid #c0392b;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#c0392b;overflow:hidden}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.hl{display:flex;align-items:center;gap:8px}
+.hl span{font-size:18px}
+.hl h1{color:#fff;font-size:17px;font-weight:800}
+.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:24px}
+
+/* PROFILE HERO */
+.profile-hero{background:#fff;border-radius:16px;padding:20px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.p-avatar-wrap{position:relative;width:88px;height:88px;margin:0 auto 14px;cursor:pointer}
+.p-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#fdecea,#fde);border:3px solid #c0392b;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#c0392b;overflow:hidden}
 .p-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.p-camera{position:absolute;bottom:0;right:0;background:#c0392b;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid #fff}
-.p-name{font-size:18px;font-weight:800;font-family:'Inter',sans-serif;color:#222;margin-bottom:5px}
-.p-blood{display:inline-block;background:#c0392b;color:#fff;font-size:12px;font-weight:700;padding:3px 14px;border-radius:20px;margin-bottom:6px;font-family:'Inter',sans-serif}
+.p-camera{position:absolute;bottom:0;right:0;background:#c0392b;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #fff}
+.p-name{font-size:19px;font-weight:800;color:#222;margin-bottom:5px}
+.p-blood{display:inline-block;background:#c0392b;color:#fff;font-size:12px;font-weight:700;padding:3px 14px;border-radius:20px;margin-bottom:6px}
 .p-location{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif}
+
+/* AVAIL TOGGLE */
 .avail-card{border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px}
 .avail-card.on{background:linear-gradient(135deg,#d5f5e3,#eafaf1);border:1.5px solid #27ae60}
 .avail-card.off{background:linear-gradient(135deg,#fdecea,#fff5f5);border:1.5px solid #e74c3c}
@@ -26,43 +35,68 @@
 .avail-t2{font-size:11px;font-family:'Hind Siliguri',sans-serif}
 .avail-card.on .avail-t2{color:#27ae60}
 .avail-card.off .avail-t2{color:#e74c3c}
-.tog{width:50px;height:28px;border-radius:28px;position:relative;cursor:pointer;transition:.3s;flex-shrink:0;border:none;outline:none}
+.tog{width:50px;height:28px;border-radius:28px;position:relative;cursor:pointer;border:none;outline:none;transition:.3s;flex-shrink:0}
 .tog.on{background:#27ae60}
 .tog.off{background:#ddd}
 .tog-circle{position:absolute;width:22px;height:22px;background:#fff;border-radius:50%;top:3px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
-.tog.on .tog-circle{left:auto;right:3px}
+.tog.on .tog-circle{right:3px;left:auto}
 .tog.off .tog-circle{left:3px}
+
+/* INFO CARD */
 .info-card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
 .info-title{font-size:12px;font-weight:700;color:#c0392b;margin-bottom:11px;padding-bottom:8px;border-bottom:1px solid #fde;font-family:'Hind Siliguri',sans-serif}
-.info-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.info-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f5f5f5}
 .info-row:last-child{border-bottom:none}
-.info-ico{font-size:16px;flex-shrink:0;width:24px;text-align:center}
-.info-label{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;flex-shrink:0;width:85px}
-.info-val{font-size:12px;font-weight:600;color:#333;font-family:'Hind Siliguri',sans-serif;flex:1}
+.info-ico{font-size:16px;width:24px;text-align:center;flex-shrink:0}
+.info-label{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;width:85px;flex-shrink:0}
+.info-val{font-size:13px;font-weight:600;color:#333;font-family:'Hind Siliguri',sans-serif;flex:1}
 .info-val.na{color:#bbb;font-style:italic;font-weight:400;font-size:11px}
+
+/* HISTORY */
 .history-card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-.hist-row{display:flex;align-items:center;gap:11px;background:#fafafa;border-radius:11px;padding:11px}
-.hist-num{width:40px;height:40px;background:#c0392b;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;flex-shrink:0}
+.hist-row{display:flex;align-items:center;gap:12px;background:#fafafa;border-radius:12px;padding:12px}
+.hist-num{width:42px;height:42px;background:#c0392b;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0}
 .hist-info h4{font-size:13px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:2px}
 .hist-info p{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif}
-.edit-btn{width:100%;padding:12px;background:#fff;color:#c0392b;border:1.5px solid #c0392b;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;margin-bottom:16px}
+
+/* BUTTONS */
+.edit-btn{width:100%;padding:12px;background:#fff;color:#c0392b;border:1.5px solid #c0392b;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.logout-btn-big{width:100%;padding:13px;background:#fff;color:#e74c3c;border:1.5px solid #e74c3c;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+.logout-btn-big:hover{background:#fdecea}
 .not-donor-box{background:#fff;border-radius:16px;padding:24px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:flex-end;justify-content:center;padding:0}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:flex-end;justify-content:center}
 .modal-bg.open{display:flex}
-.modal{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding-bottom:20px}
+.modal{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;padding-bottom:24px}
 .modal-header{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;padding:14px 16px;border-radius:24px 24px 0 0;display:flex;justify-content:space-between;align-items:center}
 .modal-header h3{font-size:15px;font-weight:700;font-family:'Hind Siliguri',sans-serif}
 .modal-close{background:none;border:none;color:#fff;font-size:24px;cursor:pointer}
 .modal-body{padding:16px}
 .form-group{margin-bottom:12px}
 .form-group label{font-size:12px;font-weight:600;color:#666;display:block;margin-bottom:5px;font-family:'Hind Siliguri',sans-serif}
-.iw{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:12px;padding:0 13px;margin-bottom:0;transition:.2s}
+.form-group .hint{font-size:11px;color:#aaa;margin-top:3px;font-family:'Hind Siliguri',sans-serif}
+.iw{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:12px;padding:0 13px;transition:.2s}
 .iw:focus-within{border-color:#c0392b;background:#fff}
-.iw input,.iw select{flex:1;border:none;background:transparent;padding:12px 0;font-size:14px;outline:none;font-family:'Hind Siliguri',sans-serif}
+.iw input,.iw select{flex:1;border:none;background:transparent;padding:12px 0;font-size:14px;outline:none;font-family:'Hind Siliguri',sans-serif;color:#222}
+.iw.disabled{background:#f0f0f0;opacity:.7}
+.iw.disabled input{color:#aaa}
 .form-row{display:flex;gap:8px}
 .form-row .form-group{flex:1}
-.submit-btn{width:100%;padding:13px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.submit-btn{width:100%;padding:13px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;margin-top:4px}
 .submit-btn:disabled{background:#e0a0a0;cursor:not-allowed}
+.section-divider{font-size:12px;font-weight:700;color:#888;margin:16px 0 10px;font-family:'Hind Siliguri',sans-serif;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
+
+/* BNAV */
+.bnav{background:#fff;border-top:1px solid #f0f0f0;display:flex;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;gap:2px;border:none;background:transparent;text-decoration:none}
+.bi{font-size:17px;line-height:1}
+.bl{font-size:9px;color:#bbb;font-family:'Hind Siliguri',sans-serif}
+.bnav-item.active .bl{color:#c0392b;font-weight:700}
+.bnav-center{flex:1;display:flex;flex-direction:column;align-items:center;padding:3px 2px;border:none;background:transparent;gap:1px;text-decoration:none}
+.bc-btn{width:44px;height:44px;background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(192,57,43,.4);margin-top:-16px}
+.bnav-center .bl{color:#c0392b;font-weight:700;font-size:9px;font-family:'Hind Siliguri',sans-serif;margin-top:2px}
+
 .loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:9999;align-items:center;justify-content:center}
 .loading-overlay.show{display:flex}
 .spinner{width:38px;height:38px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:spin 1s linear infinite}
@@ -72,20 +106,14 @@
 </style>
 </head>
 <body>
-<div class="app">
+<div class="app" style="display:flex;flex-direction:column;min-height:100vh;max-width:480px;margin:0 auto;background:#f5f5f5">
 
   <div class="header">
-    <div class="header-left">
-      <span class="logo-drop">👤</span>
-      <h1>আমার Profile</h1>
-    </div>
-    <div class="header-right">
-      <button class="logout-btn" onclick="doLogout()">Logout</button>
-    </div>
+    <div class="hl"><span>👤</span><h1>আমার Profile</h1></div>
   </div>
 
   <div class="scr" id="profile-content">
-    <div style="display:flex;align-items:center;justify-content:center;flex:1;flex-direction:column;gap:12px;padding:40px">
+    <div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;flex-direction:column;gap:12px">
       <div class="spinner"></div>
       <p style="color:#bbb;font-family:'Hind Siliguri',sans-serif;font-size:13px">লোড হচ্ছে...</p>
     </div>
@@ -111,73 +139,108 @@
   </div>
 </div>
 
+<!-- PASSWORD CHANGE MODAL -->
+<div class="modal-bg" id="pass-modal" onclick="if(event.target===this)closePassModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🔒 পাসওয়ার্ড পরিবর্তন</h3>
+      <button class="modal-close" onclick="closePassModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="pass-err" style="background:#fdecea;color:#c0392b;padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:12px;border-left:3px solid #c0392b;display:none;font-family:'Hind Siliguri',sans-serif"></div>
+      <div class="form-group">
+        <label>বর্তমান পাসওয়ার্ড *</label>
+        <div class="iw"><input type="password" id="cur-pass" placeholder="বর্তমান পাসওয়ার্ড"/></div>
+      </div>
+      <div class="form-group">
+        <label>নতুন পাসওয়ার্ড *</label>
+        <div class="iw"><input type="password" id="new-pass" placeholder="নতুন পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)"/></div>
+      </div>
+      <div class="form-group">
+        <label>নতুন পাসওয়ার্ড আবার দিন *</label>
+        <div class="iw"><input type="password" id="new-pass2" placeholder="নতুন পাসওয়ার্ড আবার দিন"/></div>
+      </div>
+      <button class="submit-btn" id="pass-btn" onclick="changePassword()">✅ পাসওয়ার্ড পরিবর্তন করুন</button>
+    </div>
+  </div>
+</div>
+
 <div id="loading" class="loading-overlay"><div class="spinner"></div></div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let CU = null, UD = null, DD = null;
+const cfg = {
+  apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
+  authDomain:"life-drop-d4784.firebaseapp.com",
+  projectId:"life-drop-d4784",
+  storageBucket:"life-drop-d4784.firebasestorage.app",
+  messagingSenderId:"671053363784",
+  appId:"1:671053363784:web:825fa9afa4f58a3ec2f67d"
+};
+const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+let CU=null, UD=null, DD=null;
 
-// ── AUTH ─────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
-  if (!user) { window.location.href = 'login.html?redirect=profile.html'; return; }
+  if(!user){ window.location.replace('login.html?redirect=profile.html'); return; }
   CU = user;
   await loadData();
   render();
 });
 
-async function loadData() {
+async function loadData(){
   try {
-    const uSnap = await getDoc(doc(db, 'users', CU.uid));
-    UD = uSnap.exists() ? uSnap.data() : { name: CU.displayName||'', email: CU.email, isDonor: false };
-    const dSnap = await getDoc(doc(db, 'donors', CU.uid));
-    DD = dSnap.exists() ? dSnap.data() : null;
-  } catch(e) {
-    console.error('loadData error:', e);
-    UD = { name: CU.displayName||'', email: CU.email, isDonor: false };
+    const [us, ds] = await Promise.all([
+      getDoc(doc(db,'users',CU.uid)),
+      getDoc(doc(db,'donors',CU.uid))
+    ]);
+    UD = us.exists() ? us.data() : {name:CU.displayName||'',email:CU.email,isDonor:false};
+    DD = ds.exists() ? ds.data() : null;
+  } catch(e){
+    UD = {name:CU.displayName||'',email:CU.email,isDonor:false};
     DD = null;
   }
 }
 
-// ── RENDER ───────────────────────────────────────────────────
-function render() {
+function render(){
   const el = document.getElementById('profile-content');
+  const isGoogleUser = CU.providerData?.some(p => p.providerId === 'google.com');
 
-  // NOT A DONOR
-  if (!DD) {
+  if(!DD){
     el.innerHTML = `
       <div class="profile-hero">
         <div class="p-avatar-wrap" onclick="pickPhoto()">
-          <div class="p-avatar" id="p-av">
-            ${UD?.photo ? `<img src="${UD.photo}"/>` : ini(UD?.name||'U')}
-          </div>
+          <div class="p-avatar">${CU.photoURL?`<img src="${CU.photoURL}"/>`:(CU.displayName?.[0]?.toUpperCase()||'👤')}</div>
           <div class="p-camera">📷</div>
           <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="uploadPhoto(this)"/>
         </div>
-        <div class="p-name">${CU.displayName || UD?.name || 'ব্যবহারকারী'}</div>
-        <div class="p-location">📧 ${CU.email}</div>
+        <div class="p-name">${CU.displayName||'ব্যবহারকারী'}</div>
+        <div class="p-location">📧 ${CU.email||''}</div>
       </div>
       <div class="not-donor-box">
         <div style="font-size:48px;margin-bottom:12px">🩸</div>
         <h3 style="font-size:16px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:8px">আপনি এখনো Donor হননি</h3>
         <p style="font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:16px;line-height:1.6">Donor হিসেবে নিবন্ধন করুন এবং মানুষের জীবন বাঁচাতে সাহায্য করুন।</p>
         <a href="register.html" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif">🩸 Donor হোন</a>
-      </div>`;
+      </div>
+      ${!isGoogleUser ? `<button class="edit-btn" onclick="openPassModal()" style="margin-top:0">🔒 পাসওয়ার্ড পরিবর্তন</button>` : ''}
+      <button class="logout-btn-big" onclick="doLogout()">🚪 লগআউট করুন</button>`;
     return;
   }
 
   const d = DD;
-  const av = d.available || false;
+  const av = d.available||false;
+  const photo = d.photo||CU.photoURL||'';
 
   el.innerHTML = `
     <div class="profile-hero">
       <div class="p-avatar-wrap" onclick="pickPhoto()">
-        <div class="p-avatar" id="p-av">
-          ${d.photo||UD?.photo ? `<img src="${d.photo||UD?.photo}"/>` : ini(d.name)}
-        </div>
+        <div class="p-avatar" id="p-av">${photo?`<img src="${photo}"/>`:ini(d.name)}</div>
         <div class="p-camera">📷</div>
         <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="uploadPhoto(this)"/>
       </div>
@@ -198,26 +261,14 @@ function render() {
 
     <div class="info-card">
       <div class="info-title">📋 ব্যক্তিগত তথ্য</div>
-      <div class="info-row">
-        <span class="info-ico">📞</span>
-        <span class="info-label">ফোন</span>
-        <span class="info-val ${av?'':'na'}">${av?(d.phone||'—'):'Phone number is not available'}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-ico">✉️</span>
-        <span class="info-label">ইমেইল</span>
-        <span class="info-val">${d.email||CU.email}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-ico">🩸</span>
-        <span class="info-label">Blood Group</span>
-        <span class="info-val">${d.blood}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-ico">📅</span>
-        <span class="info-label">শেষ দান</span>
-        <span class="info-val">${d.lastDonation||(d.neverDonated?'এখনো দেননি':'—')}</span>
-      </div>
+      <div class="info-row"><span class="info-ico">📞</span><span class="info-label">ফোন</span>
+        <span class="info-val ${av?'':'na'}">${av?(d.phone||'—'):'Phone number is not available'}</span></div>
+      <div class="info-row"><span class="info-ico">✉️</span><span class="info-label">ইমেইল</span>
+        <span class="info-val">${d.email||CU.email}</span></div>
+      <div class="info-row"><span class="info-ico">🩸</span><span class="info-label">Blood Group</span>
+        <span class="info-val">${d.blood}</span></div>
+      <div class="info-row"><span class="info-ico">📅</span><span class="info-label">শেষ দান</span>
+        <span class="info-val">${d.lastDonation||(d.neverDonated?'এখনো দেননি':'—')}</span></div>
       ${d.wa?`<div class="info-row"><span class="info-ico">💬</span><span class="info-label">WhatsApp</span><span class="info-val">${d.wa}</span></div>`:''}
     </div>
 
@@ -232,88 +283,151 @@ function render() {
       </div>
     </div>
 
-    <button class="edit-btn" onclick="openEdit()">✏️ Profile Edit করুন</button>`;
+    <button class="edit-btn" onclick="openEdit()">✏️ Profile Edit করুন</button>
+    ${!isGoogleUser?`<button class="edit-btn" onclick="openPassModal()" style="margin-top:0;color:#555;border-color:#ddd">🔒 পাসওয়ার্ড পরিবর্তন</button>`:''}
+    <button class="logout-btn-big" onclick="doLogout()">🚪 লগআউট করুন</button>`;
 }
 
-// ── TOGGLE ───────────────────────────────────────────────────
-window.handleToggle = async (val) => {
+// TOGGLE
+window.handleToggle = async val => {
   try {
-    await updateDoc(doc(db,'donors',CU.uid),{ available: val });
-    await updateDoc(doc(db,'users',CU.uid),{ available: val });
-    DD.available = val;
-    toast(val?'✅ রক্ত দিতে প্রস্তুত':'❌ অপ্রস্তুত হিসেবে চিহ্নিত');
-    render();
+    await updateDoc(doc(db,'donors',CU.uid),{available:val});
+    try{ await updateDoc(doc(db,'users',CU.uid),{available:val}); }catch(e){}
+    DD.available = val; toast(val?'✅ রক্ত দিতে প্রস্তুত':'❌ অপ্রস্তুত'); render();
   } catch(e){ toast('Error: '+e.message); }
 };
 
-// ── PHOTO ─────────────────────────────────────────────────────
+// PHOTO
 window.pickPhoto = () => document.getElementById('photo-inp')?.click();
-window.uploadPhoto = (inp) => {
+window.uploadPhoto = inp => {
   const f = inp.files[0]; if(!f) return;
-  if(f.size>2*1024*1024){toast('ছবি ২MB এর বেশি হবে না');return;}
-  const r = new FileReader();
-  r.onload = async e => {
-    setLoad(true);
-    try {
-      const b64 = e.target.result;
-      await updateDoc(doc(db,'donors',CU.uid),{photo:b64});
-      await updateDoc(doc(db,'users',CU.uid),{photo:b64});
-      DD.photo = b64; toast('✅ ছবি আপলোড হয়েছে!'); render();
-    } catch(err){toast('Error: '+err.message);}
-    finally{setLoad(false);}
+  // Compress if > 500KB
+  const reader = new FileReader();
+  reader.onload = async e => {
+    let b64 = e.target.result;
+    // Compress using canvas
+    const img = new Image();
+    img.onload = async () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 600;
+      let w=img.width, h=img.height;
+      if(w>h){ if(w>MAX){h=h*(MAX/w);w=MAX;} }
+      else { if(h>MAX){w=w*(MAX/h);h=MAX;} }
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      b64 = canvas.toDataURL('image/jpeg',0.75);
+      setLoad(true);
+      try {
+        await updateDoc(doc(db,'donors',CU.uid),{photo:b64});
+        try{ await updateDoc(doc(db,'users',CU.uid),{photo:b64}); }catch(e){}
+        DD.photo=b64; toast('✅ ছবি আপলোড হয়েছে!'); render();
+      } catch(err){ toast('Error: '+err.message); }
+      finally{ setLoad(false); }
+    };
+    img.src = b64;
   };
-  r.readAsDataURL(f);
+  reader.readAsDataURL(f);
 };
 
-// ── EDIT ──────────────────────────────────────────────────────
+// EDIT
 window.openEdit = () => {
   const d = DD;
   document.getElementById('edit-body').innerHTML = `
-    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
-      <div class="form-group"><label>পূর্ণ নাম *</label>
-        <div class="iw"><input id="e-name" value="${d.name||''}"/></div></div>
-      <div class="form-group"><label>ফোন নম্বর *</label>
-        <div class="iw"><input id="e-phone" value="${d.phone||''}"/></div></div>
-      <div class="form-group"><label>WhatsApp (optional)</label>
-        <div class="iw"><input id="e-wa" value="${d.wa||''}"/></div></div>
-      <div class="form-row">
-        <div class="form-group"><label>Blood Group</label>
-          <div class="iw"><select id="e-blood">
-            ${['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(b=>`<option ${b===d.blood?'selected':''}>${b}</option>`).join('')}
-          </select></div></div>
-        <div class="form-group"><label>এলাকা</label>
-          <div class="iw"><input id="e-area" value="${d.area||''}"/></div></div>
-      </div>
-      <div class="form-group"><label>সর্বশেষ রক্তদানের তারিখ</label>
-        <div class="iw"><input type="date" id="e-last" value="${d.lastDonation||''}"/></div></div>
-      <button class="submit-btn" onclick="saveEdit()">✅ Save করুন</button>
-    </div>`;
+    <div class="section-divider">ব্যক্তিগত তথ্য</div>
+    <div class="form-group"><label>পূর্ণ নাম *</label>
+      <div class="iw"><input id="e-name" value="${d.name||''}"/></div></div>
+    <div class="form-group"><label>ফোন নম্বর *</label>
+      <div class="iw"><input id="e-phone" value="${d.phone||''}"/></div></div>
+    <div class="form-group"><label>WhatsApp</label>
+      <div class="iw"><input id="e-wa" value="${d.wa||''}"/></div></div>
+    <div class="form-group"><label>ইমেইল</label>
+      <div class="iw disabled"><input id="e-email" value="${d.email||CU.email}" readonly/></div>
+      <p class="hint">ইমেইল পরিবর্তন করা যাবে না</p></div>
+
+    <div class="section-divider">রক্তের তথ্য</div>
+    <div class="form-row">
+      <div class="form-group"><label>Blood Group *</label>
+        <div class="iw"><select id="e-blood">
+          ${['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(b=>`<option ${b===d.blood?'selected':''}>${b}</option>`).join('')}
+        </select></div></div>
+      <div class="form-group"><label>মোট রক্তদান (বার)</label>
+        <div class="iw"><input type="number" id="e-donations" value="${d.donations||0}" min="0"/></div></div>
+    </div>
+    <div class="form-group"><label>সর্বশেষ রক্তদানের তারিখ</label>
+      <div class="iw"><input type="date" id="e-last" value="${d.lastDonation||''}"/></div></div>
+
+    <div class="section-divider">অবস্থান</div>
+    <div class="form-group"><label>এলাকা</label>
+      <div class="iw"><input id="e-area" value="${d.area||''}"/></div></div>
+
+    <button class="submit-btn" onclick="saveEdit()">✅ Save করুন</button>`;
   document.getElementById('edit-modal').classList.add('open');
 };
 window.closeEdit = () => document.getElementById('edit-modal').classList.remove('open');
 
 window.saveEdit = async () => {
-  const name=document.getElementById('e-name').value.trim();
-  const phone=document.getElementById('e-phone').value.trim();
-  const wa=document.getElementById('e-wa').value.trim();
-  const blood=document.getElementById('e-blood').value;
-  const area=document.getElementById('e-area').value.trim();
-  const last=document.getElementById('e-last').value;
-  if(!name||!phone){toast('নাম ও ফোন দিন');return;}
+  const name      = document.getElementById('e-name').value.trim();
+  const phone     = document.getElementById('e-phone').value.trim();
+  const wa        = document.getElementById('e-wa').value.trim();
+  const blood     = document.getElementById('e-blood').value;
+  const donations = parseInt(document.getElementById('e-donations').value)||0;
+  const last      = document.getElementById('e-last').value;
+  const area      = document.getElementById('e-area').value.trim();
+  if(!name||!phone){ toast('নাম ও ফোন দিন'); return; }
   setLoad(true);
   try {
-    await updateDoc(doc(db,'donors',CU.uid),{name,phone,wa,blood,area,lastDonation:last||null});
-    await updateDoc(doc(db,'users',CU.uid),{name,phone,blood});
-    Object.assign(DD,{name,phone,wa,blood,area,lastDonation:last||null});
+    await updateDoc(doc(db,'donors',CU.uid),{name,phone,wa,blood,donations,lastDonation:last||null,area});
+    try{ await updateDoc(doc(db,'users',CU.uid),{name,phone,blood}); }catch(e){}
+    Object.assign(DD,{name,phone,wa,blood,donations,lastDonation:last||null,area});
     closeEdit(); toast('✅ Profile update হয়েছে!'); render();
-  } catch(e){toast('Error: '+e.message);}
-  finally{setLoad(false);}
+  } catch(e){ toast('Error: '+e.message); }
+  finally{ setLoad(false); }
 };
 
-window.doLogout = async () => { await signOut(auth); window.location.href='index.html'; };
+// PASSWORD CHANGE
+window.openPassModal = () => {
+  document.getElementById('cur-pass').value='';
+  document.getElementById('new-pass').value='';
+  document.getElementById('new-pass2').value='';
+  document.getElementById('pass-err').style.display='none';
+  document.getElementById('pass-modal').classList.add('open');
+};
+window.closePassModal = () => document.getElementById('pass-modal').classList.remove('open');
 
-function ini(n){ return (n||'U').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
+window.changePassword = async () => {
+  const cur  = document.getElementById('cur-pass').value;
+  const nw   = document.getElementById('new-pass').value;
+  const nw2  = document.getElementById('new-pass2').value;
+  const errEl = document.getElementById('pass-err');
+  errEl.style.display='none';
+
+  if(!cur||!nw||!nw2){ showPassErr('সব তথ্য পূরণ করুন'); return; }
+  if(nw.length<6){ showPassErr('নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষর'); return; }
+  if(nw!==nw2){ showPassErr('নতুন পাসওয়ার্ড দুটো মিলছে না'); return; }
+
+  const btn = document.getElementById('pass-btn');
+  btn.disabled=true; btn.textContent='পরিবর্তন হচ্ছে...';
+  try {
+    const cred = EmailAuthProvider.credential(CU.email, cur);
+    await reauthenticateWithCredential(CU, cred);
+    await updatePassword(CU, nw);
+    closePassModal(); toast('✅ পাসওয়ার্ড পরিবর্তন হয়েছে!');
+  } catch(e){
+    if(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential')
+      showPassErr('বর্তমান পাসওয়ার্ড ভুল।');
+    else showPassErr('Error: '+e.message);
+  } finally{ btn.disabled=false; btn.textContent='✅ পাসওয়ার্ড পরিবর্তন করুন'; }
+};
+function showPassErr(m){ const e=document.getElementById('pass-err'); e.textContent=m; e.style.display='block'; }
+
+window.doLogout = async () => {
+  if(!confirm('লগআউট করবেন?')) return;
+  await signOut(auth);
+  window.location.replace('index.html');
+};
+
+function ini(n){ return(n||'D').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
 function setLoad(v){ document.getElementById('loading').classList.toggle('show',v); }
 </script>
 </body>
