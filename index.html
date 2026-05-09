@@ -7,6 +7,43 @@
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
+/* ── LOADING SCREEN ── */
+#ld-screen{
+  position:fixed;inset:0;
+  background:linear-gradient(135deg,#c0392b,#e74c3c);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:9999;
+  transition:opacity .5s ease;
+}
+#ld-screen.hide{opacity:0;pointer-events:none}
+.ld-drop{font-size:56px;animation:ld-pulse 1.2s ease-in-out infinite}
+@keyframes ld-pulse{
+  0%,100%{transform:scale(1);opacity:1}
+  50%{transform:scale(1.15);opacity:.8}
+}
+.ld-name{
+  color:#fff;font-size:28px;font-weight:800;
+  font-family:'Inter',sans-serif;margin-top:10px;letter-spacing:.5px
+}
+.ld-tagline{
+  color:rgba(255,255,255,.8);font-size:13px;
+  font-family:'Hind Siliguri',sans-serif;margin-top:6px
+}
+.ld-dots{display:flex;gap:7px;margin-top:22px}
+.ld-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(255,255,255,.4);
+  animation:ld-blink 1.2s ease-in-out infinite
+}
+.ld-dot:nth-child(2){animation-delay:.2s}
+.ld-dot:nth-child(3){animation-delay:.4s}
+@keyframes ld-blink{
+  0%,100%{background:rgba(255,255,255,.3);transform:scale(1)}
+  50%{background:#fff;transform:scale(1.3)}
+}
+
+/* ── LOGIN REQUIRED OVERLAY ── */
 .lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:20px}
 .lr-overlay.show{display:flex}
 .lr-card{background:#fff;border-radius:20px;padding:28px 22px;text-align:center;max-width:300px;width:100%}
@@ -18,6 +55,19 @@
 </style>
 </head>
 <body>
+
+<!-- ══ LOADING SCREEN ══ -->
+<div id="ld-screen">
+  <div class="ld-drop">🩸</div>
+  <div class="ld-name">LifeDrop</div>
+  <div class="ld-tagline">রক্তদানে জীবন বাঁচান</div>
+  <div class="ld-dots">
+    <div class="ld-dot"></div>
+    <div class="ld-dot"></div>
+    <div class="ld-dot"></div>
+  </div>
+</div>
+
 <div class="app">
 
   <div class="header">
@@ -26,7 +76,6 @@
       <h1>LifeDrop</h1>
     </div>
     <div class="header-right" id="auth-btn">
-      <!-- default: login button, no wait -->
       <a href="login.html" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;padding:6px 13px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;font-family:'Hind Siliguri',sans-serif">লগইন করুন</a>
     </div>
   </div>
@@ -43,12 +92,12 @@
         </div>
         <div class="slide" id="slide-1">
           <div class="slide-tag">🩸 আমাদের আহ্বান</div>
-          <h2>Donor ফর্ম পূরণ করে  মানবতার কল্যাণে যুক্ত হন</h2>
+          <h2>Donor ফর্ম পূরণ করে মানবতার কল্যাণে যুক্ত হন</h2>
           <div class="ref">— LifeDrop</div>
         </div>
         <div class="slide" id="slide-2">
-          <div class="slide-tag">📢 Notice </div>
-          <h2>লাইফড্রপের কাজ চলছে,খুব শীঘ্রই আসছে রক্তদাতা খুঁজে দিতে</h2>
+          <div class="slide-tag">📢 Notice</div>
+          <h2>লাইফড্রপের কাজ চলছে, খুব শীঘ্রই আসছে রক্তদাতা খুঁজে দিতে</h2>
           <div class="ref">— LifeDrop Team</div>
         </div>
       </div>
@@ -96,7 +145,7 @@
       <div class="stats-row">
         <div class="stat"><div class="stat-n" id="stat-donors">—</div><div class="stat-l">সক্রিয় Donor</div></div>
         <div class="stat"><div class="stat-n" id="stat-donations">—</div><div class="stat-l">রক্তদান সম্পন্ন</div></div>
-        <div class="stat"><div class="stat-n">৬৪টি</div><div class="stat-l">জেলায় সেবা</div></div>
+        <div class="stat"><div class="stat-n">৬৪টি</div><div class="stat-l">জেলায় সেবা</div></div>
       </div>
     </div>
 
@@ -124,7 +173,8 @@
         <div class="prep-item"><div class="prep-dot"></div><p>রক্ত দেওয়ার পর কিছুক্ষণ বিশ্রাম নিন</p></div>
         <div class="prep-item"><div class="prep-dot"></div><p>ডাবের পানি / ওরস্যালাইন পান করুন</p></div>
         <div class="prep-item"><div class="prep-dot"></div><p>রোগীর জন্য প্রার্থনা করুন</p></div>
-        <div class="prep-item"><div class="prep-dot" style="background:#c0392b"></div>
+        <div class="prep-item">
+          <div class="prep-dot" style="background:#c0392b"></div>
           <p><b>কোনো বিনিময় ছাড়া মানবতার সেবায় রক্ত দেওয়াই সর্বোত্তম</b></p>
         </div>
       </div>
@@ -156,7 +206,17 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── SLIDER (runs immediately, no Firebase needed) ─────────────
+// ── LOADING SCREEN — সর্বোচ্চ 3 সেকেন্ড দেখাবে ──
+function hideLoader() {
+  const ld = document.getElementById('ld-screen');
+  if(!ld) return;
+  ld.classList.add('hide');
+  setTimeout(() => ld.remove(), 500);
+}
+// সর্বোচ্চ 3 সেকেন্ড — তারপর যাই হোক hide করবে
+const ldTimeout = setTimeout(hideLoader, 3000);
+
+// ── SLIDER ──
 let cur = 0;
 function goSlide(n) {
   document.getElementById('slide-'+cur).classList.remove('active');
@@ -167,8 +227,7 @@ function goSlide(n) {
 }
 setInterval(() => goSlide(cur + 1), 4000);
 
-// ── AUTH GUARD (non-blocking) ─────────────────────────────────
-// _authReady becomes true once Firebase responds (or times out)
+// ── AUTH GUARD ──
 window._loggedIn  = false;
 window._authReady = false;
 
@@ -188,7 +247,7 @@ function showToast(m) {
 }
 </script>
 
-<!-- Firebase loads AFTER page is visible — non-blocking -->
+<!-- Firebase — non-blocking -->
 <script type="module">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -210,17 +269,15 @@ try {
   db   = getFirestore(app);
 } catch(e) {
   console.warn('Firebase init failed:', e);
-  // Page still works — auth just stays false
+  hideLoader(); // Firebase fail হলেও page দেখাবে
 }
 
 if(auth) {
-  // Timeout: if Firebase takes > 5s, give up waiting
-  const authTimeout = setTimeout(() => {
-    window._authReady = true;
-  }, 5000);
-
   onAuthStateChanged(auth, user => {
-    clearTimeout(authTimeout);
+    // Firebase respond করলে loader সরিয়ে দাও
+    clearTimeout(ldTimeout);
+    hideLoader();
+
     window._authReady = true;
     window._loggedIn  = !!user;
 
@@ -238,11 +295,9 @@ if(auth) {
           <span style="font-size:11px;color:#fff;font-weight:600;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Hind Siliguri',sans-serif">${name}</span>
         </a>`;
     }
-    // If not logged in, default "লগইন করুন" button is already shown in HTML
   });
 }
 
-// Stats — with error handling
 if(db) {
   try {
     onSnapshot(
