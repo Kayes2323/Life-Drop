@@ -113,7 +113,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
     <div class="stats-grid">
       <div class="stat"><div class="stat-n" id="s-donors">—</div><div class="stat-l">সক্রিয় Donor</div></div>
       <div class="stat"><div class="stat-n" id="s-donations">—</div><div class="stat-l">রক্তদান সম্পন্ন</div></div>
-      <div class="stat"><div class="stat-n">৬৪</div><div class="stat-l">জেলায় সেবা</div></div>
+      <div class="stat"><div class="stat-n">৮</div><div class="stat-l">বিভাগে সেবা</div></div>
     </div>
   </div>
 
@@ -198,13 +198,9 @@ window.setStar = (n) => {
   });
 };
 
-// Secret admin: founder image click করলে ৫ বার
+// Admin check — only aakayes99@gmail.com
 window.adminClick = () => {
-  adminClickCount++;
-  if(adminClickCount >= 5) {
-    document.getElementById('admin-upload').style.display = 'block';
-    adminClickCount = 0;
-  }
+  // Will be checked after Firebase auth loads
 };
 
 function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
@@ -212,7 +208,43 @@ function showToast(m){ const t=document.getElementById('toast'); t.textContent=m
 
 <script type="module">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, addDoc, collection, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const cfg = {
+  apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
+  authDomain:"life-drop-d4784.firebaseapp.com",
+  projectId:"life-drop-d4784",
+  storageBucket:"life-drop-d4784.firebasestorage.app",
+  messagingSenderId:"671053363784",
+  appId:"1:671053363784:web:825fa9afa4f58a3ec2f67d"
+};
+const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+const ADMIN_EMAIL = 'aakayes99@gmail.com';
+
+// Check admin on auth load
+onAuthStateChanged(auth, user => {
+  if(user && user.email === ADMIN_EMAIL) {
+    document.getElementById('admin-upload').style.display = 'block';
+  }
+});
+
+// Admin click on founder photo (backup: 5 taps if not logged in)
+let tapCount = 0;
+window.adminClick = () => {
+  import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js").then(({getAuth})=>{
+    const u = getAuth().currentUser;
+    if(u && u.email === ADMIN_EMAIL) {
+      document.getElementById('admin-upload').style.display = 'block';
+    } else {
+      tapCount++;
+      if(tapCount >= 7) { tapCount=0; showToast('Admin হিসেবে লগইন করুন।'); }
+    }
+  });
+};
 
 const cfg = {
   apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
