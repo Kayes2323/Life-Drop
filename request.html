@@ -52,7 +52,8 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .e-info-item:nth-child(4){border-top:1px solid #f5f5f5;border-right:none}
 .e-info-label{font-size:10px;color:#bbb;font-family:'Hind Siliguri',sans-serif;margin-bottom:3px}
 .e-info-val{font-size:12px;font-weight:700;color:#333;font-family:'Hind Siliguri',sans-serif;line-height:1.4}
-.e-details{padding:10px 13px;background:#fafafa;font-size:12px;color:#555;font-family:'Hind Siliguri',sans-serif;line-height:1.6;border-top:1px solid #f0f0f0}
+.e-location{padding:6px 13px;font-size:11px;color:#2980b9;font-family:'Hind Siliguri',sans-serif;background:#ebf5fb;border-top:1px solid #f0f0f0}
+.e-details{padding:8px 13px;background:#fafafa;font-size:12px;color:#555;font-family:'Hind Siliguri',sans-serif;line-height:1.6;border-top:1px solid #f0f0f0}
 .e-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;border-top:1px solid #f5f5f5}
 .e-time{font-size:10px;color:#bbb;font-family:'Inter',sans-serif}
 .e-actions{display:flex;gap:6px}
@@ -273,29 +274,30 @@ window.loadPosts = () => {
           <div class="e-card-header">
             <div class="blood-circle" style="background:${c}">${r.blood}</div>
             <div class="e-card-title">
-              <div class="e-patient">${r.patientName} — ${r.bags} ব্যাগ দরকার</div>
-              <div class="e-hospital">🏥 ${r.hospital}</div>
+              <div class="e-patient">${r.patientName} — ${r.bags} ব্যাগ ${r.blood} দরকার</div>
+              <div class="e-hospital">🏥 ${r.hospital}, ${r.location}</div>
             </div>
             <span class="urgent-pill">🆘 জরুরি</span>
           </div>
           <div class="e-info-grid">
             <div class="e-info-item">
-              <div class="e-info-label">সমস্যা</div>
+              <div class="e-info-label">🔴 সমস্যা</div>
               <div class="e-info-val">${r.problem}</div>
             </div>
             <div class="e-info-item">
-              <div class="e-info-label">রক্তের গ্রুপ</div>
-              <div class="e-info-val" style="color:${c}">${r.blood}</div>
+              <div class="e-info-label">🩸 রক্তের গ্রুপ</div>
+              <div class="e-info-val" style="color:${c};font-size:15px;font-weight:800">${r.blood}</div>
             </div>
             <div class="e-info-item">
-              <div class="e-info-label">কখন লাগবে</div>
+              <div class="e-info-label">⏰ কখন লাগবে</div>
               <div class="e-info-val">${formatDate(r.when)}</div>
             </div>
             <div class="e-info-item">
-              <div class="e-info-label">এলাকা</div>
-              <div class="e-info-val">${r.location||'—'}</div>
+              <div class="e-info-label">📌 হাসপাতাল</div>
+              <div class="e-info-val">${r.hospital}</div>
             </div>
           </div>
+          ${r.location?`<div class="e-location">📍 ${r.location}</div>`:''}
           ${r.details?`<div class="e-details">📝 ${r.details}</div>`:''}
           <div class="e-footer">
             <span class="e-time">${timeAgo(r.createdAt)}</span>

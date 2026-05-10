@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeDrop — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+.header{background:linear-gradient(135deg,#2c3e50,#34495e);padding:13px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.15);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header h1{color:#fff;font-size:16px;font-weight:800}
+.admin-badge{background:#e74c3c;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:auto;font-family:'Inter',sans-serif}
+.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:24px}
+
+/* TABS */
+.tabs{display:flex;background:#fff;border-bottom:2px solid #f0f0f0;flex-shrink:0}
+.tab{flex:1;padding:11px 4px;border:none;background:transparent;font-size:12px;font-weight:600;color:#bbb;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Hind Siliguri',sans-serif;transition:.2s}
+.tab.active{color:#2c3e50;border-bottom-color:#2c3e50}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.stat-card{background:#fff;border-radius:14px;padding:16px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.stat-card .num{font-size:28px;font-weight:800;font-family:'Inter',sans-serif;color:#2c3e50}
+.stat-card .lbl{font-size:11px;color:#aaa;margin-top:3px;font-family:'Hind Siliguri',sans-serif}
+.stat-card.red .num{color:#c0392b}
+.stat-card.green .num{color:#27ae60}
+.stat-card.blue .num{color:#2980b9}
+.stat-card.orange .num{color:#e67e22}
+
+/* FEEDBACK CARD */
+.fb-card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06);border-left:4px solid #3498db}
+.fb-card.rating-5{border-left-color:#27ae60}
+.fb-card.rating-4{border-left-color:#2ecc71}
+.fb-card.rating-3{border-left-color:#f39c12}
+.fb-card.rating-2{border-left-color:#e67e22}
+.fb-card.rating-1{border-left-color:#c0392b}
+.fb-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.fb-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ecf0f1,#bdc3c7);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#2c3e50;flex-shrink:0}
+.fb-name{font-size:13px;font-weight:700;font-family:'Hind Siliguri',sans-serif;color:#222}
+.fb-time{font-size:10px;color:#bbb;font-family:'Inter',sans-serif}
+.fb-stars{margin-left:auto;font-size:13px}
+.fb-text{font-size:12px;color:#555;font-family:'Hind Siliguri',sans-serif;line-height:1.7;background:#fafafa;border-radius:10px;padding:10px}
+
+/* DONOR LIST */
+.donor-row{background:#fff;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.d-avatar{width:38px;height:38px;border-radius:50%;background:#fdecea;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#c0392b;flex-shrink:0;overflow:hidden}
+.d-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.d-info{flex:1;min-width:0}
+.d-name{font-size:13px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:2px}
+.d-sub{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif}
+.d-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.d-badge.active{background:#d1f3e0;color:#155724}
+.d-badge.inactive{background:#fdecea;color:#c0392b}
+
+/* ACCESS DENIED */
+.denied{text-align:center;padding:60px 20px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.denied .icon{font-size:56px;margin-bottom:14px}
+.denied h3{font-size:18px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:8px;color:#c0392b}
+.denied p{font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif;line-height:1.6}
+
+.spinner{width:36px;height:36px;border:4px solid #eee;border-top-color:#2c3e50;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:'Hind Siliguri',sans-serif}
+.toast.show{opacity:1}
+.empty{text-align:center;padding:40px 20px;color:#bbb;font-family:'Hind Siliguri',sans-serif;font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html" class="back">←</a>
+  <h1>🔐 Admin Panel</h1>
+  <span class="admin-badge">ADMIN ONLY</span>
+</div>
+
+<!-- TABS -->
+<div class="tabs" id="admin-tabs" style="display:none">
+  <button class="tab active" id="t-feedback" onclick="switchTab('feedback')">💬 Feedback</button>
+  <button class="tab" id="t-stats" onclick="switchTab('stats')">📊 Statistics</button>
+  <button class="tab" id="t-donors" onclick="switchTab('donors')">🩸 Donors</button>
+</div>
+
+<!-- CONTENT -->
+<div class="scr" id="main-content">
+  <div style="text-align:center;padding:60px 20px">
+    <div class="spinner"></div>
+    <p style="margin-top:14px;color:#aaa;font-size:13px;font-family:'Hind Siliguri',sans-serif">লোড হচ্ছে...</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN = 'aakayes99@gmail.com';
+
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
+function ini(n){ return(n||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+function timeAgo(ts){
+  if(!ts) return '';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  const s=Math.floor((Date.now()-d)/1000);
+  if(s<60) return 'এইমাত্র';
+  if(s<3600) return Math.floor(s/60)+' মিনিট আগে';
+  if(s<86400) return Math.floor(s/3600)+' ঘণ্টা আগে';
+  return Math.floor(s/86400)+' দিন আগে';
+}
+function stars(r){ return '⭐'.repeat(r||0)+'☆'.repeat(5-(r||0)); }
+
+window.switchTab = (tab) => {
+  ['feedback','stats','donors'].forEach(t => {
+    document.getElementById('t-'+t).classList.toggle('active', t===tab);
+  });
+  if(tab==='feedback') loadFeedback();
+  if(tab==='stats') loadStats();
+  if(tab==='donors') loadDonors();
+};
+</script>
+
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const cfg = {
+  apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
+  authDomain:"life-drop-d4784.firebaseapp.com",
+  projectId:"life-drop-d4784",
+  storageBucket:"life-drop-d4784.firebasestorage.app",
+  messagingSenderId:"671053363784",
+  appId:"1:671053363784:web:825fa9afa4f58a3ec2f67d"
+};
+const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+const ADMIN_EMAIL = 'aakayes99@gmail.com';
+
+onAuthStateChanged(auth, user => {
+  const el = document.getElementById('main-content');
+  if(!user){
+    el.innerHTML=`<div class="denied"><div class="icon">🔒</div><h3>Access Denied</h3><p>Admin হিসেবে লগইন করুন।</p><a href="login.html" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#c0392b;color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif">লগইন করুন</a></div>`;
+    return;
+  }
+  if(user.email !== ADMIN_EMAIL){
+    el.innerHTML=`<div class="denied"><div class="icon">⛔</div><h3>Access Denied</h3><p>এই page শুধু admin দেখতে পারবেন।</p></div>`;
+    return;
+  }
+  // Admin confirmed
+  document.getElementById('admin-tabs').style.display='flex';
+  loadFeedback();
+});
+
+// ── FEEDBACK ─────────────────────────────────────────────────
+window.loadFeedback = async () => {
+  const el = document.getElementById('main-content');
+  el.innerHTML=`<div style="text-align:center;padding:30px"><div class="spinner"></div></div>`;
+  try {
+    const snap = await getDocs(query(collection(db,'feedback'), orderBy('createdAt','desc')));
+    if(snap.empty){
+      el.innerHTML=`<div class="empty">এখনো কোনো feedback নেই।</div>`; return;
+    }
+    const avgRating = snap.docs.reduce((s,d)=>s+(d.data().rating||0),0)/snap.size;
+    el.innerHTML=`
+      <div style="background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.06);text-align:center">
+        <div style="font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:4px">মোট ${snap.size}টি feedback • গড় rating</div>
+        <div style="font-size:24px;font-weight:800;color:#2c3e50;font-family:'Inter',sans-serif">${avgRating.toFixed(1)} ⭐</div>
+      </div>` +
+    snap.docs.map(d => {
+      const f = d.data();
+      const r = f.rating||0;
+      return `
+      <div class="fb-card rating-${r}">
+        <div class="fb-top">
+          <div class="fb-avatar">${ini(f.name)}</div>
+          <div>
+            <div class="fb-name">${f.name||'অজ্ঞাত'}</div>
+            <div class="fb-time">${timeAgo(f.createdAt)}</div>
+          </div>
+          <div class="fb-stars">${stars(r)}</div>
+        </div>
+        <div class="fb-text">${f.text}</div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    el.innerHTML=`<div class="empty" style="color:#c0392b">লোড করতে সমস্যা হয়েছে।</div>`;
+  }
+};
+
+// ── STATS ─────────────────────────────────────────────────────
+window.loadStats = async () => {
+  const el = document.getElementById('main-content');
+  el.innerHTML=`<div style="text-align:center;padding:30px"><div class="spinner"></div></div>`;
+  try {
+    const [donorsSnap, usersSnap, reqSnap, fbSnap] = await Promise.all([
+      getDocs(collection(db,'donors')),
+      getDocs(collection(db,'users')),
+      getDocs(collection(db,'bloodRequests')),
+      getDocs(collection(db,'feedback'))
+    ]);
+    const activeDonors = donorsSnap.docs.filter(d=>d.data().available).length;
+    el.innerHTML=`
+      <div class="stat-grid">
+        <div class="stat-card red"><div class="num">${donorsSnap.size}</div><div class="lbl">মোট Donor</div></div>
+        <div class="stat-card green"><div class="num">${activeDonors}</div><div class="lbl">সক্রিয় Donor</div></div>
+        <div class="stat-card blue"><div class="num">${usersSnap.size}</div><div class="lbl">মোট User</div></div>
+        <div class="stat-card orange"><div class="num">${reqSnap.size}</div><div class="lbl">রক্তের অনুরোধ</div></div>
+      </div>
+      <div class="stat-card" style="margin-top:0"><div class="num" style="color:#8e44ad">${fbSnap.size}</div><div class="lbl">মোট Feedback</div></div>`;
+  } catch(e){
+    el.innerHTML=`<div class="empty" style="color:#c0392b">লোড করতে সমস্যা হয়েছে।</div>`;
+  }
+};
+
+// ── DONORS ────────────────────────────────────────────────────
+window.loadDonors = async () => {
+  const el = document.getElementById('main-content');
+  el.innerHTML=`<div style="text-align:center;padding:30px"><div class="spinner"></div></div>`;
+  try {
+    const snap = await getDocs(query(collection(db,'donors'), orderBy('createdAt','desc')));
+    if(snap.empty){ el.innerHTML=`<div class="empty">কোনো donor নেই।</div>`; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const r = d.data();
+      return `
+      <div class="donor-row">
+        <div class="d-avatar">${r.photo?`<img src="${r.photo}"/>`:ini(r.name)}</div>
+        <div class="d-info">
+          <div class="d-name">${r.name} <span style="font-size:11px;color:#c0392b;font-weight:700">${r.blood}</span></div>
+          <div class="d-sub">📌 ${[r.area,r.district,r.division].filter(Boolean).join(', ')}</div>
+          <div class="d-sub">📞 ${r.phone||'—'}</div>
+        </div>
+        <span class="d-badge ${r.available?'active':'inactive'}">${r.available?'সক্রিয়':'অপ্রস্তুত'}</span>
+      </div>`;
+    }).join('');
+  } catch(e){
+    el.innerHTML=`<div class="empty" style="color:#c0392b">লোড করতে সমস্যা হয়েছে।</div>`;
+  }
+};
+</script>
+</body>
+</html>
