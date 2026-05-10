@@ -168,7 +168,7 @@ window.switchTab = (tab) => {
     document.getElementById('phone-step1').style.display = 'block';
     document.getElementById('phone-step2').style.display = 'none';
     document.getElementById('otp-sent-msg').style.display = 'none';
-    initRecaptcha();
+    initRecaptcha(true);
   }
 };
 
@@ -219,32 +219,73 @@ window.loginEmail = async () => {
   }
 };
 
-// PHONE OTP
-function initRecaptcha(){
-  if(recaptchaVerifier) return;
+// PHONE OTP — Firebase SMS + reCAPTCHA; tear down verifier on failures so retries work.
+function destroyRecaptcha(){
+  try {
+    recaptchaVerifier?.clear?.();
+  } catch(_) {}
+  recaptchaVerifier = null;
+  const el = document.getElementById('recaptcha-container');
+  if (el) el.innerHTML = '';
+}
+
+/** Accepts +880..., 880..., 01..., 1... (Bangladesh mobile) → E.164 +8801XXXXXXXXX */
+function normalizeBdPhone(raw){
+  let d = String(raw || '').replace(/\s+/g, '');
+  if (!d) return '';
+  if (d.startsWith('+')) d = d.slice(1);
+  if (d.startsWith('880')) d = d.slice(3);
+  if (d.startsWith('0')) d = d.slice(1);
+  if (d.startsWith('1') && d.length === 10) return '+880' + d;
+  if (/^\d{10,11}$/.test(d)) return '+880' + (d.startsWith('1') ? d : '');
+  return '+' + raw.replace(/\s+/g,'').replace(/^\+/, '');
+}
+
+/** @returns {boolean} */
+function initRecaptcha(silent){
+  destroyRecaptcha();
   try {
     recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
       size:'invisible',
       callback: () => {}
     });
-  } catch(e){}
+    return true;
+  } catch(e){
+    if(!silent){
+      showErr('যাচাইকরণ লোড করা যায়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।');
+    }
+    return false;
+  }
 }
 
 window.sendOTP = async () => {
-  const phone = document.getElementById('phone-num').value.trim();
+  const raw = document.getElementById('phone-num').value.trim();
   const btn   = document.getElementById('otp-send-btn');
   hideErr();
-  if(!phone){ showErr('+880 দিয়ে পূর্ণ ফোন নম্বর দিন'); return; }
-  if(!phone.startsWith('+')){ showErr('নম্বর +880 দিয়ে শুরু করুন, যেমন: +8801711223344'); return; }
+
+  let phone = raw.replace(/\s+/g, '').trim();
+  if (!phone){ showErr('ফোন নম্বর দিন'); return; }
+  if (!phone.startsWith('+')) phone = normalizeBdPhone(phone);
+  if (!/^\+8801\d{9}$/.test(phone)){
+    showErr('মোবাইল নম্বর সঠিক দিন: +880 দিয়ে ১১ টি সংখ্যা (যেমন +8801712345678) বা 01XXXXXXXXX'); return;
+  }
+
   btn.textContent='OTP পাঠানো হচ্ছে...'; btn.disabled=true;
+
   try {
+    if (!recaptchaVerifier && !initRecaptcha(false)){
+      btn.textContent='OTP পাঠান'; btn.disabled=false; return;
+    }
     confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
+    document.getElementById('phone-num').value = phone;
     document.getElementById('phone-step1').style.display='none';
     document.getElementById('phone-step2').style.display='block';
     document.getElementById('otp-sent-msg').style.display='block';
   } catch(e){
-    showErr('OTP পাঠানো যায়নি: '+e.message);
-    recaptchaVerifier=null;
+    const code = e?.code || '';
+    showErr(phoneErrMsg(code) || ('OTP পাঠানো যায়নি: ' + (e?.message || String(e))));
+    destroyRecaptcha();
+    initRecaptcha(true);
     btn.textContent='OTP পাঠান'; btn.disabled=false;
   }
 };
@@ -292,6 +333,20 @@ function errMsg(c){
     'auth/too-many-requests':'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
     'auth/network-request-failed':'ইন্টারনেট সংযোগ চেক করুন।'
   }[c]||'সমস্যা হয়েছে: '+c;
+}
+
+function phoneErrMsg(c){
+  return {
+    'auth/invalid-phone-number':'ফোন নম্বরের ফরম্যাট ভুল। +8801XXXXXXXXX দিন।',
+    'auth/missing-phone-number':'ফোন নম্বর দিন।',
+    'auth/captcha-check-failed':'যাচাইকরণ (reCAPTCHA) ব্যর্থ। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।',
+    'auth/quota-exceeded':'SMS কোটা শেষ। Firebase Console / বিলিং চেক করুন।',
+    'auth/too-many-requests':'একই নম্বরে অনেকবার চেষ্টা। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
+    'auth/missing-app-credential':'Firebase ফোন লগইন এই ব্রাউজার/ডোমেইনে সেটআপ নেই। Authorized domains চেক করুন।',
+    'auth/invalid-app-credential':'অ্যাপ কনফিগ/SHA বা ডোমেইন মিলছে না। Firebase Authentication সেটিং দেখুন।',
+    'auth/operation-not-allowed':'Firebase Console এ Phone sign-in চালু করুন।',
+    'auth/network-request-failed':'ইন্টারনেট সংযোগ চেক করুন।'
+  }[c] || '';
 }
 
 document.addEventListener('keydown', e => {

@@ -94,8 +94,6 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 <div class="toast" id="toast"></div>
 
 <script>
-const ADMIN = 'aakayes99@gmail.com';
-
 function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
 function ini(n){ return(n||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
 function timeAgo(ts){
@@ -122,7 +120,7 @@ window.switchTab = (tab) => {
 <script type="module">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
   apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
@@ -136,19 +134,32 @@ const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-const ADMIN_EMAIL = 'aakayes99@gmail.com';
+const SUPER_ADMIN_EMAIL = 'aakayes99@gmail.com';
 
-onAuthStateChanged(auth, user => {
+async function userIsAdmin(user){
+  if(!user?.uid) return false;
+  if((user.email||'').toLowerCase()===SUPER_ADMIN_EMAIL) return true;
+  try{
+    const snap = await getDoc(doc(db,'users',user.uid));
+    if(snap.exists()){
+      const d = snap.data();
+      return d.isAdmin===true || d.role==='admin';
+    }
+  }catch(e){}
+  return false;
+}
+
+onAuthStateChanged(auth, async user => {
   const el = document.getElementById('main-content');
   if(!user){
     el.innerHTML=`<div class="denied"><div class="icon">🔒</div><h3>Access Denied</h3><p>Admin হিসেবে লগইন করুন।</p><a href="login.html" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#c0392b;color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif">লগইন করুন</a></div>`;
     return;
   }
-  if(user.email !== ADMIN_EMAIL){
-    el.innerHTML=`<div class="denied"><div class="icon">⛔</div><h3>Access Denied</h3><p>এই page শুধু admin দেখতে পারবেন।</p></div>`;
+  const ok = await userIsAdmin(user);
+  if(!ok){
+    el.innerHTML=`<div class="denied"><div class="icon">⛔</div><h3>Access Denied</h3><p>এই পেজ শুধু অনুমোদিত প্রশাসকের জন্য। মূল অ্যাডমিন অন্য অ্যাকাউন্টে প্রশাসক অ্যাক্সেস দিতে Firestore এর <strong>users</strong> ডকুমেন্টে <strong>isAdmin: true</strong> সেট করতে পারেন।</p></div>`;
     return;
   }
-  // Admin confirmed
   document.getElementById('admin-tabs').style.display='flex';
   loadFeedback();
 });

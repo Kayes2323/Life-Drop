@@ -7,11 +7,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
-.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding-bottom:76px}
+.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
 .back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .header h1{color:#fff;font-size:16px;font-weight:800}
-.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:24px}
+.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:88px}
 .acard{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
 .acard-dark{background:#2c2c2c;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.1)}
 .atitle{display:flex;align-items:center;gap:8px;margin-bottom:10px}
@@ -51,7 +51,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .success-box{text-align:center;padding:20px;display:none}
 .success-box .icon{font-size:40px;margin-bottom:8px}
 .success-box p{font-size:13px;color:#27ae60;font-weight:700;font-family:'Hind Siliguri',sans-serif}
-.bnav{background:#fff;border-top:1px solid #f0f0f0;display:flex;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.bnav{background:#fff;border-top:1px solid #f0f0f0;display:flex;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);z-index:300}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;gap:2px;border:none;background:transparent;text-decoration:none}
 .bi{font-size:17px;line-height:1}
 .bl{font-size:9px;color:#bbb;font-family:'Hind Siliguri',sans-serif}
@@ -96,7 +96,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
     <div class="stats-grid">
       <div class="stat"><div class="stat-n" id="s-donors">—</div><div class="stat-l">সক্রিয় Donor</div></div>
       <div class="stat"><div class="stat-n" id="s-donations">—</div><div class="stat-l">রক্তদান সম্পন্ন</div></div>
-      <div class="stat"><div class="stat-n">৮</div><div class="stat-l">বিভাগে সেবা</div></div>
+      <div class="stat"><div class="stat-n">৬৪</div><div class="stat-l">জেলায় সেবা</div></div>
     </div>
   </div>
 
@@ -114,7 +114,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
       <img id="founder-photo" src="" style="display:none"/>
       <span id="founder-placeholder">👤</span>
     </div>
-    <div class="founder-name">আব্দুল আজিজ কায়েস</div>
+    <div class="founder-name" lang="en">Abdul Aziz Kayes</div>
     <div class="founder-role">Founder & Developer — LifeDrop</div>
     <p class="founder-bio">মানুষের উপকারে প্রযুক্তিকে ব্যবহার করার লক্ষ্য থেকেই এই প্ল্যাটফর্মটি তৈরি করেছি, যাতে সহজভাবে এবং দ্রুত একটি জীবন বাঁচাতে সাহায্য করা যায়।</p>
     <div class="admin-upload" id="admin-upload">
@@ -196,20 +196,33 @@ const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-const ADMIN_EMAIL = 'aakayes99@gmail.com';
+const SUPER_ADMIN_EMAIL = 'aakayes99@gmail.com';
+
+async function userIsAdmin(u){
+  if(!u?.uid) return false;
+  if(u.email?.toLowerCase?.()===SUPER_ADMIN_EMAIL) return true;
+  try{
+    const snap = await getDoc(doc(db,'users',u.uid));
+    if(snap.exists()){
+      const d = snap.data();
+      return d.isAdmin===true || d.role==='admin';
+    }
+  }catch(e){}
+  return false;
+}
 
 // ✅ Admin check — একবারই করা হচ্ছে
-onAuthStateChanged(auth, user => {
-  if(user && user.email === ADMIN_EMAIL) {
+onAuthStateChanged(auth, async user => {
+  if(user && await userIsAdmin(user)) {
     document.getElementById('admin-upload').style.display = 'block';
   }
 });
 
 // ✅ Admin click on founder photo
 let tapCount = 0;
-window.adminClick = () => {
+window.adminClick = async () => {
   const u = auth.currentUser;
-  if(u && u.email === ADMIN_EMAIL) {
+  if(u && await userIsAdmin(u)) {
     document.getElementById('admin-upload').style.display = 'block';
   } else {
     tapCount++;

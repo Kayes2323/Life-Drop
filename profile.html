@@ -7,15 +7,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
-.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+html{height:100%;overflow-x:hidden;-webkit-text-size-adjust:100%}
+html,body{width:100%;max-width:100%}
+body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;margin:0;padding:0;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:stretch;overflow-x:hidden}
+.app{width:100%;max-width:480px;margin:0 auto;flex:1;display:flex;flex-direction:column;min-height:100dvh;background:#f5f5f5}
+.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:260;width:100%}
 .hl{display:flex;align-items:center;gap:8px}
 .hl span{font-size:18px}
 .hl h1{color:#fff;font-size:17px;font-weight:800}
-.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:24px}
+.scr{flex:1;min-height:0;width:100%;min-width:0;overflow-x:hidden;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:88px;-webkit-overflow-scrolling:touch}
 
 /* PROFILE HERO */
+.profile-hero,.info-card,.history-card,.avail-card,.not-donor-box{width:100%;max-width:100%}
 .profile-hero{background:#fff;border-radius:16px;padding:20px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06)}
 .p-avatar-wrap{position:relative;width:88px;height:88px;margin:0 auto 14px;cursor:pointer}
 .p-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#fdecea,#fde);border:3px solid #c0392b;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#c0392b;overflow:hidden}
@@ -50,13 +53,14 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .info-row:last-child{border-bottom:none}
 .info-ico{font-size:16px;width:24px;text-align:center;flex-shrink:0}
 .info-label{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;width:85px;flex-shrink:0}
-.info-val{font-size:13px;font-weight:600;color:#333;font-family:'Hind Siliguri',sans-serif;flex:1}
+.info-val{font-size:13px;font-weight:600;color:#333;font-family:'Hind Siliguri',sans-serif;flex:1;min-width:0;word-break:break-word}
 .info-val.na{color:#bbb;font-style:italic;font-weight:400;font-size:11px}
 
 /* HISTORY */
 .history-card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
 .hist-row{display:flex;align-items:center;gap:12px;background:#fafafa;border-radius:12px;padding:12px}
 .hist-num{width:42px;height:42px;background:#c0392b;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0}
+.hist-info{min-width:0;flex:1}
 .hist-info h4{font-size:13px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:2px}
 .hist-info p{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif}
 
@@ -89,7 +93,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .section-divider{font-size:12px;font-weight:700;color:#888;margin:16px 0 10px;font-family:'Hind Siliguri',sans-serif;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
 
 /* BNAV */
-.bnav{background:#fff;border-top:1px solid #f0f0f0;display:flex;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.bnav{background:#fff;border-top:1px solid #f0f0f0;display:flex;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06);position:fixed;bottom:0;left:0;right:0;margin:0 auto;max-width:480px;width:100%;z-index:300;padding-bottom:env(safe-area-inset-bottom,0px)}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;gap:2px;border:none;background:transparent;text-decoration:none}
 .bi{font-size:17px;line-height:1}
 .bl{font-size:9px;color:#bbb;font-family:'Hind Siliguri',sans-serif}
@@ -107,7 +111,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 </style>
 </head>
 <body>
-<div class="app" style="display:flex;flex-direction:column;min-height:100vh;max-width:480px;margin:0 auto;background:#f5f5f5">
+<div class="app">
 
   <div class="header">
     <div class="hl"><span>👤</span><h1>আমার Profile</h1></div>
