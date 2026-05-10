@@ -2,7 +2,7 @@
 body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;color:#222;-webkit-tap-highlight-color:transparent}
 
 /* ══ APP SHELL ══ */
-.app{max-width:480px;margin:0 auto;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;position:relative}
+.app { width: 100%; margin: 0 auto; background: #ffffff; min-height: 100vh; display: flex; flex-direction: column; position: relative; overflow: hidden; }
 
 /* ══ HEADER ══ */
 .header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 8px rgba(192,57,43,.3)}
@@ -338,3 +338,9 @@ body {
   margin-top: -18px;
 }
 .bnav-center .bl { color: #c0392b; font-weight: 700; font-size: 9px; font-family: 'Hind Siliguri', sans-serif; }
+@media screen and (min-width: 500px) {
+    .app {
+        max-width: 480px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+}
