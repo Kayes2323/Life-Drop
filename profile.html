@@ -96,14 +96,15 @@ body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-
 .section-divider{font-size:12px;font-weight:700;color:#888;margin:16px 0 10px;font-family:'Hind Siliguri',sans-serif;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
 
 /* BNAV */
-.bnav{background:#fff;border-top:1px solid #f0f0f0;display:flex;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06);position:fixed;bottom:0;left:0;right:0;margin:0 auto;max-width:480px;width:100%;z-index:300;padding-bottom:env(safe-area-inset-bottom,0px)}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;gap:2px;border:none;background:transparent;text-decoration:none}
-.bi{font-size:17px;line-height:1}
-.bl{font-size:9px;color:#bbb;font-family:'Hind Siliguri',sans-serif}
+.bnav{background:#fff;border-top:1px solid #f0f0f0;display:flex;flex-shrink:0;box-shadow:0 -2px 10px rgba(0,0,0,.06);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);z-index:300;padding-bottom:env(safe-area-inset-bottom,0px)}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 2px;gap:2px;border:none;background:transparent;text-decoration:none}
+.bi{font-size:18px;line-height:1}
+.bl{font-size:9px;color:#bbb;font-family:'Hind Siliguri',sans-serif;margin-top:1px}
 .bnav-item.active .bl{color:#c0392b;font-weight:700}
-.bnav-center{flex:1;display:flex;flex-direction:column;align-items:center;padding:3px 2px;border:none;background:transparent;gap:1px;text-decoration:none}
-.bc-btn{width:44px;height:44px;background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(192,57,43,.4);margin-top:-16px}
-.bnav-center .bl{color:#c0392b;font-weight:700;font-size:9px;font-family:'Hind Siliguri',sans-serif;margin-top:2px}
+.bnav-item.active .bi{filter:drop-shadow(0 0 2px rgba(192,57,43,.3))}
+.bnav-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 2px;border:none;background:transparent;gap:2px;text-decoration:none}
+.bc-btn{width:46px;height:46px;background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 14px rgba(192,57,43,.45);margin-top:-18px}
+.bnav-center .bl{color:#c0392b;font-weight:700;font-size:9px;font-family:'Hind Siliguri',sans-serif}
 
 .loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:9999;align-items:center;justify-content:center}
 .loading-overlay.show{display:flex}
