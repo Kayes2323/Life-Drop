@@ -20,7 +20,7 @@ body{
   width:100%;
   max-width:480px;
   margin:0 auto;
-  padding-bottom:92px;
+  padding-bottom:102px;
   overflow-x:hidden; /* prevent horizontal overflow */
 }
 
@@ -161,11 +161,10 @@ body{
     <div class="alert-icon">🆘</div>
     <div class="alert-text">
       <h3>জরুরি রক্তের প্রয়োজন?</h3>
-      <p>ঠিকানা ও বিস্তারিত ঐচ্ছিক — বাকি * অংশগুলো পূরণ করলেই পোস্ট হবে</p>
+      <p>হিমোগ্লোবিন ও বিস্তারিত ঐচ্ছিক — বাকি * অংশগুলো পূরণ করলেই পোস্ট হবে</p>
     </div>
   </div>
 
-  <!-- অনুরোধ ফর্ম (সংক্ষিপ্ত) -->
   <div class="fcard">
     <div class="fcard-title">🩸 অনুরোধের তথ্য</div>
     <div class="iw"><span class="ico">⚕️</span><input type="text" id="f-prob" placeholder="কী কারণে রক্ত লাগবে? (যেমন: অপারেশন) *"/></div>
@@ -181,15 +180,11 @@ body{
     </div>
     <div class="date-label">কখন লাগবে? *</div>
     <div class="iw"><span class="ico">📅</span><input type="datetime-local" id="f-when"/></div>
-  </div>
-
-  <div class="fcard">
-    <div class="fcard-title">🏥 হাসপাতাল ও যোগাযোগ</div>
     <div class="iw"><span class="ico">🏥</span><input type="text" id="f-hospital" placeholder="হাসপাতালের নাম *"/></div>
-    <div class="iw"><span class="ico">📌</span><input type="text" id="f-location" placeholder="হাসপাতালের এলাকা বা ঠিকানা (ঐচ্ছিক)"/></div>
     <div class="iw"><span class="ico">👤</span><input type="text" id="f-cname" placeholder="যোগাযোগের নাম *"/></div>
     <div class="iw"><span class="ico">📞</span><input type="tel" id="f-cphone" placeholder="ফোন নম্বর *"/></div>
-    <div class="iw" style="align-items:flex-start;padding-top:10px;padding-bottom:10px"><span class="ico" style="margin-top:2px">📝</span><textarea id="f-details" rows="2" placeholder="বিস্তারিত (ঐচ্ছিক) — প্রয়োজনে লিখুন"></textarea></div>
+    <div class="iw"><span class="ico">🧪</span><input type="text" id="f-hb" placeholder="হিমোগ্লোবিন (ঐচ্ছিক), যেমন: ১০ গ্রাম/ডিএল"/></div>
+    <div class="iw" style="align-items:flex-start;padding-top:10px;padding-bottom:10px"><span class="ico" style="margin-top:2px">📝</span><textarea id="f-details" rows="2" placeholder="বিস্তারিত (ঐচ্ছিক) — শেষে লিখুন"></textarea></div>
   </div>
 
   <button class="submit-btn" id="submit-btn" onclick="submitRequest()">🆘 পোস্ট করুন</button>
@@ -255,9 +250,10 @@ function formatDate(str){
 }
 function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
 
-window.sharePost = (problem, blood, bags, hospital, phone, location) => {
+window.sharePost = (problem, blood, bags, hospital, phone, location, hemoglobin) => {
   const loc = (location && String(location).trim()) ? `\nঠিকানা: ${location}` : '';
-  const text = `🆘 জরুরি রক্তের প্রয়োজন!\n\nকারণ: ${problem}\nরক্তের গ্রুপ: ${blood} (${bags} ব্যাগ)\nহাসপাতাল: ${hospital}${loc}\nযোগাযোগ: ${phone}\n\nSondhan — life-drop-ashen.vercel.app/request.html`;
+  const hb = (hemoglobin && String(hemoglobin).trim()) ? `\nহিমোগ্লোবিন: ${hemoglobin}` : '';
+  const text = `🆘 জরুরি রক্তের প্রয়োজন!\n\nকারণ: ${problem}\nরক্তের গ্রুপ: ${blood} (${bags} ব্যাগ)\nহাসপাতাল: ${hospital}${loc}${hb}\nযোগাযোগ: ${phone}\n\nSondhan — life-drop-ashen.vercel.app/request.html`;
   if(navigator.share){ navigator.share({title:'জরুরি রক্তের অনুরোধ', text}); }
   else { navigator.clipboard.writeText(text); showToast('✅ কপি হয়েছে! Share করুন।'); }
 };
@@ -265,7 +261,7 @@ window.sharePost = (problem, blood, bags, hospital, phone, location) => {
 
 <script type="module">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
@@ -279,28 +275,27 @@ const cfg = {
 const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
 const auth = getAuth(app);
 const db   = getFirestore(app);
+setPersistence(auth, browserLocalPersistence).catch(() => {});
 let CU = null;
 
-// ── Auth check with 3s timeout ──
-let authDone = false;
-const authTimeout = setTimeout(() => {
-  if(!authDone){
-    authDone = true;
-    document.getElementById('auth-overlay').classList.add('show');
-  }
-}, 3000);
-
-onAuthStateChanged(auth, user => {
-  clearTimeout(authTimeout);
-  if(authDone) return;
-  authDone = true;
+function applyAuthUser(user){
   CU = user;
+  const ov = document.getElementById('auth-overlay');
   if(user){
     document.getElementById('f-cname').value = user.displayName||'';
-    loadPosts();
+    ov.classList.remove('show');
   } else {
-    document.getElementById('auth-overlay').classList.add('show');
+    ov.classList.add('show');
   }
+}
+
+auth.authStateReady().then(() => {
+  applyAuthUser(auth.currentUser);
+  if(auth.currentUser) loadPosts();
+});
+
+onAuthStateChanged(auth, user => {
+  applyAuthUser(user);
 });
 
 let postsUnsub = null;
@@ -312,7 +307,7 @@ window.submitRequest = async () => {
   const bags     = document.getElementById('f-bags').value;
   const when     = document.getElementById('f-when').value;
   const hospital = document.getElementById('f-hospital').value.trim();
-  const location = document.getElementById('f-location').value.trim();
+  const hb       = document.getElementById('f-hb').value.trim();
   const details  = document.getElementById('f-details').value.trim();
   const cname    = document.getElementById('f-cname').value.trim();
   const cphone   = document.getElementById('f-cphone').value.trim();
@@ -327,12 +322,13 @@ window.submitRequest = async () => {
       patientName:'',
       problem:prob, blood,
       bags:parseInt(bags), when, hospital,
-      location: location || '',
+      location:'',
+      hemoglobin: hb || '',
       details, contactName:cname, contactPhone:cphone,
       uid:CU.uid, status:'active',
       createdAt:serverTimestamp()
     });
-    ['f-prob','f-bags','f-when','f-hospital','f-location','f-details','f-cphone']
+    ['f-prob','f-bags','f-when','f-hospital','f-hb','f-details','f-cphone']
       .forEach(id => document.getElementById(id).value='');
     document.getElementById('f-blood').value='';
     showToast('✅ পোস্ট হয়েছে!');
@@ -364,6 +360,9 @@ window.loadPosts = () => {
         const locStr = (r.location && String(r.location).trim())
           ? `<div class="post-strip"><span class="strip-icon">📌</span><span class="strip-label">ঠিকানা</span><span class="strip-val">${r.location}</span></div>`
           : '';
+        const hbStr = (r.hemoglobin && String(r.hemoglobin).trim())
+          ? `<div class="post-strip"><span class="strip-icon">🧪</span><span class="strip-label">হিমোগ্লোবিন</span><span class="strip-val">${r.hemoglobin}</span></div>`
+          : '';
         const contactMeta = (r.contactName && String(r.contactName).trim())
           ? `<div class="post-contact">${r.contactName}</div>`
           : '';
@@ -387,13 +386,14 @@ window.loadPosts = () => {
               <span class="strip-val">${formatDate(r.when)}</span>
             </div>
             ${locStr}
+            ${hbStr}
           </div>
           ${r.details?`<div class="post-note">📝 ${r.details}</div>`:''}
           <div class="post-footer">
             <div class="post-foot-line"><span class="post-time">${timeAgo(r.createdAt)}</span>${contactMeta}</div>
             <div class="post-actions">
               <a class="pbtn call" href="tel:${r.contactPhone}">📞 কল করুন</a>
-              <button type="button" class="pbtn share" onclick="sharePost(${JSON.stringify(r.problem||'')}, ${JSON.stringify(r.blood||'')}, ${JSON.stringify(String(r.bags||''))}, ${JSON.stringify(r.hospital||'')}, ${JSON.stringify(r.contactPhone||'')}, ${JSON.stringify(r.location||'')})">🔗 শেয়ার</button>
+              <button type="button" class="pbtn share" onclick="sharePost(${JSON.stringify(r.problem||'')}, ${JSON.stringify(r.blood||'')}, ${JSON.stringify(String(r.bags||''))}, ${JSON.stringify(r.hospital||'')}, ${JSON.stringify(r.contactPhone||'')}, ${JSON.stringify(r.location||'')}, ${JSON.stringify(r.hemoglobin||'')})">🔗 শেয়ার</button>
             </div>
           </div>
         </div>`;

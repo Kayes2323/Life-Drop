@@ -196,13 +196,20 @@ import { collection, getDocs, addDoc, serverTimestamp } from "https://www.gstati
 
 let CU = null;
 
-// LOGIN GUARD
-onAuthStateChanged(auth, user => {
+auth.authStateReady().then(() => {
+  const user = auth.currentUser;
   if(!user){ window.location.href='login.html?redirect=search.html'; return; }
   CU = user;
   document.getElementById('auth-info').textContent = user.displayName?.split(' ')[0]||'';
-  // pre-fill request form
-  document.getElementById('req-name').value = user.displayName||'';
+  const rn = document.getElementById('req-name');
+  if(rn) rn.value = user.displayName||'';
+  onAuthStateChanged(auth, u => {
+    if(!u){ window.location.href='login.html?redirect=search.html'; return; }
+    CU = u;
+    document.getElementById('auth-info').textContent = u.displayName?.split(' ')[0]||'';
+    const r2 = document.getElementById('req-name');
+    if(r2) r2.value = u.displayName||'';
+  });
 });
 
 // SEARCH — donors collection, JS filter

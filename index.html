@@ -214,7 +214,7 @@ window.addEventListener('load', () => {
 <!-- Firebase loads AFTER page is visible — non-blocking -->
 <script type="module">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
@@ -231,6 +231,7 @@ try {
   app  = getApps().length ? getApps()[0] : initializeApp(cfg);
   auth = getAuth(app);
   db   = getFirestore(app);
+  setPersistence(auth, browserLocalPersistence).catch(() => {});
 } catch(e) {
   console.warn('Firebase init failed:', e);
   // Page still works — auth just stays false

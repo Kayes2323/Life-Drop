@@ -13,7 +13,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{height:100%;overflow-x:hidden;-webkit-text-size-adjust:100%}
 html,body{width:100%;max-width:100%}
-body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;margin:0;padding:0;padding-bottom:calc(92px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:stretch;overflow-x:hidden}
+body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;margin:0;padding:0;padding-bottom:calc(102px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:stretch;overflow-x:hidden}
 .app{width:100%;max-width:480px;margin:0 auto;flex:1;display:flex;flex-direction:column;min-height:100dvh;background:#f5f5f5}
 .header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:260;width:100%}
 .hl{display:flex;align-items:center;gap:8px;min-width:0}
@@ -168,7 +168,7 @@ body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-
 
 <script type="module">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
@@ -182,13 +182,21 @@ const cfg = {
 const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
 const auth = getAuth(app);
 const db   = getFirestore(app);
+setPersistence(auth, browserLocalPersistence).catch(() => {});
 let CU=null, UD=null, DD=null;
 
-onAuthStateChanged(auth, async user => {
+auth.authStateReady().then(async () => {
+  const user = auth.currentUser;
   if(!user){ window.location.replace('login.html?redirect=profile.html'); return; }
   CU = user;
   await loadData();
   render();
+  onAuthStateChanged(auth, async u => {
+    if(!u){ window.location.replace('login.html?redirect=profile.html'); return; }
+    CU = u;
+    await loadData();
+    render();
+  });
 });
 
 async function loadData(){
