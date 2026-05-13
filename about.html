@@ -11,11 +11,11 @@
 <link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding-bottom:76px}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding-bottom:92px}
 .header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
 .back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .header h1{color:#fff;font-size:16px;font-weight:800}
-.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:88px}
+.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:calc(14px + var(--bottom-nav-h))}
 .acard{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
 .acard-dark{background:#2c2c2c;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.1)}
 .atitle{display:flex;align-items:center;gap:8px;margin-bottom:10px}
@@ -55,14 +55,6 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .success-box{text-align:center;padding:20px;display:none}
 .success-box .icon{font-size:40px;margin-bottom:8px}
 .success-box p{font-size:13px;color:#27ae60;font-weight:700;font-family:'Hind Siliguri',sans-serif}
-.bnav{background:#fff;border-top:1px solid #f0f0f0;display:flex;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);z-index:300}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;gap:2px;border:none;background:transparent;text-decoration:none}
-.bi{font-size:17px;line-height:1}
-.bl{font-size:9px;color:#bbb;font-family:'Hind Siliguri',sans-serif}
-.bnav-item.active .bl{color:#c0392b;font-weight:700}
-.bnav-center{flex:1;display:flex;flex-direction:column;align-items:center;padding:3px 2px;border:none;background:transparent;gap:1px;text-decoration:none}
-.bc-btn{width:44px;height:44px;background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(192,57,43,.4);margin-top:-16px}
-.bnav-center .bl{color:#c0392b;font-weight:700;font-size:9px;font-family:'Hind Siliguri',sans-serif;margin-top:2px}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;font-family:'Hind Siliguri',sans-serif}
 .toast.show{opacity:1}
 </style>
@@ -162,11 +154,11 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 </div>
 
 <div class="bnav">
-  <a class="bnav-item" href="index.html"><span class="bi">🏠</span><span class="bl">হোম</span></a>
-  <a class="bnav-item" href="search.html"><span class="bi">🔍</span><span class="bl">খুঁজুন</span></a>
-  <a class="bnav-center" href="request.html"><div class="bc-btn">🆘</div><span class="bl">অনুরোধ</span></a>
-  <a class="bnav-item active" href="about.html"><span class="bi">ℹ️</span><span class="bl">About</span></a>
-  <a class="bnav-item" href="profile.html"><span class="bi">👤</span><span class="bl">Profile</span></a>
+  <a class="bnav-item bnav-item--home" href="index.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg></span><span class="bl">হোম</span></a>
+  <a class="bnav-item bnav-item--search" href="search.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.5-3.5"/></svg></span><span class="bl">খুঁজুন</span></a>
+  <a class="bnav-center" href="request.html"><div class="bc-btn" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(-2.5 0) scale(.75)"/><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(4 -0.5) scale(.62)"/></svg></div><span class="bl">অনুরোধ</span></a>
+  <a class="bnav-item bnav-item--about active" href="about.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span><span class="bl">About</span></a>
+  <a class="bnav-item bnav-item--profile" href="profile.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="bl">Profile</span></a>
 </div>
 
 <div class="toast" id="toast"></div>

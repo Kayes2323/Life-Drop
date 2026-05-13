@@ -13,12 +13,12 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{height:100%;overflow-x:hidden;-webkit-text-size-adjust:100%}
 html,body{width:100%;max-width:100%}
-body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;margin:0;padding:0;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:stretch;overflow-x:hidden}
+body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;margin:0;padding:0;padding-bottom:calc(92px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:stretch;overflow-x:hidden}
 .app{width:100%;max-width:480px;margin:0 auto;flex:1;display:flex;flex-direction:column;min-height:100dvh;background:#f5f5f5}
 .header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:260;width:100%}
 .hl{display:flex;align-items:center;gap:8px;min-width:0}
 .hl h1{color:#fff;font-size:17px;font-weight:800;min-width:0;flex:1}
-.scr{flex:1;min-height:0;width:100%;min-width:0;overflow-x:hidden;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:88px;-webkit-overflow-scrolling:touch}
+.scr{flex:1;min-height:0;width:100%;min-width:0;overflow-x:hidden;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:calc(14px + var(--bottom-nav-h));-webkit-overflow-scrolling:touch}
 
 /* PROFILE HERO */
 .profile-hero,.info-card,.history-card,.avail-card,.not-donor-box{width:100%;max-width:100%}
@@ -95,17 +95,6 @@ body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-
 .submit-btn:disabled{background:#e0a0a0;cursor:not-allowed}
 .section-divider{font-size:12px;font-weight:700;color:#888;margin:16px 0 10px;font-family:'Hind Siliguri',sans-serif;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
 
-/* BNAV */
-.bnav{background:#fff;border-top:1px solid #f0f0f0;display:flex;flex-shrink:0;box-shadow:0 -2px 10px rgba(0,0,0,.06);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);z-index:300;padding-bottom:env(safe-area-inset-bottom,0px)}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 2px;gap:2px;border:none;background:transparent;text-decoration:none}
-.bi{font-size:18px;line-height:1}
-.bl{font-size:9px;color:#bbb;font-family:'Hind Siliguri',sans-serif;margin-top:1px}
-.bnav-item.active .bl{color:#c0392b;font-weight:700}
-.bnav-item.active .bi{filter:drop-shadow(0 0 2px rgba(192,57,43,.3))}
-.bnav-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 2px;border:none;background:transparent;gap:2px;text-decoration:none}
-.bc-btn{width:46px;height:46px;background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 14px rgba(192,57,43,.45);margin-top:-18px}
-.bnav-center .bl{color:#c0392b;font-weight:700;font-size:9px;font-family:'Hind Siliguri',sans-serif}
-
 .loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:9999;align-items:center;justify-content:center}
 .loading-overlay.show{display:flex}
 .spinner{width:38px;height:38px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:spin 1s linear infinite}
@@ -129,11 +118,11 @@ body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-
   </div>
 
   <div class="bnav">
-    <a class="bnav-item" href="index.html"><span class="bi">🏠</span><span class="bl">হোম</span></a>
-    <a class="bnav-item" href="search.html"><span class="bi">🔍</span><span class="bl">খুঁজুন</span></a>
-    <a class="bnav-center" href="request.html"><div class="bc-btn">🆘</div><span class="bl">অনুরোধ</span></a>
-    <a class="bnav-item" href="about.html"><span class="bi">ℹ️</span><span class="bl">About</span></a>
-    <a class="bnav-item active" href="profile.html"><span class="bi">👤</span><span class="bl">Profile</span></a>
+    <a class="bnav-item bnav-item--home" href="index.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg></span><span class="bl">হোম</span></a>
+    <a class="bnav-item bnav-item--search" href="search.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.5-3.5"/></svg></span><span class="bl">খুঁজুন</span></a>
+    <a class="bnav-center" href="request.html"><div class="bc-btn" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(-2.5 0) scale(.75)"/><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(4 -0.5) scale(.62)"/></svg></div><span class="bl">অনুরোধ</span></a>
+    <a class="bnav-item bnav-item--about" href="about.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span><span class="bl">About</span></a>
+    <a class="bnav-item bnav-item--profile active" href="profile.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="bl">Profile</span></a>
   </div>
 </div>
 

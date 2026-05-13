@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="sondhan-logo.png"/>
-<title>Sondhan — জরুরি অনুরোধ</title>
+<title>Sondhan — রক্তের অনুরোধ</title>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
@@ -20,24 +20,24 @@ body{
   width:100%;
   max-width:480px;
   margin:0 auto;
-  padding-bottom:76px;
+  padding-bottom:92px;
   overflow-x:hidden; /* prevent horizontal overflow */
 }
 
-.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260;width:100%}
+.req-chrome{position:sticky;top:0;z-index:260;width:100%;flex-shrink:0}
+.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:10px 12px;display:flex;align-items:center;gap:10px;width:100%}
 .back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.header h1{color:#fff;font-size:16px;font-weight:800}
 
-.tabs{display:flex;background:#fff;border-bottom:2px solid #f0f0f0;flex-shrink:0;position:sticky;top:56px;z-index:240;width:100%}
-.tab{flex:1;padding:11px 4px;border:none;background:transparent;font-size:13px;font-weight:600;color:#bbb;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Hind Siliguri',sans-serif;transition:.2s}
-.tab.active{color:#c0392b;border-bottom-color:#c0392b}
+.tabs{display:flex;background:#fff;border-bottom:2px solid #f0f0f0;width:100%}
+.tab{flex:1;padding:10px 6px;border:none;background:transparent;font-size:12px;font-weight:600;color:#888;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Hind Siliguri',sans-serif;transition:.2s;line-height:1.3}
+.tab.active{color:#c0392b;border-bottom-color:#c0392b;font-weight:700}
 
 /* ── FIX: scr must be block-level full width, NOT flex-row ── */
 .scr{
   width:100%;
   overflow-y:auto;
   padding:12px;
-  padding-bottom:88px;
+  padding-bottom:calc(14px + var(--bottom-nav-h));
   display:block; /* NOT flex — this was causing horizontal split */
 }
 
@@ -55,6 +55,7 @@ body{
 .iw:focus-within{border-color:#c0392b;background:#fff}
 .ico{font-size:14px;margin-right:9px;opacity:.6;flex-shrink:0}
 .iw input,.iw select,.iw textarea{flex:1;border:none;background:transparent;padding:12px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif;min-width:0}
+.iw textarea{min-height:52px;resize:vertical;line-height:1.45;padding-top:4px;padding-bottom:4px}
 .iw-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;width:100%}
 .iw-grid .iw{margin-bottom:0}
 .date-label{font-size:11px;font-weight:700;color:#666;margin-bottom:6px;font-family:'Hind Siliguri',sans-serif}
@@ -64,8 +65,10 @@ body{
 
 /* ── POST CARD — improved design ── */
 .post-card{background:#fff;border-radius:16px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);width:100%}
-.post-top{padding:13px 13px 10px;display:flex;align-items:flex-start;gap:10px}
-.blood-badge{min-width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;font-family:'Inter',sans-serif}
+.post-top{padding:13px 13px 10px;display:flex;align-items:flex-start;gap:12px}
+.post-blood-col{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0}
+.post-bags{font-size:11px;font-weight:700;color:#555;font-family:'Hind Siliguri',sans-serif}
+.blood-badge{min-width:52px;height:52px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;border:3px solid;flex-shrink:0;font-family:'Inter',sans-serif}
 .post-head{flex:1;min-width:0}
 .post-patient{font-size:15px;font-weight:700;font-family:'Hind Siliguri',sans-serif;color:#222;margin-bottom:2px}
 .post-problem{font-size:12px;color:#888;font-family:'Hind Siliguri',sans-serif;margin-bottom:0}
@@ -84,25 +87,17 @@ body{
 .bags-pill{background:#fdecea;color:#c0392b;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px;flex-shrink:0}
 
 /* Footer */
-.post-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:#fafafa;border-top:1px solid #f0f0f0}
+.post-footer{display:flex;flex-direction:column;gap:8px;padding:10px 13px;background:#fafafa;border-top:1px solid #f0f0f0}
+.post-foot-line{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;flex-wrap:wrap}
+.post-contact{font-size:11px;font-weight:600;color:#444;font-family:'Hind Siliguri',sans-serif;text-align:right;max-width:55%}
 .post-time{font-size:10px;color:#bbb;font-family:'Inter',sans-serif}
-.post-actions{display:flex;gap:6px}
-.pbtn{padding:8px 14px;border-radius:9px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;text-decoration:none;display:flex;align-items:center;gap:4px}
-.pbtn.call{background:#27ae60;color:#fff}
+.post-actions{display:flex;flex-direction:column;gap:6px;width:100%}
+.pbtn{padding:11px 14px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;width:100%}
+.pbtn.call{background:#d5f5e0;color:#1e8449;border:1px solid #a8e6bc}
 .pbtn.share{background:#f0f0f0;color:#555}
 
 /* Details note */
 .post-note{padding:8px 13px;background:#fffbf0;border-top:1px solid #fef3cd;font-size:11px;color:#7d6608;font-family:'Hind Siliguri',sans-serif;line-height:1.6}
-
-/* BNAV */
-.bnav{background:#fff;border-top:1px solid #f0f0f0;display:flex;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);z-index:300}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px;gap:2px;border:none;background:transparent;text-decoration:none;cursor:pointer}
-.bi{font-size:17px;line-height:1}
-.bl{font-size:9px;color:#bbb;font-family:'Hind Siliguri',sans-serif}
-.bnav-item.active .bl{color:#c0392b;font-weight:700}
-.bnav-center{flex:1;display:flex;flex-direction:column;align-items:center;padding:3px 2px;cursor:pointer;border:none;background:transparent;gap:1px;text-decoration:none}
-.bc-btn{width:44px;height:44px;background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(192,57,43,.4);margin-top:-16px}
-.bnav-center .bl{color:#c0392b;font-weight:700;font-size:9px;font-family:'Hind Siliguri',sans-serif;margin-top:2px}
 
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;font-family:'Hind Siliguri',sans-serif}
 .toast.show{opacity:1}
@@ -146,34 +141,34 @@ body{
 </head>
 <body>
 
+<div class="req-chrome">
 <div class="header">
   <a href="index.html" class="back">←</a>
   <div class="sondhan-logo sondhan-logo--navbar-crop">
     <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
   </div>
-  <h1>🆘 জরুরি রক্তের অনুরোধ</h1>
 </div>
 
 <div class="tabs">
-  <button class="tab active" id="tab-new" onclick="switchTab('new')">✏️ পোস্ট করুন</button>
-  <button class="tab" id="tab-all" onclick="switchTab('all')">📋 সকল পোস্ট</button>
+  <button type="button" class="tab active" id="tab-all" onclick="switchTab('all')">রক্তের অনুরোধসমূহ</button>
+  <button type="button" class="tab" id="tab-new" onclick="switchTab('new')">রক্তের জন্য অনুরোধ করুন</button>
+</div>
 </div>
 
 <!-- NEW REQUEST FORM -->
-<div class="scr" id="view-new">
+<div class="scr" id="view-new" style="display:none">
   <div class="alert-banner">
     <div class="alert-icon">🆘</div>
     <div class="alert-text">
       <h3>জরুরি রক্তের প্রয়োজন?</h3>
-      <p>নিচের ফর্মটি পূরণ করুন — সবাই দেখতে পাবেন</p>
+      <p>ঠিকানা ও বিস্তারিত ঐচ্ছিক — বাকি * অংশগুলো পূরণ করলেই পোস্ট হবে</p>
     </div>
   </div>
 
-  <!-- রোগীর তথ্য -->
+  <!-- অনুরোধ ফর্ম (সংক্ষিপ্ত) -->
   <div class="fcard">
-    <div class="fcard-title">👤 রোগীর তথ্য</div>
-    <div class="iw"><span class="ico">👤</span><input type="text" id="f-pname" placeholder="রোগীর নাম *"/></div>
-    <div class="iw"><span class="ico">🏥</span><input type="text" id="f-prob" placeholder="কী সমস্যা? (যেমন: অপারেশন) *"/></div>
+    <div class="fcard-title">🩸 অনুরোধের তথ্য</div>
+    <div class="iw"><span class="ico">⚕️</span><input type="text" id="f-prob" placeholder="কী কারণে রক্ত লাগবে? (যেমন: অপারেশন) *"/></div>
     <div class="iw-grid">
       <div class="iw">
         <select id="f-blood" style="flex:1;border:none;background:transparent;padding:12px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif">
@@ -184,30 +179,24 @@ body{
       </div>
       <div class="iw"><span class="ico">🩸</span><input type="number" id="f-bags" placeholder="কয় ব্যাগ *" min="1" max="20"/></div>
     </div>
-  </div>
-
-  <!-- স্থান ও সময় -->
-  <div class="fcard">
-    <div class="fcard-title">📍 স্থান ও সময়</div>
     <div class="date-label">কখন লাগবে? *</div>
-    <div class="iw" style="margin-bottom:10px"><span class="ico">📅</span><input type="datetime-local" id="f-when"/></div>
-    <div class="iw"><span class="ico">🏥</span><input type="text" id="f-hospital" placeholder="হাসপাতালের নাম *"/></div>
-    <div class="iw"><span class="ico">📌</span><input type="text" id="f-location" placeholder="হাসপাতালের এলাকা/ঠিকানা *"/></div>
-    <div class="iw"><span class="ico">📝</span><input type="text" id="f-details" placeholder="বিস্তারিত"/><span class="opt-label">(ঐচ্ছিক)</span></div>
+    <div class="iw"><span class="ico">📅</span><input type="datetime-local" id="f-when"/></div>
   </div>
 
-  <!-- যোগাযোগ -->
   <div class="fcard">
-    <div class="fcard-title">📞 যোগাযোগ</div>
-    <div class="iw"><span class="ico">👤</span><input type="text" id="f-cname" placeholder="আপনার নাম *"/></div>
+    <div class="fcard-title">🏥 হাসপাতাল ও যোগাযোগ</div>
+    <div class="iw"><span class="ico">🏥</span><input type="text" id="f-hospital" placeholder="হাসপাতালের নাম *"/></div>
+    <div class="iw"><span class="ico">📌</span><input type="text" id="f-location" placeholder="হাসপাতালের এলাকা বা ঠিকানা (ঐচ্ছিক)"/></div>
+    <div class="iw"><span class="ico">👤</span><input type="text" id="f-cname" placeholder="যোগাযোগের নাম *"/></div>
     <div class="iw"><span class="ico">📞</span><input type="tel" id="f-cphone" placeholder="ফোন নম্বর *"/></div>
+    <div class="iw" style="align-items:flex-start;padding-top:10px;padding-bottom:10px"><span class="ico" style="margin-top:2px">📝</span><textarea id="f-details" rows="2" placeholder="বিস্তারিত (ঐচ্ছিক) — প্রয়োজনে লিখুন"></textarea></div>
   </div>
 
   <button class="submit-btn" id="submit-btn" onclick="submitRequest()">🆘 পোস্ট করুন</button>
 </div>
 
 <!-- ALL REQUESTS FEED -->
-<div class="scr" id="view-all" style="display:none">
+<div class="scr" id="view-all">
   <div id="posts-list">
     <div style="text-align:center;padding:40px 20px">
       <div class="spinner" style="margin:0 auto 12px"></div>
@@ -218,11 +207,11 @@ body{
 
 <!-- BOTTOM NAV -->
 <div class="bnav">
-  <a class="bnav-item" href="index.html"><span class="bi">🏠</span><span class="bl">হোম</span></a>
-  <a class="bnav-item" href="search.html"><span class="bi">🔍</span><span class="bl">খুঁজুন</span></a>
-  <a class="bnav-center active" href="request.html"><div class="bc-btn">🆘</div><span class="bl">পোস্ট</span></a>
-  <a class="bnav-item" href="about.html"><span class="bi">ℹ️</span><span class="bl">About</span></a>
-  <a class="bnav-item" href="profile.html"><span class="bi">👤</span><span class="bl">Profile</span></a>
+  <a class="bnav-item bnav-item--home" href="index.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg></span><span class="bl">হোম</span></a>
+  <a class="bnav-item bnav-item--search" href="search.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.5-3.5"/></svg></span><span class="bl">খুঁজুন</span></a>
+  <a class="bnav-center active" href="request.html"><div class="bc-btn" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(-2.5 0) scale(.75)"/><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(4 -0.5) scale(.62)"/></svg></div><span class="bl">অনুরোধ</span></a>
+  <a class="bnav-item bnav-item--about" href="about.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span><span class="bl">About</span></a>
+  <a class="bnav-item bnav-item--profile" href="profile.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="bl">Profile</span></a>
 </div>
 
 <!-- PROFESSIONAL LOGIN OVERLAY -->
@@ -266,8 +255,9 @@ function formatDate(str){
 }
 function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
 
-window.sharePost = (pname, blood, bags, hospital, phone) => {
-  const text = `🆘 জরুরি রক্তের প্রয়োজন!\n\nরোগী: ${pname}\nরক্তের গ্রুপ: ${blood} (${bags} ব্যাগ)\nহাসপাতাল: ${hospital}\nযোগাযোগ: ${phone}\n\nSondhan — life-drop-ashen.vercel.app/request.html`;
+window.sharePost = (problem, blood, bags, hospital, phone, location) => {
+  const loc = (location && String(location).trim()) ? `\nঠিকানা: ${location}` : '';
+  const text = `🆘 জরুরি রক্তের প্রয়োজন!\n\nকারণ: ${problem}\nরক্তের গ্রুপ: ${blood} (${bags} ব্যাগ)\nহাসপাতাল: ${hospital}${loc}\nযোগাযোগ: ${phone}\n\nSondhan — life-drop-ashen.vercel.app/request.html`;
   if(navigator.share){ navigator.share({title:'জরুরি রক্তের অনুরোধ', text}); }
   else { navigator.clipboard.writeText(text); showToast('✅ কপি হয়েছে! Share করুন।'); }
 };
@@ -307,14 +297,16 @@ onAuthStateChanged(auth, user => {
   CU = user;
   if(user){
     document.getElementById('f-cname').value = user.displayName||'';
+    loadPosts();
   } else {
     document.getElementById('auth-overlay').classList.add('show');
   }
 });
 
+let postsUnsub = null;
+
 window.submitRequest = async () => {
   if(!CU){ document.getElementById('auth-overlay').classList.add('show'); return; }
-  const pname    = document.getElementById('f-pname').value.trim();
   const prob     = document.getElementById('f-prob').value.trim();
   const blood    = document.getElementById('f-blood').value;
   const bags     = document.getElementById('f-bags').value;
@@ -325,20 +317,22 @@ window.submitRequest = async () => {
   const cname    = document.getElementById('f-cname').value.trim();
   const cphone   = document.getElementById('f-cphone').value.trim();
 
-  if(!pname||!prob||!blood||!bags||!when||!hospital||!location||!cname||!cphone){
+  if(!prob||!blood||!bags||!when||!hospital||!cname||!cphone){
     showToast('সব * তথ্য পূরণ করুন'); return;
   }
   const btn = document.getElementById('submit-btn');
   btn.textContent='পাঠানো হচ্ছে...'; btn.disabled=true;
   try {
     await addDoc(collection(db,'bloodRequests'),{
-      patientName:pname, problem:prob, blood,
-      bags:parseInt(bags), when, hospital, location,
+      patientName:'',
+      problem:prob, blood,
+      bags:parseInt(bags), when, hospital,
+      location: location || '',
       details, contactName:cname, contactPhone:cphone,
       uid:CU.uid, status:'active',
       createdAt:serverTimestamp()
     });
-    ['f-pname','f-prob','f-bags','f-when','f-hospital','f-location','f-details','f-cphone']
+    ['f-prob','f-bags','f-when','f-hospital','f-location','f-details','f-cphone']
       .forEach(id => document.getElementById(id).value='');
     document.getElementById('f-blood').value='';
     showToast('✅ পোস্ট হয়েছে!');
@@ -349,10 +343,11 @@ window.submitRequest = async () => {
 
 window.loadPosts = () => {
   const el = document.getElementById('posts-list');
+  if(postsUnsub){ try{ postsUnsub(); }catch(e){} postsUnsub = null; }
   el.innerHTML=`<div style="text-align:center;padding:30px 20px"><div class="spinner" style="margin:0 auto 12px"></div><p style="font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif">লোড হচ্ছে...</p></div>`;
   try {
     const q = query(collection(db,'bloodRequests'), orderBy('createdAt','desc'));
-    onSnapshot(q, snap => {
+    postsUnsub = onSnapshot(q, snap => {
       if(snap.empty){
         el.innerHTML=`<div style="text-align:center;padding:40px 20px;color:#bbb"><div style="font-size:40px;margin-bottom:12px">📋</div><p style="font-size:13px;font-family:'Hind Siliguri',sans-serif">এখনো কোনো পোস্ট নেই।</p></div>`;
         return;
@@ -360,45 +355,45 @@ window.loadPosts = () => {
       el.innerHTML = snap.docs.map(d => {
         const r = d.data();
         const c = bloodColor(r.blood);
+        const urgent = r.urgency === 'normal';
+        const tagHtml = urgent
+          ? `<span class="urgent-tag" style="background:#fff3e0;color:#e65100">সাধারণ</span>`
+          : `<span class="urgent-tag">জরুরি</span>`;
+        const head = ((r.hospital||'')+'').trim() || ((r.patientName||'')+'').trim() || 'রক্তের অনুরোধ';
+        const sub = ((r.problem||'')+'').trim() || 'কারণ উল্লেখ নেই';
+        const locStr = (r.location && String(r.location).trim())
+          ? `<div class="post-strip"><span class="strip-icon">📌</span><span class="strip-label">ঠিকানা</span><span class="strip-val">${r.location}</span></div>`
+          : '';
+        const contactMeta = (r.contactName && String(r.contactName).trim())
+          ? `<div class="post-contact">${r.contactName}</div>`
+          : '';
         return `
         <div class="post-card">
           <div class="post-top">
-            <div class="blood-badge" style="background:${c}">${r.blood}</div>
-            <div class="post-head">
-              <div class="post-patient">${r.patientName}</div>
-              <div class="post-problem">${r.problem}</div>
+            <div class="post-blood-col">
+              <div class="blood-badge" style="border-color:${c};color:${c}">${r.blood}</div>
+              <span class="post-bags">${r.bags} ব্যাগ</span>
             </div>
-            <span class="urgent-tag">🆘 জরুরি</span>
+            <div class="post-head">
+              <div class="post-patient">${head}</div>
+              <div class="post-problem">⚕️ ${sub}</div>
+            </div>
+            ${tagHtml}
           </div>
           <div class="post-strips">
             <div class="post-strip">
-              <span class="strip-icon">🩸</span>
-              <span class="strip-label">রক্ত দরকার</span>
-              <span class="strip-val blood-val" style="color:${c}">${r.blood}</span>
-              <span class="bags-pill">${r.bags} ব্যাগ</span>
-            </div>
-            <div class="post-strip">
-              <span class="strip-icon">🏥</span>
-              <span class="strip-label">হাসপাতাল</span>
-              <span class="strip-val">${r.hospital}</span>
-            </div>
-            <div class="post-strip">
-              <span class="strip-icon">📌</span>
-              <span class="strip-label">ঠিকানা</span>
-              <span class="strip-val">${r.location}</span>
-            </div>
-            <div class="post-strip">
               <span class="strip-icon">⏰</span>
-              <span class="strip-label">কখন লাগবে</span>
+              <span class="strip-label">কখন</span>
               <span class="strip-val">${formatDate(r.when)}</span>
             </div>
+            ${locStr}
           </div>
           ${r.details?`<div class="post-note">📝 ${r.details}</div>`:''}
           <div class="post-footer">
-            <span class="post-time">${timeAgo(r.createdAt)}</span>
+            <div class="post-foot-line"><span class="post-time">${timeAgo(r.createdAt)}</span>${contactMeta}</div>
             <div class="post-actions">
-              <a class="pbtn call" href="tel:${r.contactPhone}">📞 ${r.contactPhone}</a>
-              <button class="pbtn share" onclick="sharePost('${r.patientName}','${r.blood}','${r.bags}','${r.hospital}','${r.contactPhone}')">🔗 Share</button>
+              <a class="pbtn call" href="tel:${r.contactPhone}">📞 কল করুন</a>
+              <button type="button" class="pbtn share" onclick="sharePost(${JSON.stringify(r.problem||'')}, ${JSON.stringify(r.blood||'')}, ${JSON.stringify(String(r.bags||''))}, ${JSON.stringify(r.hospital||'')}, ${JSON.stringify(r.contactPhone||'')}, ${JSON.stringify(r.location||'')})">🔗 শেয়ার</button>
             </div>
           </div>
         </div>`;
