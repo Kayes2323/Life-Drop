@@ -6,19 +6,40 @@
 <link rel="icon" type="image/png" href="sondhan-logo.png"/>
 <title>Sondhan — জরুরি অনুরোধ</title>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding-bottom:76px}
-.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
+
+/* ── FIX: body single column, no flex-row split ── */
+body{
+  font-family:'Inter','Hind Siliguri',sans-serif;
+  background:#f5f5f5;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  width:100%;
+  max-width:480px;
+  margin:0 auto;
+  padding-bottom:76px;
+  overflow-x:hidden; /* prevent horizontal overflow */
+}
+
+.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260;width:100%}
 .back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .header h1{color:#fff;font-size:16px;font-weight:800}
-.tabs{display:flex;background:#fff;border-bottom:2px solid #f0f0f0;flex-shrink:0;position:sticky;top:56px;z-index:240}
-.tab{flex:1;padding:11px 4px;border:none;background:transparent;font-size:12px;font-weight:600;color:#bbb;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Hind Siliguri',sans-serif;transition:.2s}
+
+.tabs{display:flex;background:#fff;border-bottom:2px solid #f0f0f0;flex-shrink:0;position:sticky;top:56px;z-index:240;width:100%}
+.tab{flex:1;padding:11px 4px;border:none;background:transparent;font-size:13px;font-weight:600;color:#bbb;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Hind Siliguri',sans-serif;transition:.2s}
 .tab.active{color:#c0392b;border-bottom-color:#c0392b}
-.scr{flex:1;overflow-y:auto;padding:12px;padding-bottom:88px}
+
+/* ── FIX: scr must be block-level full width, NOT flex-row ── */
+.scr{
+  width:100%;
+  overflow-y:auto;
+  padding:12px;
+  padding-bottom:88px;
+  display:block; /* NOT flex — this was causing horizontal split */
+}
 
 /* ALERT BANNER */
 .alert-banner{background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:14px;padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
@@ -27,43 +48,51 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .alert-text p{color:rgba(255,255,255,.85);font-size:11px;font-family:'Hind Siliguri',sans-serif;line-height:1.5}
 
 /* FORM */
-.fcard{background:#fff;border-radius:14px;padding:14px;margin-bottom:11px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.fcard{background:#fff;border-radius:14px;padding:14px;margin-bottom:11px;box-shadow:0 1px 6px rgba(0,0,0,.06);width:100%}
 .fcard-title{font-size:12px;font-weight:700;color:#c0392b;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #fde;font-family:'Hind Siliguri',sans-serif}
-.iw{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:11px;padding:0 12px;margin-bottom:10px;transition:.2s}
+.iw{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:11px;padding:0 12px;margin-bottom:10px;transition:.2s;width:100%}
 .iw:last-child{margin-bottom:0}
 .iw:focus-within{border-color:#c0392b;background:#fff}
 .ico{font-size:14px;margin-right:9px;opacity:.6;flex-shrink:0}
-.iw input,.iw select,.iw textarea{flex:1;border:none;background:transparent;padding:12px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif}
-.iw-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.iw input,.iw select,.iw textarea{flex:1;border:none;background:transparent;padding:12px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif;min-width:0}
+.iw-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;width:100%}
 .iw-grid .iw{margin-bottom:0}
 .date-label{font-size:11px;font-weight:700;color:#666;margin-bottom:6px;font-family:'Hind Siliguri',sans-serif}
-.opt-label{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-left:4px}
+.opt-label{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-left:4px;white-space:nowrap}
 .submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 14px rgba(192,57,43,.3);margin-bottom:16px}
 .submit-btn:disabled{background:#e0a0a0;box-shadow:none;cursor:not-allowed}
 
-/* EMERGENCY CARD */
-.e-card{background:#fff;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)}
-.e-card-header{display:flex;align-items:center;gap:10px;padding:13px 13px 0}
-.blood-circle{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;font-family:'Inter',sans-serif}
-.e-card-title{flex:1;min-width:0}
-.e-patient{font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;color:#222;margin-bottom:2px}
-.e-hospital{font-size:11px;color:#888;font-family:'Hind Siliguri',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.urgent-pill{background:#fdecea;color:#c0392b;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;font-family:'Inter',sans-serif}
-.e-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:10px 0 0;border-top:1px solid #f5f5f5}
-.e-info-item{padding:10px 13px;border-right:1px solid #f5f5f5}
-.e-info-item:last-child{border-right:none}
-.e-info-item:nth-child(3){border-top:1px solid #f5f5f5}
-.e-info-item:nth-child(4){border-top:1px solid #f5f5f5;border-right:none}
-.e-info-label{font-size:10px;color:#bbb;font-family:'Hind Siliguri',sans-serif;margin-bottom:3px}
-.e-info-val{font-size:12px;font-weight:700;color:#333;font-family:'Hind Siliguri',sans-serif;line-height:1.4}
-.e-location{padding:6px 13px;font-size:11px;color:#2980b9;font-family:'Hind Siliguri',sans-serif;background:#ebf5fb;border-top:1px solid #f0f0f0}
-.e-details{padding:8px 13px;background:#fafafa;font-size:12px;color:#555;font-family:'Hind Siliguri',sans-serif;line-height:1.6;border-top:1px solid #f0f0f0}
-.e-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;border-top:1px solid #f5f5f5}
-.e-time{font-size:10px;color:#bbb;font-family:'Inter',sans-serif}
-.e-actions{display:flex;gap:6px}
-.e-btn{padding:7px 14px;border-radius:9px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;text-decoration:none;display:flex;align-items:center;gap:4px}
-.e-btn.call{background:#27ae60;color:#fff}
-.e-btn.share{background:#f0f0f0;color:#555}
+/* ── POST CARD — improved design ── */
+.post-card{background:#fff;border-radius:16px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);width:100%}
+.post-top{padding:13px 13px 10px;display:flex;align-items:flex-start;gap:10px}
+.blood-badge{min-width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;font-family:'Inter',sans-serif}
+.post-head{flex:1;min-width:0}
+.post-patient{font-size:15px;font-weight:700;font-family:'Hind Siliguri',sans-serif;color:#222;margin-bottom:2px}
+.post-problem{font-size:12px;color:#888;font-family:'Hind Siliguri',sans-serif;margin-bottom:0}
+.urgent-tag{background:#fdecea;color:#c0392b;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;font-family:'Inter',sans-serif;align-self:flex-start;flex-shrink:0}
+
+/* Info strips */
+.post-strips{display:flex;flex-direction:column;gap:0;border-top:1px solid #f5f5f5}
+.post-strip{display:flex;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid #f5f5f5}
+.post-strip:last-child{border-bottom:none}
+.strip-icon{font-size:13px;width:20px;text-align:center;flex-shrink:0}
+.strip-label{font-size:10px;color:#bbb;font-family:'Hind Siliguri',sans-serif;width:72px;flex-shrink:0}
+.strip-val{font-size:12px;font-weight:600;color:#333;font-family:'Hind Siliguri',sans-serif;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.strip-val.blood-val{font-size:14px;font-weight:800}
+
+/* Bags pill */
+.bags-pill{background:#fdecea;color:#c0392b;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px;flex-shrink:0}
+
+/* Footer */
+.post-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:#fafafa;border-top:1px solid #f0f0f0}
+.post-time{font-size:10px;color:#bbb;font-family:'Inter',sans-serif}
+.post-actions{display:flex;gap:6px}
+.pbtn{padding:8px 14px;border-radius:9px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;text-decoration:none;display:flex;align-items:center;gap:4px}
+.pbtn.call{background:#27ae60;color:#fff}
+.pbtn.share{background:#f0f0f0;color:#555}
+
+/* Details note */
+.post-note{padding:8px 13px;background:#fffbf0;border-top:1px solid #fef3cd;font-size:11px;color:#7d6608;font-family:'Hind Siliguri',sans-serif;line-height:1.6}
 
 /* BNAV */
 .bnav{background:#fff;border-top:1px solid #f0f0f0;display:flex;flex-shrink:0;box-shadow:0 -2px 8px rgba(0,0,0,.06);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);z-index:300}
@@ -77,10 +106,42 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;font-family:'Hind Siliguri',sans-serif}
 .toast.show{opacity:1}
-.loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:10px}
-.loading-overlay.show{display:flex}
 .spinner{width:38px;height:38px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── PROFESSIONAL LOGIN OVERLAY ── */
+.auth-overlay{
+  display:none;position:fixed;inset:0;
+  background:linear-gradient(160deg,rgba(192,57,43,.96),rgba(44,44,44,.97));
+  z-index:800;align-items:center;justify-content:center;padding:24px;
+  backdrop-filter:blur(4px);
+}
+.auth-overlay.show{display:flex}
+.auth-card{
+  background:#fff;border-radius:24px;padding:32px 24px;
+  text-align:center;max-width:320px;width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+.auth-icon{
+  width:70px;height:70px;background:linear-gradient(135deg,#fdecea,#fde);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:32px;margin:0 auto 16px;border:2px solid #f5c6c2;
+}
+.auth-card h3{font-size:18px;font-weight:800;font-family:'Hind Siliguri',sans-serif;color:#222;margin-bottom:8px}
+.auth-card p{font-size:13px;color:#888;font-family:'Hind Siliguri',sans-serif;margin-bottom:20px;line-height:1.7}
+.auth-btn{
+  display:block;width:100%;padding:13px;
+  background:linear-gradient(135deg,#c0392b,#e74c3c);
+  color:#fff;border-radius:12px;font-size:14px;font-weight:700;
+  text-decoration:none;font-family:'Hind Siliguri',sans-serif;
+  margin-bottom:10px;border:none;cursor:pointer;
+  box-shadow:0 4px 14px rgba(192,57,43,.35);
+}
+.auth-back{
+  background:none;border:none;color:#aaa;font-size:13px;
+  cursor:pointer;font-family:'Hind Siliguri',sans-serif;
+  text-decoration:underline;
+}
 </style>
 </head>
 <body>
@@ -94,8 +155,8 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 </div>
 
 <div class="tabs">
-  <button class="tab active" id="tab-new" onclick="switchTab('new')">➕ নতুন অনুরোধ</button>
-  <button class="tab" id="tab-all" onclick="switchTab('all')">📋 সকল অনুরোধ</button>
+  <button class="tab active" id="tab-new" onclick="switchTab('new')">✏️ পোস্ট করুন</button>
+  <button class="tab" id="tab-all" onclick="switchTab('all')">📋 সকল পোস্ট</button>
 </div>
 
 <!-- NEW REQUEST FORM -->
@@ -142,7 +203,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
     <div class="iw"><span class="ico">📞</span><input type="tel" id="f-cphone" placeholder="ফোন নম্বর *"/></div>
   </div>
 
-  <button class="submit-btn" id="submit-btn" onclick="submitRequest()">🆘 অনুরোধ পাঠান</button>
+  <button class="submit-btn" id="submit-btn" onclick="submitRequest()">🆘 পোস্ট করুন</button>
 </div>
 
 <!-- ALL REQUESTS FEED -->
@@ -159,18 +220,28 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 <div class="bnav">
   <a class="bnav-item" href="index.html"><span class="bi">🏠</span><span class="bl">হোম</span></a>
   <a class="bnav-item" href="search.html"><span class="bi">🔍</span><span class="bl">খুঁজুন</span></a>
-  <a class="bnav-center" href="request.html"><div class="bc-btn">🆘</div><span class="bl">অনুরোধ</span></a>
+  <a class="bnav-center active" href="request.html"><div class="bc-btn">🆘</div><span class="bl">পোস্ট</span></a>
   <a class="bnav-item" href="about.html"><span class="bi">ℹ️</span><span class="bl">About</span></a>
   <a class="bnav-item" href="profile.html"><span class="bi">👤</span><span class="bl">Profile</span></a>
 </div>
 
-<div id="loading" class="loading-overlay"><div class="spinner"></div></div>
+<!-- PROFESSIONAL LOGIN OVERLAY -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-icon">🩸</div>
+    <h3>লগইন প্রয়োজন</h3>
+    <p>জরুরি রক্তের পোস্ট করতে বা দেখতে লগইন করুন।<br>আপনার তথ্য সম্পূর্ণ সুরক্ষিত থাকবে।</p>
+    <a href="login.html?redirect=request.html" class="auth-btn">লগইন / Sign Up করুন</a>
+    <button class="auth-back" onclick="window.location.href='index.html'">← হোমে ফিরুন</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 window.switchTab = tab => {
-  document.getElementById('view-new').style.display = tab==='new' ? 'flex':'none';
-  document.getElementById('view-all').style.display = tab==='all' ? 'flex':'none';
+  document.getElementById('view-new').style.display = tab==='new' ? 'block':'none';
+  document.getElementById('view-all').style.display = tab==='all' ? 'block':'none';
   document.getElementById('tab-new').classList.toggle('active', tab==='new');
   document.getElementById('tab-all').classList.toggle('active', tab==='all');
   if(tab==='all') loadPosts();
@@ -194,10 +265,9 @@ function formatDate(str){
   catch(e){ return str; }
 }
 function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
-function setLoad(v){ document.getElementById('loading').classList.toggle('show',v); }
 
-window.sharePost = (pname, blood, hospital, phone) => {
-  const text = `🆘 জরুরি রক্তের প্রয়োজন!\n\nরোগী: ${pname}\nরক্তের গ্রুপ: ${blood}\nহাসপাতাল: ${hospital}\nযোগাযোগ: ${phone}\n\nSondhan — life-drop-ashen.vercel.app/request.html`;
+window.sharePost = (pname, blood, bags, hospital, phone) => {
+  const text = `🆘 জরুরি রক্তের প্রয়োজন!\n\nরোগী: ${pname}\nরক্তের গ্রুপ: ${blood} (${bags} ব্যাগ)\nহাসপাতাল: ${hospital}\nযোগাযোগ: ${phone}\n\nSondhan — life-drop-ashen.vercel.app/request.html`;
   if(navigator.share){ navigator.share({title:'জরুরি রক্তের অনুরোধ', text}); }
   else { navigator.clipboard.writeText(text); showToast('✅ কপি হয়েছে! Share করুন।'); }
 };
@@ -221,15 +291,29 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 let CU = null;
 
+// ── Auth check with 3s timeout ──
+let authDone = false;
+const authTimeout = setTimeout(() => {
+  if(!authDone){
+    authDone = true;
+    document.getElementById('auth-overlay').classList.add('show');
+  }
+}, 3000);
+
 onAuthStateChanged(auth, user => {
+  clearTimeout(authTimeout);
+  if(authDone) return;
+  authDone = true;
   CU = user;
   if(user){
     document.getElementById('f-cname').value = user.displayName||'';
+  } else {
+    document.getElementById('auth-overlay').classList.add('show');
   }
 });
 
 window.submitRequest = async () => {
-  if(!CU){ showToast('লগইন করুন'); window.location.href='login.html?redirect=request.html'; return; }
+  if(!CU){ document.getElementById('auth-overlay').classList.add('show'); return; }
   const pname    = document.getElementById('f-pname').value.trim();
   const prob     = document.getElementById('f-prob').value.trim();
   const blood    = document.getElementById('f-blood').value;
@@ -257,10 +341,10 @@ window.submitRequest = async () => {
     ['f-pname','f-prob','f-bags','f-when','f-hospital','f-location','f-details','f-cphone']
       .forEach(id => document.getElementById(id).value='');
     document.getElementById('f-blood').value='';
-    showToast('✅ অনুরোধ পাঠানো হয়েছে!');
+    showToast('✅ পোস্ট হয়েছে!');
     setTimeout(()=>switchTab('all'), 1200);
   } catch(e){ showToast('Error: '+e.message); }
-  finally{ btn.textContent='🆘 অনুরোধ পাঠান'; btn.disabled=false; }
+  finally{ btn.textContent='🆘 পোস্ট করুন'; btn.disabled=false; }
 };
 
 window.loadPosts = () => {
@@ -270,47 +354,51 @@ window.loadPosts = () => {
     const q = query(collection(db,'bloodRequests'), orderBy('createdAt','desc'));
     onSnapshot(q, snap => {
       if(snap.empty){
-        el.innerHTML=`<div style="text-align:center;padding:40px 20px;color:#bbb"><div style="font-size:40px;margin-bottom:12px">📋</div><p style="font-size:13px;font-family:'Hind Siliguri',sans-serif">এখনো কোনো অনুরোধ নেই।</p></div>`;
+        el.innerHTML=`<div style="text-align:center;padding:40px 20px;color:#bbb"><div style="font-size:40px;margin-bottom:12px">📋</div><p style="font-size:13px;font-family:'Hind Siliguri',sans-serif">এখনো কোনো পোস্ট নেই।</p></div>`;
         return;
       }
       el.innerHTML = snap.docs.map(d => {
         const r = d.data();
         const c = bloodColor(r.blood);
         return `
-        <div class="e-card">
-          <div class="e-card-header">
-            <div class="blood-circle" style="background:${c}">${r.blood}</div>
-            <div class="e-card-title">
-              <div class="e-patient">${r.patientName} — ${r.bags} ব্যাগ ${r.blood} দরকার</div>
-              <div class="e-hospital">🏥 ${r.hospital}, ${r.location}</div>
+        <div class="post-card">
+          <div class="post-top">
+            <div class="blood-badge" style="background:${c}">${r.blood}</div>
+            <div class="post-head">
+              <div class="post-patient">${r.patientName}</div>
+              <div class="post-problem">${r.problem}</div>
             </div>
-            <span class="urgent-pill">🆘 জরুরি</span>
+            <span class="urgent-tag">🆘 জরুরি</span>
           </div>
-          <div class="e-info-grid">
-            <div class="e-info-item">
-              <div class="e-info-label">🔴 সমস্যা</div>
-              <div class="e-info-val">${r.problem}</div>
+          <div class="post-strips">
+            <div class="post-strip">
+              <span class="strip-icon">🩸</span>
+              <span class="strip-label">রক্ত দরকার</span>
+              <span class="strip-val blood-val" style="color:${c}">${r.blood}</span>
+              <span class="bags-pill">${r.bags} ব্যাগ</span>
             </div>
-            <div class="e-info-item">
-              <div class="e-info-label">🩸 রক্তের গ্রুপ</div>
-              <div class="e-info-val" style="color:${c};font-size:15px;font-weight:800">${r.blood}</div>
+            <div class="post-strip">
+              <span class="strip-icon">🏥</span>
+              <span class="strip-label">হাসপাতাল</span>
+              <span class="strip-val">${r.hospital}</span>
             </div>
-            <div class="e-info-item">
-              <div class="e-info-label">⏰ কখন লাগবে</div>
-              <div class="e-info-val">${formatDate(r.when)}</div>
+            <div class="post-strip">
+              <span class="strip-icon">📌</span>
+              <span class="strip-label">ঠিকানা</span>
+              <span class="strip-val">${r.location}</span>
             </div>
-            <div class="e-info-item">
-              <div class="e-info-label">📌 হাসপাতাল</div>
-              <div class="e-info-val">${r.hospital}</div>
+            <div class="post-strip">
+              <span class="strip-icon">⏰</span>
+              <span class="strip-label">কখন লাগবে</span>
+              <span class="strip-val">${formatDate(r.when)}</span>
             </div>
           </div>
-          ${r.location?`<div class="e-location">📍 ${r.location}</div>`:''}
-          ${r.details?`<div class="e-details">📝 ${r.details}</div>`:''}
-          <div class="e-footer">
-            <span class="e-time">${timeAgo(r.createdAt)}</span>
-            <div class="e-actions">
-              <a class="e-btn call" href="tel:${r.contactPhone}">📞 ${r.contactPhone}</a>
-              <button class="e-btn share" onclick="sharePost('${r.patientName}','${r.blood}','${r.hospital}','${r.contactPhone}')">🔗 Share</button>
+          ${r.details?`<div class="post-note">📝 ${r.details}</div>`:''}
+          <div class="post-footer">
+            <span class="post-time">${timeAgo(r.createdAt)}</span>
+            <div class="post-actions">
+              <a class="pbtn call" href="tel:${r.contactPhone}">📞 ${r.contactPhone}</a>
+              <button class="pbtn share" onclick="sharePost('${r.patientName}','${r.blood}','${r.bags}','${r.hospital}','${r.contactPhone}')">🔗 Share</button>
             </div>
           </div>
         </div>`;
