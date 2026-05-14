@@ -3,28 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🩸 LifeDrop</title>
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<title>Sondhan</title>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+.brand-tagline{font-family:'Hind Siliguri',sans-serif;font-weight:400;color:#6B7280;font-size:12px}
+.loading-screen{position:fixed;inset:0;background:linear-gradient(135deg,#c0392b,#e74c3c);z-index:1200;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;transition:opacity .35s ease,visibility .35s ease}
+.loading-screen.hide{opacity:0;visibility:hidden}
+.loading-screen .brand-tagline{color:rgba(255,255,255,.92)}
+.loading-dots{display:flex;gap:6px}
+.loading-dots span{width:8px;height:8px;border-radius:50%;background:#fff;animation:dotPulse 1s infinite ease-in-out;opacity:.9}
+.loading-dots span:nth-child(2){animation-delay:.15s}
+.loading-dots span:nth-child(3){animation-delay:.3s}
+@keyframes dotPulse{0%,80%,100%{transform:scale(.6);opacity:.5}40%{transform:scale(1);opacity:1}}
+.lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:20px}
+.lr-overlay.show{display:flex}
+.lr-card{background:#fff;border-radius:20px;padding:28px 22px;text-align:center;max-width:300px;width:100%}
+.lr-icon{font-size:44px;margin-bottom:10px}
+.lr-card h3{font-size:16px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:6px}
+.lr-card p{font-size:12px;color:#888;font-family:'Hind Siliguri',sans-serif;margin-bottom:16px;line-height:1.6}
+.lr-btn{display:block;padding:12px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:11px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif;margin-bottom:8px}
+.lr-cancel{background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.ac-v2{position:relative;overflow:hidden;justify-content:flex-end;padding:12px 12px 11px;gap:0}
+
+/* Glass shine at top */
+.ac-v2::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,0.14) 0%,rgba(255,255,255,0) 100%);pointer-events:none;border-radius:inherit}
+
+/* Icon box — top right */
+.ac-v2-icon{position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15)}
+.ac-v2-icon svg{width:20px;height:20px}
+
+/* Ghost text background */
+.ac-v2-bg-text{position:absolute;right:-3px;bottom:-8px;font-size:50px;font-weight:800;color:rgba(255,255,255,0.07);letter-spacing:-2px;line-height:1;pointer-events:none;font-family:'Hind Siliguri',sans-serif;user-select:none}
+
+/* Bottom content */
+.ac-v2-bottom{position:relative;z-index:1}
+.ac-v2 .ac-label{font-size:13px;font-weight:700;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.18);margin:0;font-family:'Hind Siliguri',sans-serif}
+.ac-v2-sub{font-size:10px;color:rgba(255,255,255,0.70);margin-top:3px;font-family:'Hind Siliguri',sans-serif}
+</style>
 </head>
 <body>
+<div id="loading-screen" class="loading-screen">
+  <div class="sondhan-logo sondhan-logo--splash">
+    <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
+  </div>
+  <div class="brand-tagline">রক্তের সন্ধানে</div>
+  <div class="loading-dots"><span></span><span></span><span></span></div>
+</div>
 <div class="app">
 
-  <!-- HEADER -->
   <div class="header">
     <div class="header-left">
-      <span class="logo-drop">🩸</span>
-      <h1>LifeDrop</h1>
+      <div class="sondhan-logo sondhan-logo--navbar-crop">
+        <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
+      </div>
     </div>
-    <div class="header-right" id="auth-header-btn">
-      <a href="login.html" class="login-chip">লগইন করুন</a>
+    <div class="header-right" id="auth-btn">
+      <!-- default: login button, no wait -->
+      <a href="login.html" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;padding:6px 13px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;font-family:'Hind Siliguri',sans-serif">লগইন করুন</a>
     </div>
   </div>
 
-  <!-- SCROLLABLE HOME CONTENT -->
   <div class="scr" style="gap:0">
 
-    <!-- BANNER SLIDER -->
+    <!-- SLIDER -->
     <div class="banner">
       <div class="slider-wrap">
         <div class="slide active" id="slide-0">
@@ -33,14 +78,14 @@
           <div class="ref">— সূরা আল-মায়েদা: ৩২</div>
         </div>
         <div class="slide" id="slide-1">
-          <div class="slide-tag">🩸 আমাদের আহ্বান</div>
-          <h2>Donor হোন — মানবতার কল্যাণে যুক্ত হন</h2>
-          <div class="ref">— LifeDrop</div>
+          <div class="slide-tag">আমাদের আহ্বান</div>
+          <h2>ডোনার রেজিস্ট্রেশন ফর্ম পূরণ করে মানবতার কল্যাণে যুক্ত হোন।</h2>
+          <div class="ref">— Sondhan</div>
         </div>
         <div class="slide" id="slide-2">
-          <div class="slide-tag">📢 নোটিশ</div>
-          <h2>লাইফড্রপ আসছে দ্রুত রক্তদাতা খুঁজে দিতে</h2>
-          <div class="ref">— LifeDrop Team</div>
+          <div class="slide-tag">📢 Notice </div>
+          <h2>Sondhan বর্তমানে উন্নয়ন ও পরীক্ষামূলক কার্যক্রমের মধ্যে রয়েছে। খুব শীঘ্রই পূর্ণাঙ্গ সেবা চালু হবে ইনশাআল্লাহ।</h2>
+          <div class="ref">— Sondhan Team</div>
         </div>
       </div>
       <div class="slider-dots">
@@ -54,22 +99,39 @@
     <div class="section" style="padding:12px 12px 0">
       <div class="sec-title">দ্রুত একশন</div>
       <div class="action-grid">
-        <button class="ac red" onclick="window.location.href='search.html'">
-          <div class="ac-bg">🔍</div>
-          <div class="ac-icon">🔍</div>
-          <div class="ac-label">রক্তদাতা খুঁজুন</div>
+        <button class="ac red ac-v2" onclick="goGuarded('search.html')">
+          <div class="ac-v2-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="M16.5 16.5L21 21"/>
+            </svg>
+          </div>
+          <div class="ac-v2-bg-text">খোঁজ</div>
+          <div class="ac-v2-bottom">
+            <div class="ac-label">রক্তদাতা খুঁজুন</div>
+            <div class="ac-v2-sub">কাছের donor সন্ধান করুন</div>
+          </div>
         </button>
-        <button class="ac orange" onclick="window.location.href='request.html'">
-          <div class="ac-bg">🆘</div>
-          <div class="ac-icon">🆘</div>
-          <div class="ac-label">জরুরি অনুরোধ</div>
+        <button class="ac orange ac-v2" onclick="goGuarded('request.html')">
+          <div class="ac-v2-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div class="ac-v2-bg-text">জরুরি</div>
+          <div class="ac-v2-bottom">
+            <div class="ac-label">জরুরি অনুরোধ</div>
+            <div class="ac-v2-sub">এখনই রক্ত দরকার?</div>
+          </div>
         </button>
-        <button class="ac teal" onclick="window.location.href='ambulance.html'">
+        <button class="ac teal" onclick="goGuarded('ambulance.html')">
           <div class="ac-bg">🚑</div>
           <div class="ac-icon">🚑</div>
           <div class="ac-label">অ্যাম্বুলেন্স খুঁজুন</div>
         </button>
-        <button class="ac green" onclick="goToDonorReg()">
+        <button class="ac green" onclick="goGuarded('register.html')">
           <div class="ac-bg">🩸</div>
           <div class="ac-icon">🩸</div>
           <div class="ac-label">Donor হোন</div>
@@ -85,50 +147,35 @@
     <div class="section" style="padding:0 12px">
       <div class="sec-title">আমাদের পরিসংখ্যান</div>
       <div class="stats-row">
-        <div class="stat">
-          <div class="stat-n" id="stat-donors">১৫ জন</div>
-          <div class="stat-l">সক্রিয় Donor</div>
-        </div>
-        <div class="stat">
-          <div class="stat-n" id="stat-donations">০</div>
-          <div class="stat-l">রক্তদান সম্পন্ন</div>
-        </div>
-        <div class="stat">
-          <div class="stat-n">৬৪টি</div>
-          <div class="stat-l">জেলায় সেবা</div>
-        </div>
+        <div class="stat"><div class="stat-n" id="stat-donors">—</div><div class="stat-l">সক্রিয় Donor</div></div>
+        <div class="stat"><div class="stat-n" id="stat-requests">—</div><div class="stat-l">রক্তের অনুরোধ</div></div>
+        <div class="stat"><div class="stat-n">৬৪</div><div class="stat-l">জেলায় সেবা</div></div>
       </div>
     </div>
 
-    <!-- WHY DONATE -->
+    <!-- WHY -->
     <div class="section" style="padding:0 12px">
       <div class="sec-title">কেন রক্ত দেবেন?</div>
       <div class="why-card">
         <div class="why-ico" style="background:#fdecea">❤️</div>
-        <div>
-          <h4>জীবন বাঁচায়</h4>
-          <p>একটি রক্তদান সর্বোচ্চ ৩টি জীবন বাঁচাতে পারে</p>
-        </div>
+        <div><h4>জীবন বাঁচায়</h4><p>আপনার দেওয়া এক ব্যাগ রক্ত একজন মানুষের জীবন বাঁচাতে গুরুত্বপূর্ণ ভূমিকা রাখতে পারে।</p></div>
       </div>
       <div class="why-card">
         <div class="why-ico" style="background:#d5f5e3">🛡️</div>
-        <div>
-          <h4>স্বাস্থ্য উপকারিতা</h4>
-          <p>হৃদরোগ ও ক্যান্সারের ঝুঁকি কমায়</p>
-        </div>
+        <div><h4>স্বাস্থ্য উপকারিতা</h4><p>হৃদরোগ ও ক্যান্সারের ঝুঁকি কমায়</p></div>
       </div>
     </div>
 
-    <!-- PREP LIST -->
+    <!-- PREP -->
     <div class="section" style="padding:0 12px;margin-bottom:16px">
-      <div class="sec-title">🩸 রক্তদানের পূর্বপ্রস্তুতি</div>
+      <div class="sec-title">রক্তদানের পূর্বপ্রস্তুতি</div>
       <div class="prep-list">
-        <div class="prep-item"><div class="prep-dot"></div><p>খালি পেটে যাবেন না — হালকা পুষ্টিকর খাবার খান</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>রক্তদানের আগে পর্যাপ্ত পানি পান করুন</p></div>
         <div class="prep-item"><div class="prep-dot"></div><p>আগের দানের কমপক্ষে <b>৪ মাস</b> পর রক্ত দিন</p></div>
-        <div class="prep-item"><div class="prep-dot"></div><p>আত্মবিশ্বাসী থাকুন — ভয়ের কিছু নেই</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>রক্তদানের পূর্বে হালকা খাবার গ্রহণ করুন</p></div>
         <div class="prep-item"><div class="prep-dot"></div><p>সর্বোচ্চ <b>~৪৫০ মি.লি.</b> রক্ত দেওয়া নিরাপদ</p></div>
         <div class="prep-item"><div class="prep-dot"></div><p>রক্ত দেওয়ার পর কিছুক্ষণ বিশ্রাম নিন</p></div>
-        <div class="prep-item"><div class="prep-dot"></div><p>ডাবের পানি / ওরস্যালাইন পান করুন</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>সুস্থ শরীর ও সুস্থ মন নিয়ে রক্তদান করুন</p></div>
         <div class="prep-item"><div class="prep-dot"></div><p>রোগীর জন্য প্রার্থনা করুন</p></div>
         <div class="prep-item"><div class="prep-dot" style="background:#c0392b"></div>
           <p><b>কোনো বিনিময় ছাড়া মানবতার সেবায় রক্ত দেওয়াই সর্বোত্তম</b></p>
@@ -136,85 +183,140 @@
       </div>
     </div>
 
-  </div><!-- /scr -->
+  </div>
 
   <!-- BOTTOM NAV -->
   <div class="bnav">
-    <a class="bnav-item active" href="index.html">
-      <span class="bi">🏠</span><span class="bl">হোম</span>
-    </a>
-    <a class="bnav-item" href="search.html">
-      <span class="bi">🔍</span><span class="bl">খুঁজুন</span>
-    </a>
-    <a class="bnav-center" href="request.html">
-      <div class="bc-btn">🆘</div>
-      <span class="bl">অনুরোধ</span>
-    </a>
-    <a class="bnav-item" href="about.html">
-      <span class="bi">ℹ️</span><span class="bl">About</span>
-    </a>
-    <a class="bnav-item" href="profile.html">
-      <span class="bi">👤</span><span class="bl">Profile</span>
-    </a>
+    <a class="bnav-item bnav-item--home active" href="index.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg></span><span class="bl">হোম</span></a>
+    <a class="bnav-item bnav-item--search" href="#" onclick="goGuarded('search.html');return false"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.5-3.5"/></svg></span><span class="bl">খুঁজুন</span></a>
+    <a class="bnav-center" href="#" onclick="goGuarded('request.html');return false"><div class="bc-btn" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(-2.5 0) scale(.75)"/><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(4 -0.5) scale(.62)"/></svg></div><span class="bl">অনুরোধ</span></a>
+    <a class="bnav-item bnav-item--about" href="about.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span><span class="bl">About</span></a>
+    <a class="bnav-item bnav-item--profile" href="#" onclick="goGuarded('profile.html');return false"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="bl">Profile</span></a>
   </div>
+</div>
 
-</div><!-- /app -->
+<!-- LOGIN REQUIRED OVERLAY -->
+<div class="lr-overlay" id="lr-overlay">
+  <div class="lr-card">
+    <div class="lr-icon">🔒</div>
+    <h3>লগইন প্রয়োজন</h3>
+    <p>এই সেবা ব্যবহার করতে লগইন করুন</p>
+    <a href="#" id="lr-btn" class="lr-btn">লগইন করুন</a>
+    <button class="lr-cancel" onclick="document.getElementById('lr-overlay').classList.remove('show')">বাতিল</button>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// SLIDER
-let cur = 0, total = 3;
+// ── SLIDER (runs immediately, no Firebase needed) ─────────────
+let cur = 0;
 function goSlide(n) {
   document.getElementById('slide-'+cur).classList.remove('active');
   document.querySelectorAll('.sdot')[cur].classList.remove('active');
-  cur = (n + total) % total;
+  cur = (n + 3) % 3;
   document.getElementById('slide-'+cur).classList.add('active');
   document.querySelectorAll('.sdot')[cur].classList.add('active');
 }
 setInterval(() => goSlide(cur + 1), 4000);
 
-// DONOR BUTTON — login check
-function goToDonorReg() {
-  window.location.href = 'register.html';
-}
+// ── AUTH GUARD (non-blocking) ─────────────────────────────────
+// _authReady becomes true once Firebase responds (or times out)
+window._loggedIn  = false;
+window._authReady = false;
 
-function showToast(msg) {
+window.goGuarded = (page) => {
+  if(window._loggedIn) {
+    window.location.href = page;
+  } else {
+    document.getElementById('lr-btn').href = 'login.html?redirect=' + page;
+    document.getElementById('lr-overlay').classList.add('show');
+  }
+};
+
+function showToast(m) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  t.textContent = m; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2700);
 }
+window.addEventListener('load', () => {
+  document.getElementById('loading-screen')?.classList.add('hide');
+});
 </script>
 
+<!-- Firebase loads AFTER page is visible — non-blocking -->
 <script type="module">
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// AUTH — update header
-onAuthStateChanged(auth, user => {
-  const el = document.getElementById('auth-header-btn');
-  if (user) {
-    el.innerHTML = `
-      <span style="font-size:12px;color:#fff;opacity:.9;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${user.displayName || 'User'}</span>
-      <a href="profile.html" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;font-family:'Hind Siliguri',sans-serif">Profile</a>`;
-  } else {
-    el.innerHTML = `<a href="login.html" class="login-chip">লগইন করুন</a>`;
-  }
-});
+const cfg = {
+  apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
+  authDomain:"life-drop-d4784.firebaseapp.com",
+  projectId:"life-drop-d4784",
+  storageBucket:"life-drop-d4784.firebasestorage.app",
+  messagingSenderId:"671053363784",
+  appId:"1:671053363784:web:825fa9afa4f58a3ec2f67d"
+};
 
-// LIVE STATS
-async function loadStats() {
+let app, auth, db;
+try {
+  app  = getApps().length ? getApps()[0] : initializeApp(cfg);
+  auth = getAuth(app);
+  db   = getFirestore(app);
+  setPersistence(auth, browserLocalPersistence).catch(() => {});
+} catch(e) {
+  console.warn('Firebase init failed:', e);
+  // Page still works — auth just stays false
+}
+
+if(auth) {
+  // Timeout: if Firebase takes > 5s, give up waiting
+  const authTimeout = setTimeout(() => {
+    window._authReady = true;
+  }, 5000);
+
+  onAuthStateChanged(auth, user => {
+    clearTimeout(authTimeout);
+    window._authReady = true;
+    window._loggedIn  = !!user;
+
+    const el = document.getElementById('auth-btn');
+    if(user) {
+      const photo = user.photoURL;
+      const name  = user.displayName?.split(' ')[0] || 'Profile';
+      el.innerHTML = `
+        <a href="profile.html" style="display:flex;align-items:center;gap:6px;text-decoration:none">
+          <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">
+            ${photo
+              ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover"/>`
+              : `<span>${name[0].toUpperCase()}</span>`}
+          </div>
+          <span style="font-size:11px;color:#fff;font-weight:600;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Hind Siliguri',sans-serif">${name}</span>
+        </a>`;
+    }
+    // If not logged in, default "লগইন করুন" button is already shown in HTML
+  });
+}
+
+// Stats — with error handling
+if(db) {
   try {
-    const donorsSnap = await getDocs(query(collection(db,'users'), where('available','==',true)));
-    document.getElementById('stat-donors').textContent = donorsSnap.size || '০';
-
-    let totalDonations = 0;
-    donorsSnap.forEach(d => { totalDonations += (d.data().donations || 0); });
-    document.getElementById('stat-donations').textContent = totalDonations || '০';
+    onSnapshot(
+      query(collection(db,'donors'), where('available','==',true)),
+      snap => {
+        document.getElementById('stat-donors').textContent = snap.size || '০';
+        let total = 0;
+        snap.forEach(d => total += (d.data().donations || 0));
+        document.getElementById('stat-donations').textContent = total || '০';
+      },
+      err => {
+        document.getElementById('stat-donors').textContent = '—';
+        document.getElementById('stat-donations').textContent = '—';
+      }
+    );
   } catch(e) {}
 }
-loadStats();
 </script>
 </body>
 </html>
