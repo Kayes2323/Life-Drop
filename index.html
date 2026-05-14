@@ -27,6 +27,22 @@
 .lr-card p{font-size:12px;color:#888;font-family:'Hind Siliguri',sans-serif;margin-bottom:16px;line-height:1.6}
 .lr-btn{display:block;padding:12px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:11px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif;margin-bottom:8px}
 .lr-cancel{background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.ac-v2{position:relative;overflow:hidden;justify-content:flex-end;padding:12px 12px 11px;gap:0}
+
+/* Glass shine at top */
+.ac-v2::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,0.14) 0%,rgba(255,255,255,0) 100%);pointer-events:none;border-radius:inherit}
+
+/* Icon box — top right */
+.ac-v2-icon{position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15)}
+.ac-v2-icon svg{width:20px;height:20px}
+
+/* Ghost text background */
+.ac-v2-bg-text{position:absolute;right:-3px;bottom:-8px;font-size:50px;font-weight:800;color:rgba(255,255,255,0.07);letter-spacing:-2px;line-height:1;pointer-events:none;font-family:'Hind Siliguri',sans-serif;user-select:none}
+
+/* Bottom content */
+.ac-v2-bottom{position:relative;z-index:1}
+.ac-v2 .ac-label{font-size:13px;font-weight:700;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.18);margin:0;font-family:'Hind Siliguri',sans-serif}
+.ac-v2-sub{font-size:10px;color:rgba(255,255,255,0.70);margin-top:3px;font-family:'Hind Siliguri',sans-serif}
 </style>
 </head>
 <body>
@@ -83,15 +99,32 @@
     <div class="section" style="padding:12px 12px 0">
       <div class="sec-title">দ্রুত একশন</div>
       <div class="action-grid">
-        <button class="ac red" onclick="goGuarded('search.html')">
-          <div class="ac-bg">🔍</div>
-          <div class="ac-icon">🔍</div>
-          <div class="ac-label">রক্তদাতা খুঁজুন</div>
+        <button class="ac red ac-v2" onclick="goGuarded('search.html')">
+          <div class="ac-v2-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="M16.5 16.5L21 21"/>
+            </svg>
+          </div>
+          <div class="ac-v2-bg-text">খোঁজ</div>
+          <div class="ac-v2-bottom">
+            <div class="ac-label">রক্তদাতা খুঁজুন</div>
+            <div class="ac-v2-sub">কাছের donor সন্ধান করুন</div>
+          </div>
         </button>
-        <button class="ac orange" onclick="goGuarded('request.html')">
-          <div class="ac-bg">🆘</div>
-          <div class="ac-icon">🆘</div>
-          <div class="ac-label">জরুরি অনুরোধ</div>
+        <button class="ac orange ac-v2" onclick="goGuarded('request.html')">
+          <div class="ac-v2-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div class="ac-v2-bg-text">জরুরি</div>
+          <div class="ac-v2-bottom">
+            <div class="ac-label">জরুরি অনুরোধ</div>
+            <div class="ac-v2-sub">এখনই রক্ত দরকার?</div>
+          </div>
         </button>
         <button class="ac teal" onclick="goGuarded('ambulance.html')">
           <div class="ac-bg">🚑</div>
