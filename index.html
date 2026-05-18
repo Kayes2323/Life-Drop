@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="sondhan-logo.png"/>
 <title>Sondhan</title>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="style.css">
 <style>
 .brand-tagline{font-family:'Hind Siliguri',sans-serif;font-weight:400;color:#6B7280;font-size:12px}
@@ -148,7 +148,7 @@
       <div class="sec-title">আমাদের পরিসংখ্যান</div>
       <div class="stats-row">
         <div class="stat"><div class="stat-n" id="stat-donors">—</div><div class="stat-l">সক্রিয় Donor</div></div>
-        <div class="stat"><div class="stat-n" id="stat-requests">—</div><div class="stat-l">রক্তের অনুরোধ</div></div>
+        <div class="stat"><div class="stat-n" id="stat-donations">—</div><div class="stat-l">মোট রক্তদান</div></div>
         <div class="stat"><div class="stat-n">৬৪</div><div class="stat-l">জেলায় সেবা</div></div>
       </div>
     </div>
@@ -305,14 +305,18 @@ if(db) {
     onSnapshot(
       query(collection(db,'donors'), where('available','==',true)),
       snap => {
-        document.getElementById('stat-donors').textContent = snap.size || '০';
+        const donorsEl = document.getElementById('stat-donors');
+        const donationsEl = document.getElementById('stat-donations');
+        if(donorsEl) donorsEl.textContent = snap.size || '০';
         let total = 0;
         snap.forEach(d => total += (d.data().donations || 0));
-        document.getElementById('stat-donations').textContent = total || '০';
+        if(donationsEl) donationsEl.textContent = total || '০';
       },
       err => {
-        document.getElementById('stat-donors').textContent = '—';
-        document.getElementById('stat-donations').textContent = '—';
+        const donorsEl = document.getElementById('stat-donors');
+        const donationsEl = document.getElementById('stat-donations');
+        if(donorsEl) donorsEl.textContent = '—';
+        if(donationsEl) donationsEl.textContent = '—';
       }
     );
   } catch(e) {}

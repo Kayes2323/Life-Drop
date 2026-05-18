@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="sondhan-logo.png"/>
 <title>Sondhan — লগইন</title>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -131,26 +131,15 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 </div>
 
 <script type="module">
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { auth, db } from './firebase-config.js';
 import {
-  getAuth, onAuthStateChanged,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup, GoogleAuthProvider,
   signInWithPhoneNumber, RecaptchaVerifier
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const cfg = {
-  apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
-  authDomain:"life-drop-d4784.firebaseapp.com",
-  projectId:"life-drop-d4784",
-  storageBucket:"life-drop-d4784.firebasestorage.app",
-  messagingSenderId:"671053363784",
-  appId:"1:671053363784:web:825fa9afa4f58a3ec2f67d"
-};
-const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
-const auth = getAuth(app);
-const db   = getFirestore(app);
 const redir = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
 
 let confirmationResult = null;
@@ -254,6 +243,7 @@ function initRecaptcha(silent){
       size:'invisible',
       callback: () => {}
     });
+    recaptchaVerifier.render().catch(() => {});
     return true;
   } catch(e){
     if(!silent){

@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="sondhan-logo.png"/>
 <title>Sondhan — অ্যাম্বুলেন্স</title>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -191,6 +191,7 @@ async function loadAmbs() {
 }
 
 window.addAmbulance = async () => {
+  console.log('addAmbulance called. CU:', CU, 'isAdmin:', CU ? isAdmin(CU) : 'N/A');
   if(!CU || !isAdmin(CU)){ showToast('শুধু নির্ধারিত প্রশাসক এই ফর্ম ব্যবহার করতে পারবেন'); return; }
   const name = document.getElementById('a-name').value.trim();
   const phone = document.getElementById('a-phone').value.trim();
@@ -201,19 +202,39 @@ window.addAmbulance = async () => {
   const btn = document.getElementById('a-btn');
   btn.disabled=true; btn.textContent='যোগ হচ্ছে...';
   try {
-    await addDoc(collection(db,'ambulances'),{
-      name, phone, wa,
-      area,
-      division:'',
-      providerType,
+    console.log('Attempting to add ambulance:', { name, phone, wa, area, providerType, uid: CU.uid });
+    const ambulanceData = {
+      name: name,
+      phone: phone,
+      wa: wa || '',
+      area: area,
+      division: '',
+      providerType: providerType,
       addedBy: CU.uid,
       createdAt: serverTimestamp()
-    });
+    };
+    console.log('Data to be sent to Firestore:', ambulanceData);
+    console.log('Firestore db instance:', db);
+    console.log('Collection reference:', collection(db, 'ambulances'));
+    const docRef = await addDoc(collection(db,'ambulances'), ambulanceData);
+    console.log('Ambulance added successfully with ID:', docRef.id);
     ['a-name','a-phone','a-wa','a-area'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('a-type').value='private';
     showToast('✅ অ্যাম্বুলেন্স যোগ হয়েছে!');
     loadAmbs();
-  } catch(e){ showToast('Error: '+e.message); }
+  } catch(e){
+    console.error('Firebase error adding ambulance:', e);
+    console.error('Error code:', e.code);
+    console.error('Error message:', e.message);
+    console.error('Full error details:', JSON.stringify(e, null, 2));
+    if(e.code === 'permission-denied'){
+      showToast('Permission denied: Firestore rules prevent write access');
+    } else if(e.code === 'unauthenticated'){
+      showToast('Authentication error: Please log in again');
+    } else {
+      showToast('Error: '+e.message);
+    }
+  }
   finally{ btn.disabled=false; btn.textContent='✅ যোগ করুন'; }
 };
 </script>
