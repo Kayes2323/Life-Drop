@@ -19,14 +19,30 @@
 .loading-dots span:nth-child(2){animation-delay:.15s}
 .loading-dots span:nth-child(3){animation-delay:.3s}
 @keyframes dotPulse{0%,80%,100%{transform:scale(.6);opacity:.5}40%{transform:scale(1);opacity:1}}
-.lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:20px}
+.lr-overlay{display:none;position:fixed;inset:0;z-index:500;align-items:flex-end;justify-content:center}
 .lr-overlay.show{display:flex}
-.lr-card{background:#fff;border-radius:20px;padding:28px 22px;text-align:center;max-width:300px;width:100%}
-.lr-icon{font-size:44px;margin-bottom:10px}
-.lr-card h3{font-size:16px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:6px}
-.lr-card p{font-size:12px;color:#888;font-family:'Hind Siliguri',sans-serif;margin-bottom:16px;line-height:1.6}
-.lr-btn{display:block;padding:12px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:11px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif;margin-bottom:8px}
-.lr-cancel{background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.lr-overlay-bg{position:absolute;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.lr-sheet{position:relative;z-index:1;width:100%;max-width:480px;background:#fff;border-radius:24px 24px 0 0;padding:0 0 32px;animation:lrSlideUp .3s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes lrSlideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.lr-handle{width:40px;height:4px;border-radius:4px;background:#e0e0e0;margin:12px auto 0}
+.lr-hero{background:linear-gradient(135deg,#c0392b,#e74c3c);margin:16px 16px 0;border-radius:18px;padding:24px 20px;text-align:center;position:relative;overflow:hidden}
+.lr-hero::before{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.08)}
+.lr-hero::after{content:'';position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05)}
+.lr-lock{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;position:relative;z-index:1}
+.lr-lock svg{width:28px;height:28px}
+.lr-hero h3{font-size:18px;font-weight:700;color:white;margin-bottom:6px;position:relative;z-index:1;font-family:'Hind Siliguri',sans-serif}
+.lr-hero p{font-size:12px;color:rgba(255,255,255,0.85);line-height:1.6;position:relative;z-index:1;font-family:'Hind Siliguri',sans-serif}
+.lr-body{padding:20px 16px 0}
+.lr-features{display:flex;gap:8px;margin-bottom:16px}
+.lr-feat{flex:1;background:#f8f8f8;border-radius:12px;padding:12px 10px;text-align:center}
+.lr-feat-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
+.lr-feat-ico.red{background:rgba(192,57,43,0.1)}
+.lr-feat-ico.blue{background:rgba(34,112,201,0.1)}
+.lr-feat-ico.green{background:rgba(5,150,105,0.1)}
+.lr-feat-lbl{font-size:10px;color:#666;font-weight:600;font-family:'Hind Siliguri',sans-serif}
+.lr-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif;margin-bottom:10px;box-shadow:0 4px 16px rgba(192,57,43,0.3);cursor:pointer}
+.lr-signup{width:100%;background:transparent;color:#c0392b;border:1.5px solid #c0392b;border-radius:14px;padding:13px;font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;margin-bottom:12px}
+.lr-cancel{display:block;width:100%;text-align:center;background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;padding:4px}
 .ac-v2{position:relative;overflow:hidden;justify-content:flex-end;padding:12px 12px 11px;gap:0}
 
 /* Glass shine at top */
@@ -197,12 +213,47 @@
 
 <!-- LOGIN REQUIRED OVERLAY -->
 <div class="lr-overlay" id="lr-overlay">
-  <div class="lr-card">
-    <div class="lr-icon">🔒</div>
-    <h3>লগইন প্রয়োজন</h3>
-    <p>এই সেবা ব্যবহার করতে লগইন করুন</p>
-    <a href="#" id="lr-btn" class="lr-btn">লগইন করুন</a>
-    <button class="lr-cancel" onclick="document.getElementById('lr-overlay').classList.remove('show')">বাতিল</button>
+  <div class="lr-overlay-bg" onclick="document.getElementById('lr-overlay').classList.remove('show')"></div>
+  <div class="lr-sheet">
+    <div class="lr-handle"></div>
+    <div class="lr-hero">
+      <div class="lr-lock">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0110 0v4"/>
+        </svg>
+      </div>
+      <h3>লগইন প্রয়োজন</h3>
+      <p>এই সেবা ব্যবহার করতে আপনাকে<br>লগইন করতে হবে</p>
+    </div>
+    <div class="lr-body">
+      <div class="lr-features">
+        <div class="lr-feat">
+          <div class="lr-feat-ico red">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+          </div>
+          <div class="lr-feat-lbl">রক্তদাতা খুঁজুন</div>
+        </div>
+        <div class="lr-feat">
+          <div class="lr-feat-ico blue">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2270C9" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+          <div class="lr-feat-lbl">অনুরোধ করুন</div>
+        </div>
+        <div class="lr-feat">
+          <div class="lr-feat-ico green">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></svg>
+          </div>
+          <div class="lr-feat-lbl">Donor হোন</div>
+        </div>
+      </div>
+      <a href="#" id="lr-btn" class="lr-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        লগইন করুন
+      </a>
+      <button class="lr-signup" onclick="window.location.href='signup.html'">নতুন account তৈরি করুন</button>
+      <button class="lr-cancel" onclick="document.getElementById('lr-overlay').classList.remove('show')">এখন না</button>
+    </div>
   </div>
 </div>
 
