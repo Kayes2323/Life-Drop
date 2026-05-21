@@ -1,0 +1,33 @@
+{
+  "name": "Sondhan — রক্তের সন্ধানে",
+  "short_name": "Sondhan",
+  "description": "জরুরি মুহূর্তে রক্তদাতা খুঁজুন",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#c0392b",
+  "theme_color": "#c0392b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["health", "medical"],
+  "lang": "bn"
+}
