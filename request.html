@@ -278,6 +278,20 @@ const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 setPersistence(auth, browserLocalPersistence).catch(() => {});
+
+// ── AUTO-FILL BLOOD GROUP FROM URL PARAMETER ──
+// যখন search.html থেকে "অনুরোধ করুন" button এ click করে আসে,
+// তখন URL এ ?blood=B+ এর মতো parameter থাকে।
+// এই code সেটা পড়ে f-blood select এ set করে এবং form tab খুলে দেয়।
+const urlParams = new URLSearchParams(window.location.search);
+const autoBlood = urlParams.get('blood');
+if (autoBlood) {
+  const bloodSelect = document.getElementById('f-blood');
+  if (bloodSelect) bloodSelect.value = autoBlood;
+  switchTab('new');
+}
+// ─────────────────────────────────────────────
+
 let CU = null;
 
 function applyAuthUser(user){
