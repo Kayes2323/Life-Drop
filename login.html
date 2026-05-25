@@ -157,17 +157,13 @@ window.switchTab = (tab) => {
     document.getElementById('t-'+t).classList.toggle('active', t===tab);
   });
   hideErr();
-  // Reset phone steps
   if(tab==='phone'){
     document.getElementById('phone-step1').style.display = 'block';
     document.getElementById('phone-step2').style.display = 'none';
     document.getElementById('otp-sent-msg').style.display = 'none';
-    if(!recaptchaVerifier) initRecaptcha(true);
+    destroyRecaptcha();
   }
 };
-
-// Init reCAPTCHA on page load so it's ready immediately
-setTimeout(() => initRecaptcha(true), 500);
 
 // GOOGLE
 window.loginGoogle = async () => {
@@ -271,13 +267,13 @@ window.sendOTP = async () => {
   btn.textContent='OTP পাঠানো হচ্ছে...'; btn.disabled=true;
 
   try {
-    // Always destroy and recreate to avoid stale verifier
+    // Fresh verifier every time — avoids "already rendered" error
     destroyRecaptcha();
-    if(!initRecaptcha(false)){
-      btn.textContent='OTP পাঠান'; btn.disabled=false; return;
-    }
-    // Small delay to let reCAPTCHA render
-    await new Promise(r => setTimeout(r, 300));
+    recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      size: 'invisible',
+      callback: () => {}
+    });
+    await recaptchaVerifier.render();
     confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
     document.getElementById('phone-num').value = phone;
     document.getElementById('phone-step1').style.display='none';
@@ -288,7 +284,6 @@ window.sendOTP = async () => {
     const msg = phoneErrMsg(code) || ('OTP পাঠানো যায়নি: ' + (e?.message || String(e)));
     showErr(msg);
     destroyRecaptcha();
-    setTimeout(() => initRecaptcha(true), 500);
     btn.textContent='OTP পাঠান'; btn.disabled=false;
   }
 };
