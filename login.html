@@ -162,9 +162,12 @@ window.switchTab = (tab) => {
     document.getElementById('phone-step1').style.display = 'block';
     document.getElementById('phone-step2').style.display = 'none';
     document.getElementById('otp-sent-msg').style.display = 'none';
-    initRecaptcha(true);
+    if(!recaptchaVerifier) initRecaptcha(true);
   }
 };
+
+// Init reCAPTCHA on page load so it's ready immediately
+setTimeout(() => initRecaptcha(true), 500);
 
 // GOOGLE
 window.loginGoogle = async () => {
@@ -262,15 +265,19 @@ window.sendOTP = async () => {
   if (!phone){ showErr('ফোন নম্বর দিন'); return; }
   if (!phone.startsWith('+')) phone = normalizeBdPhone(phone);
   if (!/^\+8801\d{9}$/.test(phone)){
-    showErr('মোবাইল নম্বর সঠিক দিন: +880 দিয়ে ১১ টি সংখ্যা (যেমন +8801712345678) বা 01XXXXXXXXX'); return;
+    showErr('মোবাইল নম্বর সঠিক দিন: 01XXXXXXXXX বা +8801XXXXXXXXX'); return;
   }
 
   btn.textContent='OTP পাঠানো হচ্ছে...'; btn.disabled=true;
 
   try {
-    if (!recaptchaVerifier && !initRecaptcha(false)){
+    // Always destroy and recreate to avoid stale verifier
+    destroyRecaptcha();
+    if(!initRecaptcha(false)){
       btn.textContent='OTP পাঠান'; btn.disabled=false; return;
     }
+    // Small delay to let reCAPTCHA render
+    await new Promise(r => setTimeout(r, 300));
     confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
     document.getElementById('phone-num').value = phone;
     document.getElementById('phone-step1').style.display='none';
@@ -278,9 +285,10 @@ window.sendOTP = async () => {
     document.getElementById('otp-sent-msg').style.display='block';
   } catch(e){
     const code = e?.code || '';
-    showErr(phoneErrMsg(code) || ('OTP পাঠানো যায়নি: ' + (e?.message || String(e))));
+    const msg = phoneErrMsg(code) || ('OTP পাঠানো যায়নি: ' + (e?.message || String(e)));
+    showErr(msg);
     destroyRecaptcha();
-    initRecaptcha(true);
+    setTimeout(() => initRecaptcha(true), 500);
     btn.textContent='OTP পাঠান'; btn.disabled=false;
   }
 };
