@@ -451,22 +451,24 @@ if(auth) {
   });
 }
 
-// Load slides from Firestore
+// Load slides from Firestore — async IIFE so it never blocks window.load
 if(db) {
-  try {
-    const snap = await getDocs(query(collection(db,'sliders'), orderBy('order','asc')));
-    if(!snap.empty) {
-      const fsSlides = snap.docs
-        .filter(d => d.data().active !== false)
-        .map(d => ({
-          tag  : d.data().tag   || '',
-          text : d.data().text  || '',
-          ref  : d.data().ref   || '',
-          color: d.data().color || 'red'
-        }));
-      if(fsSlides.length) buildSlider(fsSlides);
-    }
-  } catch(e) { /* keep defaults */ }
+  (async () => {
+    try {
+      const snap = await getDocs(query(collection(db,'sliders'), orderBy('order','asc')));
+      if(!snap.empty) {
+        const fsSlides = snap.docs
+          .filter(d => d.data().active !== false)
+          .map(d => ({
+            tag  : d.data().tag   || '',
+            text : d.data().text  || '',
+            ref  : d.data().ref   || '',
+            color: d.data().color || 'red'
+          }));
+        if(fsSlides.length) buildSlider(fsSlides);
+      }
+    } catch(e) { /* keep defaults */ }
+  })();
 }
 
 // Stats — with error handling
