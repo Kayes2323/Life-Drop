@@ -391,9 +391,12 @@ function showToast(m) {
   t.textContent = m; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2700);
 }
-window.addEventListener('load', () => {
+// Hide loading screen — on load event OR after 1.5s max (safety net)
+function hideLoading() {
   document.getElementById('loading-screen')?.classList.add('hide');
-});
+}
+window.addEventListener('load', hideLoading);
+setTimeout(hideLoading, 1500);
 </script>
 
 <!-- Firebase loads AFTER page is visible — non-blocking -->
