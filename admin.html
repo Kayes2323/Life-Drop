@@ -70,6 +70,27 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:'Hind Siliguri',sans-serif}
 .toast.show{opacity:1}
 .empty{text-align:center;padding:40px 20px;color:#bbb;font-family:'Hind Siliguri',sans-serif;font-size:13px}
+
+/* SLIDER MANAGER */
+.slider-form{background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:12px}
+.slider-form-title{font-size:13px;font-weight:700;color:#2c3e50;margin-bottom:12px;font-family:'Hind Siliguri',sans-serif}
+.sf-iw{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:11px;padding:0 12px;margin-bottom:9px;transition:.2s}
+.sf-iw:focus-within{border-color:#c0392b;background:#fff}
+.sf-iw input,.sf-iw select,.sf-iw textarea{flex:1;border:none;background:transparent;padding:10px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif}
+.sf-iw textarea{resize:vertical;min-height:60px;padding:10px 0}
+.sf-add-btn{width:100%;padding:12px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.sl-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,.06);display:flex;gap:12px;align-items:flex-start}
+.sl-color-dot{width:36px;height:36px;border-radius:10px;flex-shrink:0;margin-top:2px}
+.sl-color-dot.red   {background:linear-gradient(135deg,#c0392b,#e74c3c)}
+.sl-color-dot.purple{background:linear-gradient(135deg,#6c3483,#8e44ad)}
+.sl-color-dot.green {background:linear-gradient(135deg,#1e8449,#27ae60)}
+.sl-color-dot.navy  {background:linear-gradient(135deg,#1a5276,#2980b9)}
+.sl-color-dot.teal  {background:linear-gradient(135deg,#0e6655,#16a085)}
+.sl-body{flex:1;min-width:0}
+.sl-tag{font-size:10px;color:#888;font-family:'Inter',sans-serif;margin-bottom:3px}
+.sl-text{font-size:13px;font-weight:600;color:#222;font-family:'Hind Siliguri',sans-serif;line-height:1.5;margin-bottom:3px}
+.sl-ref{font-size:11px;color:#aaa;font-style:italic;font-family:'Hind Siliguri',sans-serif}
+.sl-del{background:#fdecea;border:none;color:#c0392b;font-size:18px;width:32px;height:32px;border-radius:8px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 <body>
@@ -88,6 +109,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
   <button class="tab active" id="t-feedback" onclick="switchTab('feedback')">💬 Feedback</button>
   <button class="tab" id="t-stats" onclick="switchTab('stats')">📊 Statistics</button>
   <button class="tab" id="t-donors" onclick="switchTab('donors')">Donors</button>
+  <button class="tab" id="t-sliders" onclick="switchTab('sliders')">🖼️ Slider</button>
 </div>
 
 <!-- CONTENT -->
@@ -115,19 +137,20 @@ function timeAgo(ts){
 function stars(r){ return '⭐'.repeat(r||0)+'☆'.repeat(5-(r||0)); }
 
 window.switchTab = (tab) => {
-  ['feedback','stats','donors'].forEach(t => {
+  ['feedback','stats','donors','sliders'].forEach(t => {
     document.getElementById('t-'+t).classList.toggle('active', t===tab);
   });
   if(tab==='feedback') loadFeedback();
   if(tab==='stats') loadStats();
   if(tab==='donors') loadDonors();
+  if(tab==='sliders') loadSliders();
 };
 </script>
 
 <script type="module">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, getDocs, addDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
   apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
@@ -254,6 +277,84 @@ window.loadDonors = async () => {
     }).join('');
   } catch(e){
     el.innerHTML=`<div class="empty" style="color:#c0392b">লোড করতে সমস্যা হয়েছে।</div>`;
+  }
+};
+
+// ── SLIDERS ───────────────────────────────────────────────────
+window.loadSliders = async () => {
+  const el = document.getElementById('main-content');
+  el.innerHTML=`<div style="text-align:center;padding:30px"><div class="spinner"></div></div>`;
+  try {
+    const snap = await getDocs(query(collection(db,'sliders'), orderBy('order','asc')));
+    let listHtml = '';
+    if(!snap.empty) {
+      listHtml = snap.docs.map(d => {
+        const s = d.data();
+        return `
+        <div class="sl-card">
+          <div class="sl-color-dot ${s.color||'red'}"></div>
+          <div class="sl-body">
+            <div class="sl-tag">${s.tag||''} &nbsp;·&nbsp; order: ${s.order||0}</div>
+            <div class="sl-text">${s.text||''}</div>
+            <div class="sl-ref">${s.ref||''}</div>
+          </div>
+          <button class="sl-del" onclick="deleteSlider('${d.id}')" title="Delete">🗑</button>
+        </div>`;
+      }).join('');
+    } else {
+      listHtml = `<div class="empty">কোনো slider নেই। নিচে যোগ করুন।</div>`;
+    }
+    el.innerHTML = `
+      <div class="slider-form">
+        <div class="slider-form-title">➕ নতুন Slide যোগ করুন</div>
+        <div class="sf-iw"><input type="text" id="sl-tag" placeholder="Tag (যেমন: 📖 কুরআনের বাণী)"/></div>
+        <div class="sf-iw"><textarea id="sl-text" placeholder="Slide এর মূল টেক্সট *"></textarea></div>
+        <div class="sf-iw"><input type="text" id="sl-ref" placeholder="Reference (যেমন: — Sondhan)"/></div>
+        <div class="sf-iw">
+          <select id="sl-color">
+            <option value="red">🔴 লাল (Red)</option>
+            <option value="purple">🟣 বেগুনি (Purple)</option>
+            <option value="green">🟢 সবুজ (Green)</option>
+            <option value="navy">🔵 নেভি (Navy)</option>
+            <option value="teal">🩵 টিল (Teal)</option>
+          </select>
+        </div>
+        <div class="sf-iw"><input type="number" id="sl-order" placeholder="Order (1, 2, 3...)" min="1" value="1"/></div>
+        <button class="sf-add-btn" id="sl-add-btn" onclick="addSlider()">✅ Slide যোগ করুন</button>
+      </div>
+      ${listHtml}`;
+  } catch(e) {
+    el.innerHTML=`<div class="empty" style="color:#c0392b">লোড করতে সমস্যা হয়েছে।</div>`;
+  }
+};
+
+window.addSlider = async () => {
+  const tag   = document.getElementById('sl-tag').value.trim();
+  const text  = document.getElementById('sl-text').value.trim();
+  const ref   = document.getElementById('sl-ref').value.trim();
+  const color = document.getElementById('sl-color').value;
+  const order = parseInt(document.getElementById('sl-order').value) || 1;
+  if(!text){ showToast('মূল টেক্সট দিন'); return; }
+  const btn = document.getElementById('sl-add-btn');
+  btn.disabled=true; btn.textContent='যোগ হচ্ছে...';
+  try {
+    await addDoc(collection(db,'sliders'), { tag, text, ref, color, order, active:true, createdAt:serverTimestamp() });
+    showToast('✅ Slide যোগ হয়েছে!');
+    loadSliders();
+  } catch(e) {
+    showToast('❌ Error: '+e.message);
+    btn.disabled=false; btn.textContent='✅ Slide যোগ করুন';
+  }
+};
+
+window.deleteSlider = async (id) => {
+  if(!confirm('এই slide মুছে ফেলবেন?')) return;
+  try {
+    await deleteDoc(doc(db,'sliders',id));
+    showToast('🗑 Slide মুছে গেছে');
+    loadSliders();
+  } catch(e) {
+    showToast('❌ Error: '+e.message);
   }
 };
 </script>

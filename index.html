@@ -61,6 +61,23 @@
 .ac-v2-bottom{position:relative;z-index:1}
 .ac-v2 .ac-label{font-size:13px;font-weight:700;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.18);margin:0;font-family:'Hind Siliguri',sans-serif}
 .ac-v2-sub{font-size:10px;color:rgba(255,255,255,0.70);margin-top:3px;font-family:'Hind Siliguri',sans-serif}
+
+/* ── SLIDER REDESIGN ────────────────────────────────────── */
+.banner{padding:0 14px 14px;flex-shrink:0;transition:background 0.6s ease}
+.banner.c-red   {background:linear-gradient(135deg,#c0392b,#e74c3c)}
+.banner.c-purple{background:linear-gradient(135deg,#6c3483,#8e44ad)}
+.banner.c-green {background:linear-gradient(135deg,#1e8449,#27ae60)}
+.banner.c-navy  {background:linear-gradient(135deg,#1a5276,#2980b9)}
+.banner.c-teal  {background:linear-gradient(135deg,#0e6655,#16a085)}
+.slider-wrap{position:relative;overflow:hidden;border-radius:16px;touch-action:pan-y}
+.slides-track{display:flex;transition:transform 0.4s cubic-bezier(.4,0,.2,1);will-change:transform}
+.slide{min-width:100%;background:rgba(255,255,255,.13);border-radius:16px;padding:15px;box-sizing:border-box;flex-shrink:0}
+.slide-tag{font-size:10px;background:rgba(255,255,255,.25);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:8px;color:#fff;font-family:'Hind Siliguri',sans-serif}
+.slide h2{font-size:14px;font-weight:700;line-height:1.6;color:#fff;font-family:'Hind Siliguri',sans-serif;margin-bottom:4px}
+.slide .ref{font-size:10px;color:rgba(255,255,255,.8);font-style:italic;font-family:'Hind Siliguri',sans-serif}
+.slider-dots{display:flex;justify-content:center;gap:5px;margin-top:10px}
+.sdot{width:20px;height:4px;border-radius:4px;background:rgba(255,255,255,.35);transition:.3s;cursor:pointer}
+.sdot.active{background:#fff;width:28px}
 </style>
 </head>
 <body>
@@ -262,16 +279,98 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── SLIDER (runs immediately, no Firebase needed) ─────────────
+// ── SLIDER ────────────────────────────────────────────────────
+const COLORS = ['c-red','c-purple','c-green','c-navy','c-teal'];
+const DEFAULT_SLIDES = [
+  {tag:'📖 কুরআনের বাণী', text:'যে একজনের প্রাণ বাঁচালো, সে যেন পুরো মানবজাতিকে বাঁচালো', ref:'— সূরা আল-মায়েদা: ৩২', color:'red'},
+  {tag:'আমাদের আহ্বান', text:'ডোনার রেজিস্ট্রেশন ফর্ম পূরণ করে মানবতার কল্যাণে যুক্ত হোন।', ref:'— Sondhan', color:'purple'},
+  {tag:'📢 Notice', text:'Sondhan বর্তমানে উন্নয়ন ও পরীক্ষামূলক কার্যক্রমের মধ্যে রয়েছে। খুব শীঘ্রই পূর্ণাঙ্গ সেবা চালু হবে ইনশাআল্লাহ।', ref:'— Sondhan Team', color:'green'}
+];
+
+let slides = [];
 let cur = 0;
-function goSlide(n) {
-  document.getElementById('slide-'+cur).classList.remove('active');
-  document.querySelectorAll('.sdot')[cur].classList.remove('active');
-  cur = (n + 3) % 3;
-  document.getElementById('slide-'+cur).classList.add('active');
-  document.querySelectorAll('.sdot')[cur].classList.add('active');
+let autoTimer = null;
+let isDragging = false;
+let touchStartX = 0;
+let touchDeltaX = 0;
+
+function buildSlider(data) {
+  slides = data;
+  const track = document.getElementById('slides-track');
+  const dots  = document.getElementById('slider-dots');
+  track.innerHTML = '';
+  dots.innerHTML  = '';
+  slides.forEach((s, i) => {
+    track.innerHTML += `<div class="slide"><div class="slide-tag">${s.tag||''}</div><h2>${s.text||''}</h2><div class="ref">${s.ref||''}</div></div>`;
+    const d = document.createElement('div');
+    d.className = 'sdot' + (i===0?' active':'');
+    d.onclick = () => goSlide(i);
+    dots.appendChild(d);
+  });
+  cur = 0;
+  updateSlider(true);
+  startAuto();
+  bindTouch();
 }
-setInterval(() => goSlide(cur + 1), 4000);
+
+function updateSlider(instant) {
+  const track  = document.getElementById('slides-track');
+  const dots   = document.querySelectorAll('.sdot');
+  const banner = document.getElementById('slider-banner');
+  // Move track
+  track.style.transition = instant ? 'none' : 'transform 0.4s cubic-bezier(.4,0,.2,1)';
+  track.style.transform  = `translateX(-${cur * 100}%)`;
+  // Update dots
+  dots.forEach((d,i) => d.classList.toggle('active', i===cur));
+  // Update banner color
+  const colorKey = slides[cur]?.color || 'red';
+  banner.className = 'banner c-' + colorKey;
+}
+
+function goSlide(n) {
+  if(!slides.length) return;
+  cur = ((n % slides.length) + slides.length) % slides.length;
+  updateSlider(false);
+}
+
+function startAuto() {
+  if(autoTimer) clearInterval(autoTimer);
+  autoTimer = setInterval(() => goSlide(cur + 1), 4000);
+}
+
+function resetAuto() {
+  startAuto();
+}
+
+function bindTouch() {
+  const wrap = document.getElementById('slider-wrap');
+  if(!wrap) return;
+  wrap.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchDeltaX = 0;
+    isDragging = true;
+    if(autoTimer) clearInterval(autoTimer);
+  }, {passive:true});
+  wrap.addEventListener('touchmove', e => {
+    if(!isDragging) return;
+    touchDeltaX = e.touches[0].clientX - touchStartX;
+    const track = document.getElementById('slides-track');
+    track.style.transition = 'none';
+    track.style.transform = `translateX(calc(-${cur * 100}% + ${touchDeltaX}px))`;
+  }, {passive:true});
+  wrap.addEventListener('touchend', () => {
+    isDragging = false;
+    if(Math.abs(touchDeltaX) > 50) {
+      touchDeltaX < 0 ? goSlide(cur + 1) : goSlide(cur - 1);
+    } else {
+      updateSlider(false);
+    }
+    resetAuto();
+  });
+}
+
+// Init with defaults immediately, Firestore will override if connected
+buildSlider(DEFAULT_SLIDES);
 
 // ── AUTH GUARD (non-blocking) ─────────────────────────────────
 // _authReady becomes true once Firebase responds (or times out)
@@ -301,7 +400,7 @@ window.addEventListener('load', () => {
 <script type="module">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, orderBy, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
   apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
@@ -350,6 +449,24 @@ if(auth) {
     }
     // If not logged in, default "লগইন করুন" button is already shown in HTML
   });
+}
+
+// Load slides from Firestore
+if(db) {
+  try {
+    const snap = await getDocs(query(collection(db,'sliders'), orderBy('order','asc')));
+    if(!snap.empty) {
+      const fsSlides = snap.docs
+        .filter(d => d.data().active !== false)
+        .map(d => ({
+          tag  : d.data().tag   || '',
+          text : d.data().text  || '',
+          ref  : d.data().ref   || '',
+          color: d.data().color || 'red'
+        }));
+      if(fsSlides.length) buildSlider(fsSlides);
+    }
+  } catch(e) { /* keep defaults */ }
 }
 
 // Stats — with error handling
