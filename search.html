@@ -264,6 +264,27 @@ function stopLoadingMsgs(){ clearInterval(_loadTimer); }
 </script>
 
 <script type="module">
+// ── SECURITY: XSS sanitizer ───────────────────────────────────
+function sanitize(str) {
+  if(!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+}
+
+// ── SECURITY: Phone masking — only show to logged-in users ────
+function maskPhone(phone, isLoggedIn) {
+  if(!phone) return '—';
+  if(isLoggedIn) return sanitize(phone);
+  var p = String(phone);
+  if(p.length >= 6) return p.substring(0,3) + '*****' + p.substring(p.length-2);
+  return '***';
+}
+
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -377,7 +398,7 @@ function renderResults(donors, blood) {
     </div>`;
     return;
   }
-  el.innerHTML=`<div class="result-header">${donors.length} জন ${blood} donor পাওয়া গেছে</div>`+
+  el.innerHTML=`<div class="result-header">${sanitize(String(donors.length))} জন ${sanitize(blood)} donor পাওয়া গেছে</div>`+
   donors.map((d,i)=>{
     const av = d.available;
     const avatarHtml = d.photo
@@ -402,8 +423,8 @@ function renderResults(donors, blood) {
       </div>
       ${av
         ?`<div class="phone-row">
-            <span>📞 ${d.phone}</span>
-            <button class="phone-copy" onclick="navigator.clipboard.writeText('${d.phone}');showToast('নম্বর কপি হয়েছে!')">📋</button>
+            <span>📞 ${maskPhone(d.phone, !!CU)}</span>
+            ${CU ? `<button class="phone-copy" onclick="navigator.clipboard.writeText('${sanitize(d.phone)}');showToast('নম্বর কপি হয়েছে!')">📋</button>` : '<span style="font-size:10px;color:#aaa;font-family:Inter">লগইন করুন</span>'}
           </div>
           <div class="dactions">
             <a class="abtn call" href="tel:${d.phone}">📞 Call</a>
