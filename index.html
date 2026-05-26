@@ -13,16 +13,15 @@
 <link rel="stylesheet" href="style.css">
 <style>
 .brand-tagline{font-family:'Hind Siliguri',sans-serif;font-weight:400;color:#6B7280;font-size:12px}
-/* ── SLIDER ─────────────────────────────────────── */
 .banner{padding:0 14px 14px;flex-shrink:0;transition:background 0.5s ease}
 .banner.c-red   {background:linear-gradient(135deg,#c0392b,#e74c3c)}
 .banner.c-purple{background:linear-gradient(135deg,#6c3483,#8e44ad)}
 .banner.c-green {background:linear-gradient(135deg,#1e8449,#27ae60)}
 .banner.c-navy  {background:linear-gradient(135deg,#1a5276,#2980b9)}
 .banner.c-teal  {background:linear-gradient(135deg,#0e6655,#16a085)}
-.slider-wrap{position:relative;overflow:hidden;border-radius:16px;touch-action:pan-y;width:100%}
-.slides-track{display:flex;transition:transform 0.4s cubic-bezier(.4,0,.2,1);will-change:transform}
-.slide{flex-shrink:0;background:rgba(255,255,255,.13);border-radius:16px;padding:15px;box-sizing:border-box}
+.slide{display:none;animation:fadeIn 0.4s ease}
+.slide.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .slide-tag{font-size:10px;background:rgba(255,255,255,.25);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:8px;color:#fff;font-family:'Hind Siliguri',sans-serif}
 .slide h2{font-size:14px;font-weight:700;line-height:1.6;color:#fff;font-family:'Hind Siliguri',sans-serif;margin-bottom:4px}
 .slide .ref{font-size:10px;color:rgba(255,255,255,.8);font-style:italic;font-family:'Hind Siliguri',sans-serif}
@@ -278,103 +277,51 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── LOADING SCREEN — hide immediately, no waiting ─────────────
-document.addEventListener('DOMContentLoaded', function() {
+// ── LOADING SCREEN ────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
   var ls = document.getElementById('loading-screen');
   if(ls) ls.classList.add('hide');
 });
-setTimeout(function() {
+setTimeout(function(){
   var ls = document.getElementById('loading-screen');
   if(ls) ls.classList.add('hide');
-}, 800);
+}, 1000);
 
-// ── SLIDER ────────────────────────────────────────────────────
-var SLIDE_COLORS = ['c-red','c-purple','c-green','c-navy','c-teal'];
+// ── SLIDER — simple show/hide (most reliable) ─────────────────
 var cur = 0;
 var totalSlides = 3;
 var autoTimer = null;
-var touchStartX = 0;
-var touchDeltaX = 0;
-var isDragging = false;
+var txStart = 0;
 
 function goSlide(n) {
-  cur = ((n % totalSlides) + totalSlides) % totalSlides;
-  var wrap   = document.getElementById('slider-wrap');
-  var track  = document.getElementById('slides-track');
-  var banner = document.getElementById('slider-banner');
+  var slides = document.querySelectorAll('.slide');
   var dots   = document.querySelectorAll('.sdot');
-  if(track && wrap){
-    var w = wrap.offsetWidth;
-    track.style.transition = 'transform 0.4s cubic-bezier(.4,0,.2,1)';
-    track.style.transform = 'translateX(' + (-(cur * w)) + 'px)';
-  }
-  if(banner) { banner.className = 'banner ' + (SLIDE_COLORS[cur] || 'c-red'); }
-  dots.forEach(function(d,i){ d.classList.toggle('active', i===cur); });
-  resetAuto();
-}
-
-function resetAuto() {
+  var banner = document.getElementById('slider-banner');
+  if(!slides.length) return;
+  slides[cur].classList.remove('active');
+  dots[cur] && dots[cur].classList.remove('active');
+  cur = ((n % slides.length) + slides.length) % slides.length;
+  slides[cur].classList.add('active');
+  dots[cur] && dots[cur].classList.add('active');
+  var bgMap = {'c-red':'linear-gradient(135deg,#c0392b,#e74c3c)','c-purple':'linear-gradient(135deg,#6c3483,#8e44ad)','c-green':'linear-gradient(135deg,#1e8449,#27ae60)','c-navy':'linear-gradient(135deg,#1a5276,#2980b9)','c-teal':'linear-gradient(135deg,#0e6655,#16a085)'};
+  if(banner) banner.style.background = bgMap[slides[cur].dataset.color] || bgMap['c-red'];
   if(autoTimer) clearInterval(autoTimer);
-  autoTimer = setInterval(function(){ goSlide(cur + 1); }, 4000);
+  autoTimer = setInterval(function(){ goSlide(cur+1); }, 4000);
 }
 
-// Init slider with pixel widths (most reliable across all browsers)
-(function(){
-  function initSizes(){
-    var wrap   = document.getElementById('slider-wrap');
-    var track  = document.getElementById('slides-track');
-    if(!wrap || !track) return;
-    var slideEls = track.querySelectorAll('.slide');
-    var w = wrap.offsetWidth;
-    slideEls.forEach(function(s){ s.style.width = w + 'px'; });
-    track.style.width = (w * slideEls.length) + 'px';
-    totalSlides = slideEls.length;
-    track.style.transition = 'none';
-    track.style.transform = 'translateX(0px)';
-  }
-  // Call initSizes after CSS is ready
-  if(document.readyState === 'complete') {
-    initSizes();
-  } else {
-    window.addEventListener('load', initSizes);
-    // Fallback: try after 300ms in case load fires late
-    setTimeout(initSizes, 300);
-  }
-  window.addEventListener('resize', initSizes);
-  resetAuto();
+// Start auto-slide
+autoTimer = setInterval(function(){ goSlide(cur+1); }, 4000);
 
-  // Touch support
+// Touch/swipe support
+document.addEventListener('DOMContentLoaded', function(){
   var wrap = document.getElementById('slider-wrap');
   if(!wrap) return;
-  wrap.addEventListener('touchstart', function(e){
-    touchStartX = e.touches[0].clientX; touchDeltaX = 0; isDragging = true;
-    if(autoTimer) clearInterval(autoTimer);
+  wrap.addEventListener('touchstart', function(e){ txStart = e.touches[0].clientX; }, {passive:true});
+  wrap.addEventListener('touchend', function(e){
+    var diff = txStart - e.changedTouches[0].clientX;
+    if(Math.abs(diff) > 50) goSlide(diff > 0 ? cur+1 : cur-1);
   }, {passive:true});
-  wrap.addEventListener('touchmove', function(e){
-    if(!isDragging) return;
-    touchDeltaX = e.touches[0].clientX - touchStartX;
-    var wrap2 = document.getElementById('slider-wrap');
-    var track2 = document.getElementById('slides-track');
-    if(track2 && wrap2){
-      var w = wrap2.offsetWidth;
-      track2.style.transition = 'none';
-      track2.style.transform = 'translateX(' + (-(cur * w) + touchDeltaX) + 'px)';
-    }
-  }, {passive:true});
-  wrap.addEventListener('touchend', function(){
-    isDragging = false;
-    if(Math.abs(touchDeltaX) > 50){ touchDeltaX < 0 ? goSlide(cur+1) : goSlide(cur-1); }
-    else {
-      var wrap2 = document.getElementById('slider-wrap');
-      var track2 = document.getElementById('slides-track');
-      if(track2 && wrap2){
-        track2.style.transition = 'transform 0.4s cubic-bezier(.4,0,.2,1)';
-        track2.style.transform = 'translateX(' + (-(cur * wrap2.offsetWidth)) + 'px)';
-      }
-    }
-    resetAuto();
-  });
-})();
+});
 
 // ── AUTH GUARD (non-blocking) ─────────────────────────────────
 // _authReady becomes true once Firebase responds (or times out)
@@ -395,7 +342,7 @@ function showToast(m) {
   t.textContent = m; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2700);
 }
-// loading screen handled above
+/* loading handled above */
 </script>
 
 <!-- Firebase loads AFTER page is visible — non-blocking -->
@@ -453,38 +400,37 @@ if(auth) {
   });
 }
 
-// Load slides from Firestore (non-blocking, updates slider if data exists)
-if(db) {
-  (function loadFsSlides(){
-    var COLOR_MAP = {'red':'c-red','purple':'c-purple','green':'c-green','navy':'c-navy','teal':'c-teal'};
-    getDocs(query(collection(db,'sliders'), orderBy('order','asc'))).then(function(snap){
-      if(snap.empty) return;
-      var fsSlides = snap.docs.filter(function(d){ return d.data().active !== false; });
-      if(!fsSlides.length) return;
-      totalSlides = fsSlides.length;
-      SLIDE_COLORS = fsSlides.map(function(d){ return COLOR_MAP[d.data().color] || 'c-red'; });
-      var track = document.getElementById('slides-track');
-      var dots  = document.getElementById('slider-dots');
-      if(!track || !dots) return;
-      track.innerHTML = fsSlides.map(function(d){
-        var s = d.data();
-        return '<div class="slide"><div class="slide-tag">'+(s.tag||'')+'</div><h2>'+(s.text||'')+'</h2><div class="ref">'+(s.ref||'')+'</div></div>';
-      }).join('');
-      dots.innerHTML = fsSlides.map(function(_,i){
-        return '<div class="sdot'+(i===0?' active':'')+'" onclick="goSlide('+i+')"></div>';
-      }).join('');
-      cur = 0;
-      // Re-init pixel sizes for new slide count
-      var w = document.getElementById('slider-wrap').offsetWidth;
-      track.querySelectorAll('.slide').forEach(function(s){ s.style.width = w+'px'; });
-      track.style.width = (w * fsSlides.length) + 'px';
-      track.style.transition = 'none';
-      track.style.transform = 'translateX(0px)';
-      var banner = document.getElementById('slider-banner');
-      if(banner) banner.className = 'banner ' + (SLIDE_COLORS[0] || 'c-red');
-    }).catch(function(){});
-  })();
-}
+// Load Firestore slides (non-blocking)
+(function(){
+  if(!db) return;
+  var colorMap = {red:'c-red',purple:'c-purple',green:'c-green',navy:'c-navy',teal:'c-teal'};
+  getDocs(query(collection(db,'sliders'), orderBy('order','asc'))).then(function(snap){
+    if(snap.empty) return;
+    var active = snap.docs.filter(function(d){ return d.data().active !== false; });
+    if(!active.length) return;
+    var wrap  = document.getElementById('slider-wrap');
+    var dots  = document.getElementById('slider-dots');
+    if(!wrap || !dots) return;
+    wrap.innerHTML = active.map(function(d,i){
+      var s = d.data();
+      var col = colorMap[s.color] || 'c-red';
+      var tag = (s.tag||'').replace(/</g,'&lt;');
+      var txt = (s.text||'').replace(/</g,'&lt;');
+      var ref = (s.ref||'').replace(/</g,'&lt;');
+      return '<div class="slide'+(i===0?' active':'')+'" id="slide-'+i+'" data-color="'+col+'">'
+        +'<div class="slide-tag">'+tag+'</div>'
+        +'<h2>'+txt+'</h2>'
+        +'<div class="ref">'+ref+'</div></div>';
+    }).join('');
+    dots.innerHTML = active.map(function(_,i){
+      return '<div class="sdot'+(i===0?' active':'')+'" onclick="goSlide('+i+')"></div>';
+    }).join('');
+    totalSlides = active.length;
+    cur = 0;
+    var banner = document.getElementById('slider-banner');
+    if(banner) banner.className = 'banner ' + (colorMap[active[0].data().color] || 'c-red');
+  }).catch(function(){});
+})();
 
 // Stats — with error handling
 if(db) {
