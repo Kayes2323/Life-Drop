@@ -15,7 +15,16 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
-  );
+  // ✅ Fixed: navigation requests (HTML/CSS) → network-first so updates reach users
+  // Static assets (images, fonts) → cache-first for speed
+  const isNavigation = e.request.mode === 'navigate';
+  if (isNavigation) {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request))
+    );
+  } else {
+    e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request))
+    );
+  }
 });
