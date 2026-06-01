@@ -229,9 +229,9 @@ function normalizeBdPhone(raw){
   if (d.startsWith('+')) d = d.slice(1);
   if (d.startsWith('880')) d = d.slice(3);
   if (d.startsWith('0')) d = d.slice(1);
-  // ✅ Fixed: only return valid BD mobile (+880 + 10 digits starting with 1)
-  if (/^1\d{9}$/.test(d)) return '+880' + d;
-  return '';
+  if (d.startsWith('1') && d.length === 10) return '+880' + d;
+  if (/^\d{10,11}$/.test(d)) return '+880' + (d.startsWith('1') ? d : '');
+  return '+' + raw.replace(/\s+/g,'').replace(/^\+/, '');
 }
 
 /** @returns {boolean} */
@@ -348,14 +348,9 @@ function phoneErrMsg(c){
 }
 
 document.addEventListener('keydown', e => {
-  if(e.key === 'Enter') {
+  if(e.key==='Enter') {
     const active = document.querySelector('.login-tab.active')?.id;
-    if(active === 't-email') loginEmail();
-    else if(active === 't-phone') {
-      const step2 = document.getElementById('phone-step2');
-      if(step2 && step2.style.display !== 'none') verifyOTP();
-      else sendOTP();
-    }
+    if(active==='t-email') loginEmail();
   }
 });
 </script>
