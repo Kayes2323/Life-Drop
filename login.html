@@ -151,7 +151,7 @@ onAuthStateChanged(auth, u => {
 });
 
 // TAB SWITCH
-window.switchTab = (tab) => {
+globalThis.switchTab = (tab) => {
   ['google','email','phone'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t===tab ? 'block':'none';
     document.getElementById('t-'+t).classList.toggle('active', t===tab);
@@ -166,7 +166,7 @@ window.switchTab = (tab) => {
 };
 
 // GOOGLE
-window.loginGoogle = async () => {
+globalThis.loginGoogle = async () => {
   const btn = document.getElementById('g-btn');
   btn.disabled=true; btn.textContent='অপেক্ষা করুন...';
   hideErr();
@@ -195,7 +195,7 @@ window.loginGoogle = async () => {
 };
 
 // EMAIL
-window.loginEmail = async () => {
+globalThis.loginEmail = async () => {
   const email = document.getElementById('email').value.trim();
   const pass  = document.getElementById('pass').value;
   const btn   = document.getElementById('e-btn');
@@ -252,7 +252,7 @@ function initRecaptcha(silent){
   }
 }
 
-window.sendOTP = async () => {
+globalThis.sendOTP = async () => {
   const raw = document.getElementById('phone-num').value.trim();
   const btn   = document.getElementById('otp-send-btn');
   hideErr();
@@ -288,7 +288,7 @@ window.sendOTP = async () => {
   }
 };
 
-window.verifyOTP = async () => {
+globalThis.verifyOTP = async () => {
   const code = document.getElementById('otp-code').value.trim();
   const btn  = document.getElementById('otp-verify-btn');
   hideErr();
@@ -315,7 +315,7 @@ window.verifyOTP = async () => {
   }
 };
 
-window.toggleEye = () => {
+globalThis.toggleEye = () => {
   const el=document.getElementById('pass');
   el.type=el.type==='password'?'text':'password';
 };
