@@ -252,14 +252,6 @@ function formatDate(str){
 }
 function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
 
-// ── SECURITY: XSS sanitizer ───────────────────────────────────
-function sanitize(str) {
-  if(!str) return '';
-  const d = document.createElement('div');
-  d.textContent = String(str);
-  return d.innerHTML;
-}
-
 window.sharePost = (problem, blood, bags, hospital, phone, location, hemoglobin) => {
   const loc = (location && String(location).trim()) ? `\nঠিকানা: ${location}` : '';
   const hb = (hemoglobin && String(hemoglobin).trim()) ? `\nহিমোগ্লোবিন: ${hemoglobin}` : '';
@@ -301,7 +293,6 @@ if (autoBlood) {
 // ─────────────────────────────────────────────
 
 let CU = null;
-let postsLoaded = false;
 
 function applyAuthUser(user){
   CU = user;
@@ -314,14 +305,13 @@ function applyAuthUser(user){
   }
 }
 
-// ✅ Fixed: removed authStateReady() + onAuthStateChanged() dual call (race condition)
-// Single onAuthStateChanged handles everything; postsLoaded flag prevents duplicate listeners
+auth.authStateReady().then(() => {
+  applyAuthUser(auth.currentUser);
+  if(auth.currentUser) loadPosts();
+});
+
 onAuthStateChanged(auth, user => {
   applyAuthUser(user);
-  if(user && !postsLoaded){
-    postsLoaded = true;
-    loadPosts();
-  }
 });
 
 let postsUnsub = null;
@@ -356,7 +346,7 @@ window.submitRequest = async () => {
     });
     ['f-prob','f-bags','f-when','f-hospital','f-hb','f-details','f-cphone']
       .forEach(id => document.getElementById(id).value='');
-    document.getElementById('f-blood').selectedIndex = 0;
+    document.getElementById('f-blood').value='';
     showToast('✅ পোস্ট হয়েছে!');
     setTimeout(()=>switchTab('all'), 1200);
   } catch(e){ showToast('Error: '+e.message); }
@@ -377,36 +367,27 @@ window.loadPosts = () => {
       el.innerHTML = snap.docs.map(d => {
         const r = d.data();
         const c = bloodColor(r.blood);
-        // ✅ Fixed: urgent tag logic was inverted before
-        const isUrgent = r.urgency !== 'normal' && r.urgency != null;
-        const tagHtml = isUrgent
-          ? `<span class="urgent-tag">জরুরি</span>`
-          : `<span class="urgent-tag" style="background:#fff3e0;color:#e65100">সাধারণ</span>`;
-        const head = sanitize(((r.hospital||'')+'').trim() || ((r.patientName||'')+'').trim() || 'রক্তের অনুরোধ');
-        const sub  = sanitize(((r.problem||'')+'').trim() || 'কারণ উল্লেখ নেই');
-        const sBlood   = sanitize(r.blood||'');
-        const sBags    = sanitize(String(r.bags||''));
-        const sWhen    = sanitize(formatDate(r.when));
-        const sPhone   = sanitize(r.contactPhone||'');
-        const sContact = sanitize(r.contactName||'');
-        const sDetails = sanitize(r.details||'');
-        const sLoc     = sanitize(r.location||'');
-        const sHb      = sanitize(r.hemoglobin||'');
-        const locStr = sLoc
-          ? `<div class="post-strip"><span class="strip-icon">📌</span><span class="strip-label">ঠিকানা</span><span class="strip-val">${sLoc}</span></div>`
+        const urgent = r.urgency === 'normal';
+        const tagHtml = urgent
+          ? `<span class="urgent-tag" style="background:#fff3e0;color:#e65100">সাধারণ</span>`
+          : `<span class="urgent-tag">জরুরি</span>`;
+        const head = ((r.hospital||'')+'').trim() || ((r.patientName||'')+'').trim() || 'রক্তের অনুরোধ';
+        const sub = ((r.problem||'')+'').trim() || 'কারণ উল্লেখ নেই';
+        const locStr = (r.location && String(r.location).trim())
+          ? `<div class="post-strip"><span class="strip-icon">📌</span><span class="strip-label">ঠিকানা</span><span class="strip-val">${r.location}</span></div>`
           : '';
-        const hbStr = sHb
-          ? `<div class="post-strip"><span class="strip-icon">🧪</span><span class="strip-label">হিমোগ্লোবিন</span><span class="strip-val">${sHb}</span></div>`
+        const hbStr = (r.hemoglobin && String(r.hemoglobin).trim())
+          ? `<div class="post-strip"><span class="strip-icon">🧪</span><span class="strip-label">হিমোগ্লোবিন</span><span class="strip-val">${r.hemoglobin}</span></div>`
           : '';
-        const contactMeta = sContact
-          ? `<div class="post-contact">${sContact}</div>`
+        const contactMeta = (r.contactName && String(r.contactName).trim())
+          ? `<div class="post-contact">${r.contactName}</div>`
           : '';
         return `
         <div class="post-card">
           <div class="post-top">
             <div class="post-blood-col">
-              <div class="blood-badge" style="border-color:${c};color:${c}">${sBlood}</div>
-              <span class="post-bags">${sBags} ব্যাগ</span>
+              <div class="blood-badge" style="border-color:${c};color:${c}">${r.blood}</div>
+              <span class="post-bags">${r.bags} ব্যাগ</span>
             </div>
             <div class="post-head">
               <div class="post-patient">${head}</div>
@@ -418,16 +399,16 @@ window.loadPosts = () => {
             <div class="post-strip">
               <span class="strip-icon">⏰</span>
               <span class="strip-label">কখন</span>
-              <span class="strip-val">${sWhen}</span>
+              <span class="strip-val">${formatDate(r.when)}</span>
             </div>
             ${locStr}
             ${hbStr}
           </div>
-          ${sDetails?`<div class="post-note">📝 ${sDetails}</div>`:''}
+          ${r.details?`<div class="post-note">📝 ${r.details}</div>`:''}
           <div class="post-footer">
             <div class="post-foot-line"><span class="post-time">${timeAgo(r.createdAt)}</span>${contactMeta}</div>
             <div class="post-actions">
-              <a class="pbtn call" href="tel:${sPhone}">📞 কল করুন</a>
+              <a class="pbtn call" href="tel:${r.contactPhone}">📞 কল করুন</a>
               <button type="button" class="pbtn share" onclick="sharePost(${JSON.stringify(r.problem||'')}, ${JSON.stringify(r.blood||'')}, ${JSON.stringify(String(r.bags||''))}, ${JSON.stringify(r.hospital||'')}, ${JSON.stringify(r.contactPhone||'')}, ${JSON.stringify(r.location||'')}, ${JSON.stringify(r.hemoglobin||'')})">🔗 শেয়ার</button>
             </div>
           </div>

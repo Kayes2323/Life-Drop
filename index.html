@@ -368,10 +368,7 @@ try {
   setPersistence(auth, browserLocalPersistence).catch(() => {});
 } catch(e) {
   console.warn('Firebase init failed:', e);
-  // ✅ Fixed: force hide loading screen so user is not stuck
-  const ls = document.getElementById('loading-screen');
-  if(ls) ls.classList.add('hide');
-  window._authReady = true;
+  // Page still works — auth just stays false
 }
 
 if(auth) {
@@ -430,10 +427,6 @@ if(auth) {
     }).join('');
     totalSlides = active.length;
     cur = 0;
-    // ✅ Fixed: restart autoTimer after dynamic content loads to avoid sync mismatch
-    clearInterval(autoTimer);
-    goSlide(0);
-    autoTimer = setInterval(function(){ goSlide(cur+1); }, 4000);
     var banner = document.getElementById('slider-banner');
     if(banner) banner.className = 'banner ' + (colorMap[active[0].data().color] || 'c-red');
   }).catch(function(){});

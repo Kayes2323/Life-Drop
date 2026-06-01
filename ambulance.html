@@ -118,12 +118,24 @@ function showToast(m){ const t=document.getElementById('toast'); t.textContent=m
 </script>
 
 <script type="module">
-// ✅ Fixed: import from shared firebase-config.js — no more duplicate hardcoded config
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, getDocs, addDoc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, addDoc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const ADMIN_EMAIL = 'aakayes99@gmail.com';
+
+const cfg = {
+  apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
+  authDomain:"life-drop-d4784.firebaseapp.com",
+  projectId:"life-drop-d4784",
+  storageBucket:"life-drop-d4784.firebasestorage.app",
+  messagingSenderId:"671053363784",
+  appId:"1:671053363784:web:825fa9afa4f58a3ec2f67d"
+};
+const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+setPersistence(auth, browserLocalPersistence).catch(() => {});
 
 // Auth state promise — resolves once Firebase knows who the user is
 const authReady = new Promise(resolve => {
@@ -181,11 +193,7 @@ async function loadAmbs() {
       </div>`;
     }).join('');
   } catch(e){
-    if(e.code === 'failed-precondition'){
-      el.innerHTML=`<p style="text-align:center;padding:20px;color:#c0392b;font-family:'Hind Siliguri',sans-serif">Firestore index তৈরি করতে হবে। Firebase Console → Firestore → Indexes এ গিয়ে <b>createdAt</b> index তৈরি করুন।</p>`;
-    } else {
-      el.innerHTML=`<p style="text-align:center;padding:20px;color:#c0392b;font-family:'Hind Siliguri',sans-serif">লোড করতে সমস্যা হয়েছে।</p>`;
-    }
+    el.innerHTML=`<p style="text-align:center;padding:20px;color:#c0392b;font-family:'Hind Siliguri',sans-serif">লোড করতে সমস্যা হয়েছে।</p>`;
   }
 }
 

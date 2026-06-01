@@ -401,17 +401,8 @@ function renderResults(donors, blood) {
   el.innerHTML=`<div class="result-header">${sanitize(String(donors.length))} জন ${sanitize(blood)} donor পাওয়া গেছে</div>`+
   donors.map((d,i)=>{
     const av = d.available;
-    const sName   = sanitize(d.name);
-    const sBlood  = sanitize(d.blood);
-    const sPhone  = sanitize(d.phone);
-    const sWa     = sanitize(d.wa);
-    const sArea   = sanitize(d.area);
-    const sDist   = sanitize(d.district);
-    const sDiv    = sanitize(d.division);
-    const sId     = sanitize(d.id);
-    const locStr  = [sArea,sDist,sDiv].filter(Boolean).join(', ');
     const avatarHtml = d.photo
-      ? `<img src="${sanitize(d.photo)}" />`
+      ? `<img src="${d.photo}" />`
       : ini(d.name);
     return `
     <div class="dcard ${i===0&&av?'featured':''}">
@@ -420,38 +411,34 @@ function renderResults(donors, blood) {
           ${avatarHtml}
         </div>
         <div class="dinfo">
-          <div class="dname" style="${!av?'color:#aaa':''}">${sName}</div>
+          <div class="dname" style="${!av?'color:#aaa':''}">${d.name}</div>
           <div class="dbadges">
-            <span class="badge blood">${sBlood}</span>
+            <span class="badge blood">${d.blood}</span>
             ${d.urgentReady&&av?'<span class="badge urgent">⚡ জরুরি</span>':''}
             ${!av?'<span class="badge inactive">⏸ অপ্রস্তুত</span>':''}
           </div>
-          <div class="dloc">📌 ${locStr||'—'}</div>
+          <div class="dloc">📌 ${[d.area,d.district,d.division].filter(Boolean).join(', ')}</div>
           <div style="font-size:11px;color:#aaa">${starsHtml(d.rating||0)} · ${d.donations||0} বার দান করেছেন</div>
         </div>
       </div>
       ${av
         ?`<div class="phone-row">
             <span>📞 ${maskPhone(d.phone, !!CU)}</span>
-            ${CU
-              ? `<button class="phone-copy" onclick="navigator.clipboard.writeText('${sPhone}');showToast('নম্বর কপি হয়েছে!')">📋</button>`
-              : '<span style="font-size:10px;color:#aaa;font-family:Inter">লগইন করুন</span>'}
+            ${CU ? `<button class="phone-copy" onclick="navigator.clipboard.writeText('${sanitize(d.phone)}');showToast('নম্বর কপি হয়েছে!')">📋</button>` : '<span style="font-size:10px;color:#aaa;font-family:Inter">লগইন করুন</span>'}
           </div>
           <div class="dactions">
-            ${CU
-              ? `<a class="abtn call" href="tel:${sPhone}">📞 Call</a>`
-              : `<button class="abtn disabled" disabled title="লগইন করুন">📞 Call</button>`}
-            ${d.wa?`<a class="abtn wa" href="https://wa.me/${sWa.replace(/\D/g,'')}" target="_blank">💬 WA</a>`:''}
-            <button class="abtn view" data-id="${sId}" onclick="viewProfile(this.dataset.id)">👤 Profile</button>
-            <button class="abtn req" data-id="${sId}" data-name="${sName}" data-blood="${sBlood}" onclick="openReqFromEl(this)">🩸 অনুরোধ</button>
+            <a class="abtn call" href="tel:${d.phone}">📞 Call</a>
+            ${d.wa?`<a class="abtn wa" href="https://wa.me/${d.wa.replace(/\D/g,'')}" target="_blank">💬 WA</a>`:''}
+            <button class="abtn view" onclick="viewProfile('${d.id}')">👤 Profile</button>
+            <button class="abtn req" onclick="openReq('${d.id}','${d.name}','${d.blood}')">🩸 অনুরোধ</button>
           </div>`
         :`<div class="phone-hidden">
             <span>🔒 <b style="color:#c0392b">Donor রক্ত দিতে প্রস্তুত নন</b></span>
           </div>
           <div class="dactions">
             <button class="abtn disabled" disabled>📞 Call</button>
-            <button class="abtn view" data-id="${sId}" onclick="viewProfile(this.dataset.id)">👤 Profile</button>
-            <button class="abtn req" data-id="${sId}" data-name="${sName}" data-blood="${sBlood}" onclick="openReqFromEl(this)">🩸 অনুরোধ</button>
+            <button class="abtn view" onclick="viewProfile('${d.id}')">👤 Profile</button>
+            <button class="abtn req" onclick="openReq('${d.id}','${d.name}','${d.blood}')">🩸 অনুরোধ</button>
           </div>`
       }
     </div>`;
@@ -460,66 +447,47 @@ function renderResults(donors, blood) {
 
 // VIEW DONOR PROFILE
 window.viewProfile = (id) => {
+  const donors = [];
+  document.querySelectorAll('.dcard').forEach((_, i) => donors.push(i));
+  // find from last search result using DOM data — re-fetch or cache
   showToast('Profile লোড হচ্ছে...');
   import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js").then(({doc,getDoc})=>{
     getDoc(doc(db,'donors',id)).then(snap=>{
       if(!snap.exists()){ showToast('পাওয়া যায়নি'); return; }
       const d = snap.data();
       const av = d.available;
-      const sName  = sanitize(d.name);
-      const sBlood = sanitize(d.blood);
-      const sPhone = sanitize(d.phone);
-      const sWa    = sanitize(d.wa);
-      const sArea  = sanitize(d.area);
-      const sDist  = sanitize(d.district);
-      const sDiv   = sanitize(d.division);
-      const sLast  = sanitize(d.lastDonation);
-      const sId    = sanitize(snap.id);
       document.getElementById('dp-title').textContent = d.name+' ('+d.blood+')';
       document.getElementById('dp-body').innerHTML=`
         <div style="text-align:center;margin-bottom:14px">
           <div class="dp-avatar">
-            ${d.photo?`<img src="${sanitize(d.photo)}"/>`:`<span>${ini(d.name)}</span>`}
+            ${d.photo?`<img src="${d.photo}"/>`:`<span>${ini(d.name)}</span>`}
           </div>
-          <div style="font-size:17px;font-weight:800;font-family:'Inter',sans-serif">${sName}</div>
-          <span style="display:inline-block;background:#c0392b;color:#fff;font-size:12px;font-weight:700;padding:3px 14px;border-radius:20px;margin:6px 0">${sBlood}</span>
+          <div style="font-size:17px;font-weight:800;font-family:'Inter',sans-serif">${d.name}</div>
+          <span style="display:inline-block;background:#c0392b;color:#fff;font-size:12px;font-weight:700;padding:3px 14px;border-radius:20px;margin:6px 0">${d.blood}</span>
         </div>
-        <div class="info-row"><span class="info-ico">📌</span><span class="info-label">অবস্থান</span><span class="info-val">${[sArea,sDist,sDiv].filter(Boolean).join(', ')||'—'}</span></div>
-        <div class="info-row"><span class="info-ico">📞</span><span class="info-label">ফোন</span><span class="info-val">${av?(sPhone||'—'):'<i style="color:#bbb;font-size:11px">Phone number is not available</i>'}</span></div>
+        <div class="info-row"><span class="info-ico">📌</span><span class="info-label">অবস্থান</span><span class="info-val">${[d.area,d.district,d.division].filter(Boolean).join(', ')}</span></div>
+        <div class="info-row"><span class="info-ico">📞</span><span class="info-label">ফোন</span><span class="info-val">${av?(d.phone||'—'):'<i style="color:#bbb;font-size:11px">Phone number is not available</i>'}</span></div>
         <div class="info-row"><span class="info-ico">🩸</span><span class="info-label">মোট দান</span><span class="info-val">${d.donations||0} বার</span></div>
-        <div class="info-row"><span class="info-ico">📅</span><span class="info-label">শেষ দান</span><span class="info-val">${sLast||(d.neverDonated?'এখনো দেননি':'—')}</span></div>
+        <div class="info-row"><span class="info-ico">📅</span><span class="info-label">শেষ দান</span><span class="info-val">${d.lastDonation||(d.neverDonated?'এখনো দেননি':'—')}</span></div>
         <div class="info-row"><span class="info-ico">⭐</span><span class="info-label">Rating</span><span class="info-val">${starsHtml(d.rating||0)} ${d.raters?'('+d.raters+' জন)':''}</span></div>
         ${av?`<div style="display:flex;gap:8px;margin-top:14px">
-          ${CU
-            ? `<a class="abtn call" href="tel:${sPhone}" style="flex:1;padding:12px">📞 Call</a>`
-            : `<button class="abtn disabled" disabled style="flex:1;padding:12px">📞 Call</button>`}
-          ${d.wa?`<a class="abtn wa" href="https://wa.me/${sWa.replace(/\D/g,'')}" target="_blank" style="flex:1;padding:12px">💬 WhatsApp</a>`:''}
-          <button class="abtn req" data-id="${sId}" data-name="${sName}" data-blood="${sBlood}" onclick="openReqFromEl(this)" style="flex:1;padding:12px">🩸 অনুরোধ</button>
+          <a class="abtn call" href="tel:${d.phone}" style="flex:1;padding:12px">📞 Call</a>
+          ${d.wa?`<a class="abtn wa" href="https://wa.me/${d.wa.replace(/\D/g,'')}" target="_blank" style="flex:1;padding:12px">💬 WhatsApp</a>`:''}
+          <button class="abtn req" onclick="openReq('${snap.id}','${d.name}','${d.blood}')" style="flex:1;padding:12px">🩸 অনুরোধ</button>
         </div>`:''}`;
       document.getElementById('dp-modal').classList.add('open');
     });
   });
 };
 
-// REQUEST — data-attribute based, no inline string injection
-window.openReqFromEl = (btn) => {
-  const id    = btn.dataset.id;
-  const name  = btn.dataset.name;
-  const blood = btn.dataset.blood;
-  document.getElementById('req-donor-id').value = id;
-  document.getElementById('req-title').textContent = `${name} (${blood}) কে অনুরোধ`;
-  document.getElementById('req-modal').classList.add('open');
-};
-
-// legacy alias — backward compat যদি কোথাও থাকে
-window.openReq = (id, name, blood) => {
+// REQUEST
+window.openReq = (id,name,blood) => {
   document.getElementById('req-donor-id').value = id;
   document.getElementById('req-title').textContent = `${name} (${blood}) কে অনুরোধ`;
   document.getElementById('req-modal').classList.add('open');
 };
 
 window.submitReq = async () => {
-  if(!CU){ showToast('অনুরোধ পাঠাতে লগইন করুন'); return; }
   const id    = document.getElementById('req-donor-id').value;
   const name  = document.getElementById('req-name').value.trim();
   const phone = document.getElementById('req-phone').value.trim();
