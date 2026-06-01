@@ -65,14 +65,14 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 
   <!-- TABS -->
   <div class="login-tabs">
-    <button class="login-tab active" id="t-google" onclick="switchTab('google')">Google</button>
-    <button class="login-tab" id="t-email" onclick="switchTab('email')">ইমেইল</button>
-    <button class="login-tab" id="t-phone" onclick="switchTab('phone')">ফোন</button>
+    <button class="login-tab active" id="t-google">Google</button>
+    <button class="login-tab" id="t-email">ইমেইল</button>
+    <button class="login-tab" id="t-phone">ফোন</button>
   </div>
 
   <!-- GOOGLE TAB -->
   <div id="tab-google">
-    <button class="google-btn" id="g-btn" onclick="loginGoogle()">
+    <button class="google-btn" id="g-btn">
       <svg width="22" height="22" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -93,9 +93,9 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
     <div class="iw">
       <span class="ico">🔒</span>
       <input type="password" id="pass" placeholder="পাসওয়ার্ড"/>
-      <button class="eye" onclick="toggleEye()">👁</button>
+      <button class="eye" id="eye-btn">👁</button>
     </div>
-    <button class="submit-btn" id="e-btn" onclick="loginEmail()">→ লগইন করুন</button>
+    <button class="submit-btn" id="e-btn">→ লগইন করুন</button>
   </div>
 
   <!-- PHONE TAB -->
@@ -109,7 +109,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
         <input type="tel" id="phone-num" placeholder="+8801XXXXXXXXX"/>
       </div>
       <div id="recaptcha-container"></div>
-      <button class="submit-btn" id="otp-send-btn" onclick="sendOTP()">OTP পাঠান</button>
+      <button class="submit-btn" id="otp-send-btn">OTP পাঠান</button>
     </div>
 
     <!-- Step 2: OTP input -->
@@ -118,8 +118,8 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
         <span class="ico">🔢</span>
         <input type="number" id="otp-code" placeholder="6 সংখ্যার OTP কোড"/>
       </div>
-      <button class="submit-btn" id="otp-verify-btn" onclick="verifyOTP()">✅ যাচাই করুন</button>
-      <button onclick="switchTab('phone')" style="width:100%;margin-top:10px;padding:10px;background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;font-family:'Hind Siliguri',sans-serif">← আবার চেষ্টা করুন</button>
+      <button class="submit-btn" id="otp-verify-btn">✅ যাচাই করুন</button>
+      <button id="retry-phone-btn" style="width:100%;margin-top:10px;padding:10px;background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;font-family:'Hind Siliguri',sans-serif">← আবার চেষ্টা করুন</button>
     </div>
   </div>
 
@@ -151,7 +151,7 @@ onAuthStateChanged(auth, u => {
 });
 
 // TAB SWITCH
-globalThis.switchTab = (tab) => {
+function switchTab(tab) {
   ['google','email','phone'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t===tab ? 'block':'none';
     document.getElementById('t-'+t).classList.toggle('active', t===tab);
@@ -163,10 +163,10 @@ globalThis.switchTab = (tab) => {
     document.getElementById('otp-sent-msg').style.display = 'none';
     destroyRecaptcha();
   }
-};
+}
 
 // GOOGLE
-globalThis.loginGoogle = async () => {
+async function loginGoogle() {
   const btn = document.getElementById('g-btn');
   btn.disabled=true; btn.textContent='অপেক্ষা করুন...';
   hideErr();
@@ -195,7 +195,7 @@ globalThis.loginGoogle = async () => {
 };
 
 // EMAIL
-globalThis.loginEmail = async () => {
+async function loginEmail() {
   const email = document.getElementById('email').value.trim();
   const pass  = document.getElementById('pass').value;
   const btn   = document.getElementById('e-btn');
@@ -252,7 +252,7 @@ function initRecaptcha(silent){
   }
 }
 
-globalThis.sendOTP = async () => {
+async function sendOTP() {
   const raw = document.getElementById('phone-num').value.trim();
   const btn   = document.getElementById('otp-send-btn');
   hideErr();
@@ -288,7 +288,7 @@ globalThis.sendOTP = async () => {
   }
 };
 
-globalThis.verifyOTP = async () => {
+async function verifyOTP() {
   const code = document.getElementById('otp-code').value.trim();
   const btn  = document.getElementById('otp-verify-btn');
   hideErr();
@@ -315,7 +315,7 @@ globalThis.verifyOTP = async () => {
   }
 };
 
-globalThis.toggleEye = () => {
+function toggleEye() {
   const el=document.getElementById('pass');
   el.type=el.type==='password'?'text':'password';
 };
@@ -353,6 +353,17 @@ document.addEventListener('keydown', e => {
     if(active==='t-email') loginEmail();
   }
 });
+
+// Attach event listeners
+document.getElementById('t-google').addEventListener('click', () => switchTab('google'));
+document.getElementById('t-email').addEventListener('click', () => switchTab('email'));
+document.getElementById('t-phone').addEventListener('click', () => switchTab('phone'));
+document.getElementById('g-btn').addEventListener('click', loginGoogle);
+document.getElementById('e-btn').addEventListener('click', loginEmail);
+document.getElementById('eye-btn').addEventListener('click', toggleEye);
+document.getElementById('otp-send-btn').addEventListener('click', sendOTP);
+document.getElementById('otp-verify-btn').addEventListener('click', verifyOTP);
+document.getElementById('retry-phone-btn').addEventListener('click', () => switchTab('phone'));
 </script>
 </body>
 </html>
