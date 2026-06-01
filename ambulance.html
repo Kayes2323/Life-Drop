@@ -1,139 +1,226 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>অ্যাম্বুলেন্স খুঁজুন - LifeDrop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f4f7f6; color: #333; }
-        .app { max-width: 500px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; padding-bottom: 70px; }
-        
-        .header { background: #8e1b1b; padding: 15px; display: flex; align-items: center; justify-content: space-between; color: white; }
-        .header-left { display: flex; align-items: center; gap: 10px; }
-        .header h1 { font-size: 16px; font-weight: 700; font-family: 'Inter', sans-serif; }
-        .login-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 20px; font-size: 12px; color: white; text-decoration: none; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<title>Sondhan — অ্যাম্বুলেন্স</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="style.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding-bottom:102px}
+.header{background:linear-gradient(135deg,#16a085,#1abc9c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
+.back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header h1{color:#fff;font-size:16px;font-weight:800}
+.scr{flex:1;overflow-y:auto;padding:12px;padding-bottom:calc(16px + var(--bottom-nav-h))}
 
-        .container { padding: 15px; }
+.emergency-bar{background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;color:#fff}
+.emergency-bar h3{font-size:15px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:4px}
+.emergency-bar p{font-size:12px;opacity:.9;font-family:'Hind Siliguri',sans-serif}
+.emergency-num{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px}
+.emergency-call{padding:10px 20px;background:#fff;color:#c0392b;border-radius:24px;font-size:16px;font-weight:800;text-decoration:none;font-family:'Inter',sans-serif}
 
-        .filter-box { display: flex; gap: 8px; margin-bottom: 15px; }
-        .filter-box select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 13px; font-family: 'Hind Siliguri'; outline: none; background: #fff; }
-        .search-btn { background: #8e1b1b; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+.sec-title{font-size:13px;font-weight:700;color:#444;margin-bottom:10px;font-family:'Hind Siliguri',sans-serif}
 
-        .card-red { background: linear-gradient(135deg, #c0392b, #e74c3c); padding: 15px; border-radius: 12px; color: white; margin-bottom: 15px; }
-        .card-tag { background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 4px; font-size: 10px; display: inline-block; margin-bottom: 8px; }
-        .card-title { font-size: 15px; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
-        .card-desc { font-size: 12px; opacity: 0.9; margin-bottom: 15px; line-height: 1.4; }
-        .phone-display { background: rgba(0,0,0,0.15); border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px dashed rgba(255,255,255,0.3); margin-bottom: 12px; }
-        .phone-num { font-size: 16px; font-weight: 700; }
-        .copy-btn { background: white; color: #c0392b; border: none; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
-        .call-now { width: 100%; background: rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; text-align: center; text-decoration: none; display: block; }
+/* Ambulance row card — list style */
+.amb-card{background:#fff;border-radius:16px;padding:14px 12px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.amb-main{flex:1;min-width:0}
+.amb-title{font-size:15px;font-weight:700;color:#111;font-family:'Hind Siliguri',sans-serif;line-height:1.35;margin-bottom:6px}
+.amb-loc{font-size:12px;color:#888;font-family:'Hind Siliguri',sans-serif;line-height:1.4;margin-bottom:8px;display:flex;align-items:flex-start;gap:5px}
+.amb-loc i{font-style:normal;opacity:.75;flex-shrink:0}
+.amb-tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;font-family:'Inter',sans-serif;text-transform:lowercase}
+.amb-tag--private{background:#e8f5e9;color:#1e8449}
+.amb-tag--hospital{background:#e3f2fd;color:#1565c0}
+.amb-btns{display:flex;align-items:center;gap:10px;flex-shrink:0;padding-top:2px}
+.amb-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:18px;transition:transform .12s ease;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.amb-circle:active{transform:scale(.94)}
+.amb-circle.wa{background:#25d366;color:#fff}
+.amb-circle.call{background:#1abc9c;color:#fff;width:48px;height:48px;font-size:19px}
 
-        .card-green { background: linear-gradient(135deg, #16a085, #1abc9c); padding: 15px; border-radius: 12px; color: white; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .plus-icon { background: rgba(255,255,255,0.2); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 20px; }
-        .card-green-text h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-        .card-green-text p { font-size: 11px; opacity: 0.9; }
+.add-box{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.add-title{font-size:13px;font-weight:700;color:#16a085;margin-bottom:10px;font-family:'Hind Siliguri',sans-serif}
+.iw{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:11px;padding:0 12px;margin-bottom:9px;transition:.2s}
+.iw:last-of-type{margin-bottom:11px}
+.iw:focus-within{border-color:#16a085;background:#fff}
+.ico{font-size:14px;margin-right:9px;opacity:.6}
+.iw input,.iw select{flex:1;border:none;background:transparent;padding:11px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif}
+.submit-btn{width:100%;padding:13px;background:linear-gradient(135deg,#16a085,#1abc9c);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.submit-btn:disabled{background:#aaa;cursor:not-allowed}
 
-        .bnav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-        .bnav-item { text-align: center; text-decoration: none; color: #888; flex: 1; }
-        .bnav-item.active { color: #8e1b1b; }
-        .bi { display: block; font-size: 18px; margin-bottom: 2px; }
-        .bl { font-size: 11px; font-weight: 600; }
-        .bnav-center { position: relative; top: -15px; }
-        .bc-btn { background: #8e1b1b; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 10px rgba(142,27,27,0.3); margin: 0 auto 5px; }
-
-        .divider { text-align: center; font-size: 12px; color: #999; margin: 20px 0; position: relative; }
-        .divider::before, .divider::after { content: ""; position: absolute; top: 50%; width: 20%; height: 1px; background: #ddd; }
-        .divider::before { left: 10%; } .divider::after { right: 10%; }
-    </style>
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:'Hind Siliguri',sans-serif}
+.toast.show{opacity:1}
+.spinner{width:36px;height:36px;border:4px solid #d5f5f0;border-top-color:#16a085;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
 
-<div class="app">
-    <div class="header">
-        <div class="header-left">
-            <a href="index.html" style="color:white; text-decoration:none;">←</a>
-            <h1>🚑 অ্যাম্বুলেন্স খুঁজুন</h1>
-        </div>
-        <a href="profile.html" class="login-btn">লগইন করুন</a>
-    </div>
-
-    <div class="container">
-        <div class="filter-box">
-            <select id="division">
-                <option value="">বিভাগ নির্বাচন করুন</option>
-                <option>ঢাকা</option><option>চট্টগ্রাম</option><option>রাজশাহী</option><option>খুলনা</option>
-                <option>বরিশাল</option><option>সিলেট</option><option>রংপুর</option><option>ময়মনসিংহ</option>
-            </select>
-            <select id="district">
-                <option value="">জেলা নির্বাচন করুন</option>
-                <!-- ঢাকা বিভাগ -->
-                <option>ঢাকা</option><option>গাজীপুর</option><option>নারায়ণগঞ্জ</option><option>নরসিংদী</option><option>মানিকগঞ্জ</option><option>মুন্সিগঞ্জ</option><option>ফরিদপুর</option><option>মাদারীপুর</option><option>গোপালগঞ্জ</option><option>রাজবাড়ী</option><option>শরীয়তপুর</option><option>টাঙ্গাইল</option><option>কিশোরগঞ্জ</option>
-                <!-- চট্টগ্রাম বিভাগ -->
-                <option>চট্টগ্রাম</option><option>কক্সবাজার</option><option>রাঙ্গামাটি</option><option>বান্দরবান</option><option>খাগড়াছড়ি</option><option>ফেনী</option><option>লক্ষ্মীপুর</option><option>নোয়াখালী</option><option>কুমিল্লা</option><option>ব্রাহ্মণবাড়িয়া</option><option>চাঁদপুর</option>
-                <!-- রাজশাহী বিভাগ -->
-                <option>রাজশাহী</option><option>চাঁপাইনবাবগঞ্জ</option><option>নাটোর</option><option>নওগাঁ</option><option>পাবনা</option><option>সিরাজগঞ্জ</option><option>বগুড়া</option><option>জয়পুরহাট</option>
-                <!-- খুলনা বিভাগ -->
-                <option>খুলনা</option><option>বাগেরহাট</option><option>সাতক্ষীরা</option><option>যশোর</option><option>মাগুরা</option><option>নড়াইল</option><option>কুষ্টিয়া</option><option>চুয়াডাঙ্গা</option><option>মেহেরপুর</option><option>ঝিনাইদহ</option>
-                <!-- বরিশাল বিভাগ -->
-                <option>বরিশাল</option><option>ভোলা</option><option>পটুয়াখালী</option><option>পিরোজপুর</option><option>বরগুনা</option><option>ঝালকাঠি</option>
-                <!-- সিলেট বিভাগ -->
-                <option>সিলেট</option><option>মৌলভীবাজার</option><option>হবিগঞ্জ</option><option>সুনামগঞ্জ</option>
-                <!-- রংপুর বিভাগ -->
-                <option>রংপুর</option><option>পঞ্চগড়</option><option>দিনাজপুর</option><option>ঠাকুরগাঁও</option><option>নীলফামারী</option><option>লালমনিরহাট</option><option>কুড়িগ্রাম</option><option>গাইবান্ধা</option>
-                <!-- ময়মনসিংহ বিভাগ -->
-                <option>ময়মনসিংহ</option><option>শেরপুর</option><option>জামালপুর</option><option>নেত্রকোণা</option>
-            </select>
-            <button class="search-btn">🔍 খুঁজুন</button>
-        </div>
-
-        <div class="card-red">
-            <span class="card-tag">✦ LifeDrop</span>
-            <div class="card-title">🚑 LifeDrop অ্যাম্বুলেন্স</div>
-            <p class="card-desc">জরুরি প্রয়োজনে সরাসরি call করুন — সার্বক্ষণিক সেবা</p>
-            <div class="phone-display">
-                <span class="phone-num">01700-000000</span>
-                <button class="copy-btn">📋 Copy</button>
-            </div>
-            <a href="tel:01700000000" class="call-now">এখনই Call করুন</a>
-        </div>
-
-        <div class="card-green">
-            <div class="plus-icon">+</div>
-            <div class="card-green-text">
-                <h3>অ্যাম্বুলেন্স নম্বর যোগ করুন</h3>
-                <p>আপনার এলাকার পরিচিত অ্যাম্বুলেন্স নম্বর দিয়ে সহায়তা করুন</p>
-            </div>
-            <span style="margin-left:auto; opacity:0.8;">›</span>
-        </div>
-
-        <div class="divider">— এলাকাভিত্তিক তালিকা —</div>
-
-        <div style="text-align:center; padding:30px; opacity:0.4;">
-            <span style="font-size:40px; display:block;">🔍</span>
-            <p style="font-size:13px;">বিভাগ ও জেলা দিয়ে<br>অ্যাম্বুলেন্স খুঁজুন</p>
-        </div>
-    </div>
-
-    <div class="bnav">
-        <a href="index.html" class="bnav-item">
-            <span class="bi">🏠</span><span class="bl">হোম</span>
-        </a>
-        <a href="search.html" class="bnav-item">
-            <span class="bi">🔍</span><span class="bl">খুঁজুন</span>
-        </a>
-        <a href="request.html" class="bnav-item bnav-center">
-            <div class="bc-btn">🆘</div><span class="bl">অনুরোধ</span>
-        </a>
-        <a href="ambulance.html" class="bnav-item active">
-            <span class="bi">🚑</span><span class="bl">অ্যাম্বুলেন্স</span>
-        </a>
-        <a href="profile.html" class="bnav-item">
-            <span class="bi">👤</span><span class="bl">প্রোফাইল</span>
-        </a>
-    </div>
+<div class="header">
+  <a href="index.html" class="back">←</a>
+  <div class="sondhan-logo sondhan-logo--navbar-crop">
+    <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
+  </div>
+  <h1>🚑 অ্যাম্বুলেন্স খুঁজুন</h1>
 </div>
 
+<div class="scr">
+
+  <div class="emergency-bar">
+    <h3>জরুরি প্রয়োজনে এখনই call করুন</h3>
+    <p>জাতীয় জরুরি সেবা</p>
+    <div class="emergency-num">
+      <a href="tel:999" class="emergency-call">📞 999</a>
+      <a href="tel:16430" class="emergency-call">📞 16430</a>
+    </div>
+  </div>
+
+  <div class="sec-title">📋 অ্যাম্বুলেন্স তালিকা</div>
+  <div id="amb-list">
+    <div style="text-align:center;padding:30px 20px">
+      <div class="spinner"></div>
+      <p style="font-size:13px;color:#aaa;margin-top:12px;font-family:'Hind Siliguri',sans-serif">লোড হচ্ছে...</p>
+    </div>
+  </div>
+
+  <div class="add-box" id="add-box" style="display:none">
+    <div class="add-title">➕ অ্যাম্বুলেন্স তালিকায় যোগ করুন (শুধু প্রশাসক)</div>
+    <div class="iw"><span class="ico">🚑</span><input type="text" id="a-name" placeholder="সেবার নাম * (যেমন: ঢাকা অ্যাম্বুলেন্স সার্ভিস)"/></div>
+    <div class="iw"><span class="ico">📌</span><input type="text" id="a-area" placeholder="এলাকা / কভারেজ * (যেমন: মিরপুর, গুলশান, ঢাকা)"/></div>
+    <div class="iw">
+      <span class="ico">🏷️</span>
+      <select id="a-type">
+        <option value="private">প্রকার: private</option>
+        <option value="hospital">প্রকার: hospital</option>
+      </select>
+    </div>
+    <div class="iw"><span class="ico">📞</span><input type="tel" id="a-phone" placeholder="কল করার নম্বর *"/></div>
+    <div class="iw"><span class="ico">💬</span><input type="tel" id="a-wa" placeholder="WhatsApp নম্বর (ঐচ্ছিক)"/></div>
+    <button class="submit-btn" id="a-btn" onclick="addAmbulance()">✅ যোগ করুন</button>
+  </div>
+
+</div>
+
+<div class="bnav">
+  <a class="bnav-item bnav-item--home" href="index.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg></span><span class="bl">হোম</span></a>
+  <a class="bnav-item bnav-item--search" href="search.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.5-3.5"/></svg></span><span class="bl">খুঁজুন</span></a>
+  <a class="bnav-center" href="request.html"><div class="bc-btn" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(-2.5 0) scale(.75)"/><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(4 -0.5) scale(.62)"/></svg></div><span class="bl">অনুরোধ</span></a>
+  <a class="bnav-item bnav-item--about" href="about.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span><span class="bl">About</span></a>
+  <a class="bnav-item bnav-item--profile" href="profile.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="bl">Profile</span></a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
+</script>
+
+<script type="module">
+// ✅ Fixed: import from shared firebase-config.js — no more duplicate hardcoded config
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, getDocs, addDoc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const ADMIN_EMAIL = 'aakayes99@gmail.com';
+
+// Auth state promise — resolves once Firebase knows who the user is
+const authReady = new Promise(resolve => {
+  const unsub = onAuthStateChanged(auth, user => {
+    unsub();
+    resolve(user);
+  });
+});
+
+function isAdmin(user){
+  return user && String(user.email||'').toLowerCase() === ADMIN_EMAIL;
+}
+
+// Initial load
+authReady.then(user => {
+  document.getElementById('add-box').style.display = isAdmin(user) ? 'block' : 'none';
+  loadAmbs();
+});
+
+function ambTag(t){
+  const v = (t||'private').toLowerCase();
+  if(v==='hospital') return `<span class="amb-tag amb-tag--hospital">hospital</span>`;
+  return `<span class="amb-tag amb-tag--private">private</span>`;
+}
+
+async function loadAmbs() {
+  const el = document.getElementById('amb-list');
+  try {
+    const snap = await getDocs(query(collection(db,'ambulances'), orderBy('createdAt','desc')));
+    if(snap.empty) {
+      el.innerHTML=`<div style="text-align:center;padding:30px 20px;color:#aaa">
+        <div style="font-size:40px;margin-bottom:10px">🚑</div>
+        <p style="font-size:13px;font-family:'Hind Siliguri',sans-serif;line-height:1.6">এখনো কোনো অ্যাম্বুলেন্স যোগ হয়নি।<br>তালিকা শীঘ্রই আপডেট হবে।</p>
+      </div>`;
+      return;
+    }
+    el.innerHTML = snap.docs.map(d => {
+      const a = d.data();
+      const locLine = [a.area, a.division].filter(Boolean).join(', ') || (a.area || '—');
+      const wa = (a.wa||'').replace(/\D/g,'');
+      const waBtn = wa
+        ? `<a class="amb-circle wa" href="https://wa.me/${wa}" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a>`
+        : `<span class="amb-circle wa" style="opacity:.35;pointer-events:none" title="WhatsApp নেই">💬</span>`;
+      return `
+      <div class="amb-card">
+        <div class="amb-main">
+          <div class="amb-title">${a.name||'অ্যাম্বুলেন্স'}</div>
+          <div class="amb-loc"><i>📍</i><span>${locLine}</span></div>
+          ${ambTag(a.providerType)}
+        </div>
+        <div class="amb-btns">
+          ${waBtn}
+          <a class="amb-circle call" href="tel:${a.phone}" aria-label="কল">📞</a>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    if(e.code === 'failed-precondition'){
+      el.innerHTML=`<p style="text-align:center;padding:20px;color:#c0392b;font-family:'Hind Siliguri',sans-serif">Firestore index তৈরি করতে হবে। Firebase Console → Firestore → Indexes এ গিয়ে <b>createdAt</b> index তৈরি করুন।</p>`;
+    } else {
+      el.innerHTML=`<p style="text-align:center;padding:20px;color:#c0392b;font-family:'Hind Siliguri',sans-serif">লোড করতে সমস্যা হয়েছে।</p>`;
+    }
+  }
+}
+
+window.addAmbulance = async () => {
+  const user = await authReady;
+  if(!user || !isAdmin(user)){ showToast('শুধু নির্ধারিত প্রশাসক এই ফর্ম ব্যবহার করতে পারবেন'); return; }
+  const name = document.getElementById('a-name').value.trim();
+  const phone = document.getElementById('a-phone').value.trim();
+  const wa = document.getElementById('a-wa').value.trim();
+  const area = document.getElementById('a-area').value.trim();
+  const providerType = document.getElementById('a-type').value;
+  if(!name||!phone||!area){ showToast('সব * তথ্য পূরণ করুন'); return; }
+  const btn = document.getElementById('a-btn');
+  btn.disabled=true; btn.textContent='যোগ হচ্ছে...';
+  try {
+    await addDoc(collection(db,'ambulances'), {
+      name, phone, wa: wa || '',
+      area, division: '',
+      providerType,
+      addedBy: user.uid,
+      createdAt: serverTimestamp()
+    });
+    ['a-name','a-phone','a-wa','a-area'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('a-type').value='private';
+    showToast('✅ অ্যাম্বুলেন্স যোগ হয়েছে!');
+    loadAmbs();
+  } catch(e){
+    if(e.code === 'permission-denied'){
+      showToast('❌ Permission denied — Firestore rules চেক করুন');
+    } else {
+      showToast('❌ Error: '+e.message);
+    }
+  }
+  finally{ btn.disabled=false; btn.textContent='✅ যোগ করুন'; }
+};
+</script>
 </body>
 </html>
