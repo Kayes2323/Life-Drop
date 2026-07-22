@@ -7,7 +7,8 @@
 <title>Sondhan — রক্তদাতা খুঁজুন</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="fonts.css">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
 .search-top{background:#fff;padding:11px 12px;border-bottom:1px solid #f0f0f0;flex-shrink:0;display:flex;flex-direction:column;gap:7px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
@@ -75,6 +76,9 @@
 @keyframes spin{to{transform:rotate(360deg)}}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;font-family:'Hind Siliguri',sans-serif}
 .toast.show{opacity:1}
+
+
+/* ══ SEARCH LOADING ANIMATION ══ */
 .search-loading{text-align:center;padding:44px 20px}
 .drop-wrap{position:relative;width:54px;height:60px;margin:0 auto 6px}
 .drop-svg{width:54px;height:54px;animation:dropBounce 1.1s ease-in-out infinite}
@@ -105,10 +109,7 @@
   50%{width:65%;margin-left:18%}
   100%{width:0%;margin-left:100%}
 }
-@keyframes hintPulse{
-  0%{transform:scale(1);opacity:0.8}
-  100%{transform:scale(1.5);opacity:0}
-}
+
 </style>
 </head>
 <body>
@@ -146,46 +147,22 @@
         <select id="dist-filter"><option value="">জেলা</option></select>
       </div>
     </div>
-    <button class="search-btn" onclick="searchDonors()">🔍 রক্তদাতার সন্ধান করুন</button>
+    <button class="search-btn" onclick="searchDonors()">🔍 রক্তদাতা খুঁজুন</button>
   </div>
 
   <div class="results-list" id="results-list">
-    <div class="hint-box" style="padding:32px 16px">
-      <div style="width:72px;height:72px;border-radius:50%;background:rgba(192,57,43,0.08);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;position:relative;">
-        <div style="position:absolute;width:100%;height:100%;border-radius:50%;border:1.5px solid rgba(192,57,43,0.2);animation:hintPulse 2.5s ease-in-out infinite;"></div>
-        <div style="position:absolute;width:100%;height:100%;border-radius:50%;border:1.5px solid rgba(192,57,43,0.1);animation:hintPulse 2.5s ease-in-out infinite;animation-delay:0.8s;"></div>
-        <svg width="36" height="36" viewBox="0 0 54 54" fill="none">
-          <defs><linearGradient id="hg" x1="27" y1="4" x2="27" y2="52" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e74c3c"/><stop offset="100%" stop-color="#922b21"/></linearGradient></defs>
-          <path d="M27 4C27 4 9 20 9 32a18 18 0 0036 0C45 20 27 4 27 4Z" fill="url(#hg)"/>
-          <circle cx="36" cy="38" r="8" fill="white" stroke="#c0392b" stroke-width="1.8"/>
-          <path d="M33 38h6M36 35v6" stroke="#c0392b" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div style="font-size:17px;font-weight:700;color:#1a1a1a;margin-bottom:8px;font-family:'Hind Siliguri',sans-serif;">রক্তদাতার সন্ধান শুরু করুন</div>
-      <div style="font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif;line-height:1.7;max-width:260px;margin:0 auto 24px;">আপনার কাছের সক্রিয় রক্তদাতা খুঁজে পেতে ফিল্টার সেট করুন</div>
-      <div style="display:flex;flex-direction:column;gap:10px;text-align:left;max-width:260px;margin:0 auto;">
-        <div style="display:flex;align-items:center;gap:10px;background:white;border-radius:10px;padding:10px 14px;border:0.5px solid rgba(0,0,0,0.08);">
-          <div style="width:22px;height:22px;border-radius:50%;background:#c0392b;color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">১</div>
-          <div style="font-size:13px;color:#555;font-family:'Hind Siliguri',sans-serif;"><strong style="color:#1a1a1a;">রক্তের গ্রুপ</strong> বেছে নিন</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:white;border-radius:10px;padding:10px 14px;border:0.5px solid rgba(0,0,0,0.08);">
-          <div style="width:22px;height:22px;border-radius:50%;background:#c0392b;color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">২</div>
-          <div style="font-size:13px;color:#555;font-family:'Hind Siliguri',sans-serif;"><strong style="color:#1a1a1a;">বিভাগ ও জেলা</strong> সিলেক্ট করুন</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:white;border-radius:10px;padding:10px 14px;border:0.5px solid rgba(0,0,0,0.08);">
-          <div style="width:22px;height:22px;border-radius:50%;background:#c0392b;color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">৩</div>
-          <div style="font-size:13px;color:#555;font-family:'Hind Siliguri',sans-serif;"><strong style="color:#1a1a1a;">সন্ধান করুন</strong> বাটনে ট্যাপ করুন</div>
-        </div>
-      </div>
+    <div class="hint-box">
+      <div style="font-size:40px">🩸</div>
+      <p>Blood group ও বিভাগ দিয়ে search করুন</p>
     </div>
   </div>
 
   <div class="bnav">
-    <a class="bnav-item bnav-item--home" href="index.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg></span><span class="bl">হোম</span></a>
-    <a class="bnav-item bnav-item--search active" href="search.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.5-3.5"/></svg></span><span class="bl">খুঁজুন</span></a>
-    <a class="bnav-center" href="request.html"><div class="bc-btn" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(-2.5 0) scale(.75)"/><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(4 -0.5) scale(.62)"/></svg></div><span class="bl">অনুরোধ</span></a>
-    <a class="bnav-item bnav-item--about" href="about.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span><span class="bl">About</span></a>
-    <a class="bnav-item bnav-item--profile" href="profile.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="bl">Profile</span></a>
+    <a class="bnav-item bnav-item--home" href="index.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V21H15V15H9V21H3V12Z"/></svg></span><span class="bl">হোম</span></a>
+    <a class="bnav-item bnav-item--search active" href="search.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></span><span class="bl">খুঁজুন</span></a>
+    <a class="bnav-center" href="request.html"><div class="bc-btn"><svg class="bnav-svg bnav-svg--drop" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5c0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z"/></svg></div><span class="bl">অনুরোধ</span></a>
+    <a class="bnav-item bnav-item--about" href="about.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/></svg></span><span class="bl">About Us</span></a>
+    <a class="bnav-item bnav-item--profile" href="profile.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></svg></span><span class="bl">প্রোফাইল</span></a>
   </div>
 </div>
 
@@ -241,10 +218,11 @@ window.fillDist=()=>{
   s.innerHTML='<option value="">জেলা</option>';
   (DISTRICTS[d]||[]).forEach(x=>s.innerHTML+=`<option>${x}</option>`);
 };
-function ini(n){return(n||'D').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();}
+// ini() সরানো হয়েছে — app.js এর initials() এখন ব্যবহার হচ্ছে
 function starsHtml(r){let s='';for(let i=1;i<=5;i++)s+=`<span style="color:${i<=Math.round(r)?'#f39c12':'#ddd'};font-size:11px">★</span>`;return s;}
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2700);}
 function setLoad(v){document.getElementById('loading').classList.toggle('show',v);}
+
 const _loadMsgs = [
   'আপনার নিকটবর্তী সক্রিয় রক্তদাতা খোঁজা হচ্ছে',
   'Sondhan ডেটাবেজ স্ক্যান করছে…',
@@ -261,50 +239,24 @@ function startLoadingMsgs(){
   }, 1100);
 }
 function stopLoadingMsgs(){ clearInterval(_loadTimer); }
+
 </script>
 
 <script type="module">
-// ── SECURITY: XSS sanitizer ───────────────────────────────────
-function sanitize(str) {
-  if(!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;');
-}
-
-// ── SECURITY: Phone masking — only show to logged-in users ────
-function maskPhone(phone, isLoggedIn) {
-  if(!phone) return '—';
-  if(isLoggedIn) return sanitize(phone);
-  var p = String(phone);
-  if(p.length >= 6) return p.substring(0,3) + '*****' + p.substring(p.length-2);
-  return '***';
-}
-
 import { auth, db } from './firebase-config.js';
+import { esc, initials, waLink, telLink, isValidBdPhone } from './app.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let CU = null;
 
-auth.authStateReady().then(() => {
-  const user = auth.currentUser;
+// LOGIN GUARD
+onAuthStateChanged(auth, user => {
   if(!user){ window.location.href='login.html?redirect=search.html'; return; }
   CU = user;
   document.getElementById('auth-info').textContent = user.displayName?.split(' ')[0]||'';
-  const rn = document.getElementById('req-name');
-  if(rn) rn.value = user.displayName||'';
-  onAuthStateChanged(auth, u => {
-    if(!u){ window.location.href='login.html?redirect=search.html'; return; }
-    CU = u;
-    document.getElementById('auth-info').textContent = u.displayName?.split(' ')[0]||'';
-    const r2 = document.getElementById('req-name');
-    if(r2) r2.value = u.displayName||'';
-  });
+  // pre-fill request form
+  document.getElementById('req-name').value = user.displayName||'';
 });
 
 // SEARCH — donors collection, JS filter
@@ -316,169 +268,207 @@ window.searchDonors = async () => {
 
   // Nice loading UI
   const el = document.getElementById('results-list');
-  el.innerHTML = `
-  <div class="search-loading">
-    <div class="drop-wrap">
-      <svg class="drop-svg" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="dg" x1="27" y1="4" x2="27" y2="52" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#e74c3c"/>
-            <stop offset="100%" stop-color="#922b21"/>
-          </linearGradient>
-        </defs>
-        <path d="M27 4C27 4 9 20 9 32a18 18 0 0036 0C45 20 27 4 27 4Z" fill="url(#dg)"/>
-        <path d="M20 32a7 7 0 017-7" stroke="rgba(255,255,255,0.5)" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <div class="drop-shadow"></div>
-    <div class="loading-title">সন্ধান চলছে<span class="loading-dots"><span></span><span></span><span></span></span></div>
-    <div class="loading-sub-text" id="loading-sub">আপনার নিকটবর্তী সক্রিয় রক্তদাতা খোঁজা হচ্ছে</div>
-    <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
-  </div>`;
-startLoadingMsgs();
+  el.innerHTML = `<div class="search-loading">
+  <div class="drop-wrap">
+    <svg class="drop-svg" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="dg" x1="27" y1="4" x2="27" y2="52" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#e74c3c"/>
+          <stop offset="100%" stop-color="#922b21"/>
+        </linearGradient>
+      </defs>
+      <path d="M27 4C27 4 9 20 9 32a18 18 0 0036 0C45 20 27 4 27 4Z" fill="url(#dg)"/>
+      <path d="M20 32a7 7 0 017-7" stroke="rgba(255,255,255,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="drop-shadow"></div>
+  <div class="loading-title">সন্ধান চলছে<span class="loading-dots"><span></span><span></span><span></span></span></div>
+  <div class="loading-sub-text" id="loading-sub">আপনার নিকটবর্তী সক্রিয় রক্তদাতা খোঁজা হচ্ছে</div>
+  <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
+</div>`;
+  startLoadingMsgs();
 
   try {
-    const snap = await getDocs(collection(db,'donors'));
+    // BUGFIX (সবচেয়ে বড় সমস্যা): আগে এখানে পুরো 'donors' collection
+    // ডাউনলোড হতো (getDocs(collection(db,'donors'))) — সব ইউজারের সব
+    // ডেটা, সব ছবি (base64) — তারপর filter হতো JS দিয়ে। ১০০ donor
+    // থাকলে প্রতি search-এ ২০-৩০MB ডাউনলোড হতো, আর rules-এও এখন
+    // list-এ limit বাধ্যতামূলক। এখন filter সার্ভার-সাইডে হয়, limit(30)
+    // সহ — শুধু প্রাসঙ্গিক ডেটা আসে, আর phone/wa আসেই না (donorsPrivate
+    // আলাদা collection, list করা যায় না)।
+    const filters = [where('blood','==',blood), where('available','==',true)];
+    if (dist)      filters.push(where('district','==',dist));
+    else if (div)  filters.push(where('division','==',div));
+
+    const snap = await getDocs(query(collection(db,'donors'), ...filters, limit(30)));
     let donors = [];
-    snap.forEach(d => donors.push({id:d.id,...d.data()}));
+    snap.forEach(d => donors.push({id:d.id, ...d.data()}));
 
-    // JS filter
-    donors = donors.filter(d => {
-      if(d.blood !== blood) return false;
-      if(div && d.division !== div) return false;
-      if(dist && d.district !== dist) return false;
-      return true;
-    });
-
-    // active donors আগে
-    donors.sort((a,b) => (b.available?1:0) - (a.available?1:0));
+    // rating বেশি যার আগে
+    donors.sort((a,b) => (b.rating||0) - (a.rating||0));
     stopLoadingMsgs();
     renderResults(donors, blood);
   } catch(e){
     stopLoadingMsgs();
+    console.warn('search error (Firestore composite index লাগতে পারে):', e);
     el.innerHTML = `<div class="hint-box"><p style="color:#c0392b">সমস্যা হয়েছে। আবার চেষ্টা করুন।</p></div>`;
   }
 };
 
+// শেষ search-এর ফলাফল এখানে রাখা হয় — viewProfile-এ আবার Firestore
+// পড়তে হয় না (একটা কম read, আর দ্রুত)
+let LAST_RESULTS = new Map();
+
 function renderResults(donors, blood) {
   const el = document.getElementById('results-list');
+  LAST_RESULTS = new Map(donors.map(d => [d.id, d]));
+
   if(!donors.length){
-    el.innerHTML=`
-    <div style="padding:32px 16px;text-align:center">
-      <div style="width:72px;height:72px;border-radius:50%;background:rgba(230,115,0,0.1);margin:0 auto 18px;display:flex;align-items:center;justify-content:center;">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2C12 2 5 9 5 14a7 7 0 0014 0C19 9 12 2 12 2Z" fill="rgba(230,115,0,0.2)" stroke="#e67e22" stroke-width="1.8" stroke-linejoin="round"/>
-          <path d="M12 10v4M12 17h.01" stroke="#e67e22" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div style="font-size:17px;font-weight:700;color:#1a1a1a;margin-bottom:8px;font-family:'Hind Siliguri',sans-serif;">
-        <b style="color:#e67e22">${blood}</b> রক্তের donor পাওয়া যায়নি
-      </div>
-      <div style="font-size:13px;color:#888;font-family:'Hind Siliguri',sans-serif;line-height:1.7;max-width:280px;margin:0 auto 20px;">
-        এই এলাকায় এখনো <b>${blood}</b> রক্তের কোনো নিবন্ধিত donor নেই। জরুরি অনুরোধ পোস্ট করুন — সবাই দেখতে পাবে।
-      </div>
-      <div style="background:linear-gradient(135deg,#fff5f0,#fff);border:1.5px solid rgba(192,57,43,0.15);border-radius:16px;padding:16px;max-width:300px;margin:0 auto 16px;text-align:left;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(192,57,43,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </div>
-          <div style="font-size:13px;font-weight:700;color:#c0392b;font-family:'Hind Siliguri',sans-serif;">জরুরি অনুরোধ করুন</div>
-        </div>
-        <div style="font-size:12px;color:#666;font-family:'Hind Siliguri',sans-serif;line-height:1.6;margin-bottom:12px;">
-          আপনার অনুরোধ সবাই দেখতে পাবে। কেউ সাহায্য করতে পারলে সরাসরি যোগাযোগ করবে।
-        </div>
-        <button onclick="window.location.href='request.html?blood=${encodeURIComponent(blood)}'" style="width:100%;padding:12px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-          ${blood} রক্তের জন্য অনুরোধ করুন
-        </button>
-      </div>
-      <div style="font-size:11px;color:#bbb;font-family:'Hind Siliguri',sans-serif;">
-        অথবা অন্য জেলা বা বিভাগে সন্ধান করুন
-      </div>
-    </div>`;
+    el.innerHTML=`<div class="hint-box"><div style="font-size:36px">🩸</div><p><b>${esc(blood)}</b> donor পাওয়া যায়নি।</p></div>`;
     return;
   }
-  el.innerHTML=`<div class="result-header">${sanitize(String(donors.length))} জন ${sanitize(blood)} donor পাওয়া গেছে</div>`+
+  // নিরাপত্তা: Firestore থেকে আসা প্রতিটা মান esc() দিয়ে পাস করানো হয়েছে,
+  // আর onclick-এ নাম বসানোর বদলে data-attribute + event delegation ব্যবহার
+  // হচ্ছে — তাই নামে ' বা " থাকলেও কিছু ভাঙে না।
+  //
+  // ফোন/WhatsApp এখন public donors ডেটায় নেই (donorsPrivate আলাদা) —
+  // তাই "নম্বর দেখুন" চাপলে তখনই সেই একজন donor-এর জন্য আলাদা করে
+  // fetch হয়, পুরো তালিকার জন্য না।
+  el.innerHTML=`<div class="result-header">${esc(donors.length)} জন ${esc(blood)} donor পাওয়া গেছে</div>`+
   donors.map((d,i)=>{
-    const av = d.available;
     const avatarHtml = d.photo
-      ? `<img src="${d.photo}" />`
-      : ini(d.name);
+      ? `<img src="${esc(d.photo)}" alt=""/>`
+      : esc(initials(d.name));
     return `
-    <div class="dcard ${i===0&&av?'featured':''}">
+    <div class="dcard ${i===0?'featured':''}">
       <div class="dcard-top">
-        <div class="avatar" style="${!av?'opacity:.5':''}">
+        <div class="avatar">
           ${avatarHtml}
         </div>
         <div class="dinfo">
-          <div class="dname" style="${!av?'color:#aaa':''}">${d.name}</div>
+          <div class="dname">${esc(d.name)}</div>
           <div class="dbadges">
-            <span class="badge blood">${d.blood}</span>
-            ${d.urgentReady&&av?'<span class="badge urgent">⚡ জরুরি</span>':''}
-            ${!av?'<span class="badge inactive">⏸ অপ্রস্তুত</span>':''}
+            <span class="badge blood">${esc(d.blood)}</span>
+            ${d.urgentReady?'<span class="badge urgent">⚡ জরুরি</span>':''}
           </div>
-          <div class="dloc">📌 ${[d.area,d.district,d.division].filter(Boolean).join(', ')}</div>
-          <div style="font-size:11px;color:#aaa">${starsHtml(d.rating||0)} · ${d.donations||0} বার দান করেছেন</div>
+          <div class="dloc">📌 ${esc([d.area,d.district,d.division].filter(Boolean).join(', '))}</div>
+          <div style="font-size:11px;color:#aaa">${starsHtml(d.rating||0)} · ${esc(d.donations||0)} বার দান করেছেন</div>
         </div>
       </div>
-      ${av
-        ?`<div class="phone-row">
-            <span>📞 ${maskPhone(d.phone, !!CU)}</span>
-            ${CU ? `<button class="phone-copy" onclick="navigator.clipboard.writeText('${sanitize(d.phone)}');showToast('নম্বর কপি হয়েছে!')">📋</button>` : '<span style="font-size:10px;color:#aaa;font-family:Inter">লগইন করুন</span>'}
-          </div>
-          <div class="dactions">
-            <a class="abtn call" href="tel:${d.phone}">📞 Call</a>
-            ${d.wa?`<a class="abtn wa" href="https://wa.me/${d.wa.replace(/\D/g,'')}" target="_blank">💬 WA</a>`:''}
-            <button class="abtn view" onclick="viewProfile('${d.id}')">👤 Profile</button>
-            <button class="abtn req" onclick="openReq('${d.id}','${d.name}','${d.blood}')">🩸 অনুরোধ</button>
-          </div>`
-        :`<div class="phone-hidden">
-            <span>🔒 <b style="color:#c0392b">Donor রক্ত দিতে প্রস্তুত নন</b></span>
-          </div>
-          <div class="dactions">
-            <button class="abtn disabled" disabled>📞 Call</button>
-            <button class="abtn view" onclick="viewProfile('${d.id}')">👤 Profile</button>
-            <button class="abtn req" onclick="openReq('${d.id}','${d.name}','${d.blood}')">🩸 অনুরোধ</button>
-          </div>`
-      }
+      <div class="phone-row">
+        <button class="reveal-btn" data-act="reveal" data-id="${esc(d.id)}" style="border:none;background:#fdecea;color:#c0392b;font-weight:700;font-size:12px;padding:8px 14px;border-radius:10px;cursor:pointer;font-family:'Hind Siliguri',sans-serif">🔒 নম্বর দেখুন</button>
+      </div>
+      <div class="dactions">
+        <button class="abtn call" data-act="call" data-id="${esc(d.id)}">📞 Call</button>
+        <button class="abtn wa" data-act="wa" data-id="${esc(d.id)}">💬 WA</button>
+        <button class="abtn view" data-act="view" data-id="${esc(d.id)}">👤 Profile</button>
+        <button class="abtn req" data-act="req" data-id="${esc(d.id)}">🩸 অনুরোধ</button>
+      </div>
     </div>`;
   }).join('');
 }
 
-// VIEW DONOR PROFILE
+// donorsPrivate থেকে একজন donor-এর phone/wa একবারই আনে, ক্যাশ করে রাখে
+async function ensurePrivate(id) {
+  const d = LAST_RESULTS.get(id);
+  if(!d) return null;
+  if(d._revealed) return d;
+  try {
+    const snap = await getDoc(doc(db,'donorsPrivate',id));
+    if(snap.exists()) Object.assign(d, snap.data());
+    d._revealed = true;
+    return d;
+  } catch(e) {
+    showToast('নম্বর দেখা যাচ্ছে না');
+    return null;
+  }
+}
+
+// ── EVENT DELEGATION — inline onclick-এর নিরাপদ বিকল্প ─────────
+document.getElementById('results-list').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-act]');
+  if (!btn) return;
+  const act = btn.dataset.act;
+
+  if (act === 'reveal') {
+    btn.textContent = 'লোড হচ্ছে...'; btn.disabled = true;
+    const d = await ensurePrivate(btn.dataset.id);
+    if(!d){ btn.disabled=false; btn.textContent='🔒 নম্বর দেখুন'; return; }
+    btn.closest('.phone-row').innerHTML =
+      `<span>📞 ${esc(d.phone||'—')}</span>
+       <button class="phone-copy" data-act="copy" data-phone="${esc(d.phone||'')}">📋</button>`;
+  } else if (act === 'copy') {
+    navigator.clipboard?.writeText(btn.dataset.phone)
+      .then(() => showToast('নম্বর কপি হয়েছে!'))
+      .catch(() => showToast('কপি করা যায়নি'));
+  } else if (act === 'call') {
+    const d = await ensurePrivate(btn.dataset.id);
+    if(!d || !d.phone){ showToast('নম্বর পাওয়া যায়নি'); return; }
+    window.location.href = telLink(d.phone);
+  } else if (act === 'wa') {
+    const d = await ensurePrivate(btn.dataset.id);
+    if(!d || !d.wa){ showToast('এই ডোনারের WhatsApp নম্বর নেই'); return; }
+    window.open(waLink(d.wa), '_blank', 'noopener');
+  } else if (act === 'view') {
+    window.viewProfile(btn.dataset.id);
+  } else if (act === 'req') {
+    const d = LAST_RESULTS.get(btn.dataset.id);
+    if (d) window.openReq(d.id, d.name, d.blood);
+  }
+});
+
+// ── VIEW DONOR PROFILE ─────────────────────────────────────────
+// আগে এখানে অকেজো কোড ছিল (একটা খালি donors array বানিয়ে ফেলে রাখা হতো)
+// এবং প্রতিবার Firestore থেকে আবার পড়া হতো। এখন search-এর ক্যাশ থেকেই আসে।
 window.viewProfile = (id) => {
-  const donors = [];
-  document.querySelectorAll('.dcard').forEach((_, i) => donors.push(i));
-  // find from last search result using DOM data — re-fetch or cache
-  showToast('Profile লোড হচ্ছে...');
-  import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js").then(({doc,getDoc})=>{
-    getDoc(doc(db,'donors',id)).then(snap=>{
-      if(!snap.exists()){ showToast('পাওয়া যায়নি'); return; }
-      const d = snap.data();
-      const av = d.available;
-      document.getElementById('dp-title').textContent = d.name+' ('+d.blood+')';
-      document.getElementById('dp-body').innerHTML=`
-        <div style="text-align:center;margin-bottom:14px">
-          <div class="dp-avatar">
-            ${d.photo?`<img src="${d.photo}"/>`:`<span>${ini(d.name)}</span>`}
-          </div>
-          <div style="font-size:17px;font-weight:800;font-family:'Inter',sans-serif">${d.name}</div>
-          <span style="display:inline-block;background:#c0392b;color:#fff;font-size:12px;font-weight:700;padding:3px 14px;border-radius:20px;margin:6px 0">${d.blood}</span>
-        </div>
-        <div class="info-row"><span class="info-ico">📌</span><span class="info-label">অবস্থান</span><span class="info-val">${[d.area,d.district,d.division].filter(Boolean).join(', ')}</span></div>
-        <div class="info-row"><span class="info-ico">📞</span><span class="info-label">ফোন</span><span class="info-val">${av?(d.phone||'—'):'<i style="color:#bbb;font-size:11px">Phone number is not available</i>'}</span></div>
-        <div class="info-row"><span class="info-ico">🩸</span><span class="info-label">মোট দান</span><span class="info-val">${d.donations||0} বার</span></div>
-        <div class="info-row"><span class="info-ico">📅</span><span class="info-label">শেষ দান</span><span class="info-val">${d.lastDonation||(d.neverDonated?'এখনো দেননি':'—')}</span></div>
-        <div class="info-row"><span class="info-ico">⭐</span><span class="info-label">Rating</span><span class="info-val">${starsHtml(d.rating||0)} ${d.raters?'('+d.raters+' জন)':''}</span></div>
-        ${av?`<div style="display:flex;gap:8px;margin-top:14px">
-          <a class="abtn call" href="tel:${d.phone}" style="flex:1;padding:12px">📞 Call</a>
-          ${d.wa?`<a class="abtn wa" href="https://wa.me/${d.wa.replace(/\D/g,'')}" target="_blank" style="flex:1;padding:12px">💬 WhatsApp</a>`:''}
-          <button class="abtn req" onclick="openReq('${snap.id}','${d.name}','${d.blood}')" style="flex:1;padding:12px">🩸 অনুরোধ</button>
-        </div>`:''}`;
-      document.getElementById('dp-modal').classList.add('open');
-    });
-  });
+  const d = LAST_RESULTS.get(id);
+  if(!d){ showToast('পাওয়া যায়নি'); return; }
+
+  document.getElementById('dp-title').textContent = `${d.name} (${d.blood})`;
+  document.getElementById('dp-body').innerHTML=`
+    <div style="text-align:center;margin-bottom:14px">
+      <div class="dp-avatar">
+        ${d.photo?`<img src="${esc(d.photo)}" alt=""/>`:`<span>${esc(initials(d.name))}</span>`}
+      </div>
+      <div style="font-size:17px;font-weight:800;font-family:'Inter',sans-serif">${esc(d.name)}</div>
+      <span style="display:inline-block;background:#c0392b;color:#fff;font-size:12px;font-weight:700;padding:3px 14px;border-radius:20px;margin:6px 0">${esc(d.blood)}</span>
+    </div>
+    <div class="info-row"><span class="info-ico">📌</span><span class="info-label">অবস্থান</span><span class="info-val">${esc([d.area,d.district,d.division].filter(Boolean).join(', '))}</span></div>
+    <div class="info-row" id="dp-phone-row"><span class="info-ico">📞</span><span class="info-label">ফোন</span><span class="info-val"><button data-act="reveal" data-id="${esc(d.id)}" style="border:none;background:#fdecea;color:#c0392b;font-weight:700;font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif">🔒 দেখুন</button></span></div>
+    <div class="info-row"><span class="info-ico">🩸</span><span class="info-label">মোট দান</span><span class="info-val">${esc(d.donations||0)} বার</span></div>
+    <div class="info-row"><span class="info-ico">📅</span><span class="info-label">শেষ দান</span><span class="info-val">${esc(d.lastDonation||(d.neverDonated?'এখনো দেননি':'—'))}</span></div>
+    <div class="info-row"><span class="info-ico">⭐</span><span class="info-label">Rating</span><span class="info-val">${starsHtml(d.rating||0)} ${d.raters?'('+esc(d.raters)+' জন)':''}</span></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="abtn call" data-act="call" data-id="${esc(d.id)}" style="flex:1;padding:12px">📞 Call</button>
+      <button class="abtn wa" data-act="wa" data-id="${esc(d.id)}" style="flex:1;padding:12px">💬 WhatsApp</button>
+      <button class="abtn req" data-act="req" data-id="${esc(d.id)}" style="flex:1;padding:12px">🩸 অনুরোধ</button>
+    </div>`;
+  document.getElementById('dp-modal').classList.add('open');
 };
+
+// modal-এর ভেতরের সব বাটন (reveal/call/wa/req) একই delegation দিয়ে চলে
+document.getElementById('dp-body').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-act]');
+  if(!btn) return;
+  const act = btn.dataset.act;
+
+  if (act === 'reveal') {
+    const d = await ensurePrivate(btn.dataset.id);
+    if(!d) return;
+    document.querySelector('#dp-phone-row .info-val').textContent = d.phone || '—';
+  } else if (act === 'call') {
+    const d = await ensurePrivate(btn.dataset.id);
+    if(!d || !d.phone){ showToast('নম্বর পাওয়া যায়নি'); return; }
+    window.location.href = telLink(d.phone);
+  } else if (act === 'wa') {
+    const d = await ensurePrivate(btn.dataset.id);
+    if(!d || !d.wa){ showToast('এই ডোনারের WhatsApp নম্বর নেই'); return; }
+    window.open(waLink(d.wa), '_blank', 'noopener');
+  } else if (act === 'req') {
+    const d = LAST_RESULTS.get(btn.dataset.id);
+    if(d){ document.getElementById('dp-modal').classList.remove('open'); window.openReq(d.id,d.name,d.blood); }
+  }
+});
 
 // REQUEST
 window.openReq = (id,name,blood) => {
@@ -493,6 +483,8 @@ window.submitReq = async () => {
   const phone = document.getElementById('req-phone').value.trim();
   const msg   = document.getElementById('req-msg').value.trim();
   if(!name||!phone||!msg){ showToast('সব তথ্য পূরণ করুন'); return; }
+  if(!isValidBdPhone(phone)){ showToast('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)'); return; }
+  if(msg.length > 500){ showToast('বার্তা ৫০০ অক্ষরের কম রাখুন'); return; }
   const btn = document.getElementById('req-btn');
   btn.textContent='পাঠানো হচ্ছে...'; btn.disabled=true;
   try {
@@ -504,7 +496,7 @@ window.submitReq = async () => {
     document.getElementById('req-modal').classList.remove('open');
     document.getElementById('req-msg').value='';
     showToast('✅ অনুরোধ পাঠানো হয়েছে!');
-  } catch(e){ showToast('Error: '+e.message); }
+  } catch(e){ showToast('অনুরোধ পাঠানো যায়নি'); console.warn(e); }
   finally{ btn.textContent='🩸 অনুরোধ পাঠান'; btn.disabled=false; }
 };
 </script>

@@ -7,18 +7,19 @@
 <title>Sondhan — Profile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="fonts.css">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{height:100%;overflow-x:hidden;-webkit-text-size-adjust:100%}
 html,body{width:100%;max-width:100%}
-body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;margin:0;padding:0;padding-bottom:calc(102px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:stretch;overflow-x:hidden}
+body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;margin:0;padding:0;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:stretch;overflow-x:hidden}
 .app{width:100%;max-width:480px;margin:0 auto;flex:1;display:flex;flex-direction:column;min-height:100dvh;background:#f5f5f5}
 .header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:260;width:100%}
 .hl{display:flex;align-items:center;gap:8px;min-width:0}
 .hl h1{color:#fff;font-size:17px;font-weight:800;min-width:0;flex:1}
-.scr{flex:1;min-height:0;width:100%;min-width:0;overflow-x:hidden;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:calc(14px + var(--bottom-nav-h));-webkit-overflow-scrolling:touch}
+.scr{flex:1;min-height:0;width:100%;min-width:0;overflow-x:hidden;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;padding-bottom:88px;-webkit-overflow-scrolling:touch}
 
 /* PROFILE HERO */
 .profile-hero,.info-card,.history-card,.avail-card,.not-donor-box{width:100%;max-width:100%}
@@ -95,27 +96,15 @@ body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-
 .submit-btn:disabled{background:#e0a0a0;cursor:not-allowed}
 .section-divider{font-size:12px;font-weight:700;color:#888;margin:16px 0 10px;font-family:'Hind Siliguri',sans-serif;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
 
+/* BNAV */
+
 .loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:9999;align-items:center;justify-content:center}
 .loading-overlay.show{display:flex}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-/* LOGOUT CONFIRM MODAL */
-.logout-modal-bg{display:none;position:fixed;inset:0;z-index:1000;align-items:center;justify-content:center;padding:20px}
-.logout-modal-bg.open{display:flex}
-.logout-modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px)}
-.logout-modal{position:relative;z-index:1;background:#fff;border-radius:20px;width:100%;max-width:300px;overflow:hidden;animation:popIn .25s cubic-bezier(0.34,1.56,0.64,1)}
-@keyframes popIn{from{transform:scale(0.88);opacity:0}to{transform:scale(1);opacity:1}}
-.logout-modal-top{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:24px 20px;text-align:center}
-.logout-modal-icon{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
-.logout-modal-icon svg{width:26px;height:26px}
-.logout-modal-title{font-size:16px;font-weight:700;color:white;font-family:'Hind Siliguri',sans-serif}
-.logout-modal-body{padding:16px 20px 20px}
-.logout-modal-text{font-size:13px;color:#666;text-align:center;font-family:'Hind Siliguri',sans-serif;line-height:1.6;margin-bottom:16px}
-.logout-modal-btns{display:flex;gap:8px}
-.logout-cancel-btn{flex:1;padding:12px;background:#f5f5f5;color:#555;border:none;border-radius:12px;font-size:14px;font-weight:600;font-family:'Hind Siliguri',sans-serif;cursor:pointer}
-.logout-confirm-btn{flex:1;padding:12px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;box-shadow:0 3px 10px rgba(192,57,43,0.3)}
+.spinner{width:38px;height:38px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;font-family:'Hind Siliguri',sans-serif}
 .toast.show{opacity:1}
+
 </style>
 </head>
 <body>
@@ -126,47 +115,18 @@ body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-
   </div>
 
   <div class="scr" id="profile-content">
-    <!-- SKELETON LOADER -->
-    <div id="skeleton-loader">
-      <div style="background:#fff;border-radius:16px;padding:20px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:10px">
-        <div style="width:88px;height:88px;border-radius:50%;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;margin:0 auto 14px"></div>
-        <div style="height:18px;width:140px;border-radius:8px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;margin:0 auto 10px"></div>
-        <div style="height:14px;width:80px;border-radius:20px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;margin:0 auto"></div>
-      </div>
-      <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:10px">
-        <div style="height:12px;width:100px;border-radius:6px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;margin-bottom:14px"></div>
-        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f5f5f5">
-          <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;flex-shrink:0"></div>
-          <div style="width:70px;height:10px;border-radius:5px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>
-          <div style="flex:1;height:10px;border-radius:5px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f5f5f5">
-          <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;flex-shrink:0"></div>
-          <div style="width:70px;height:10px;border-radius:5px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>
-          <div style="flex:1;height:10px;border-radius:5px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f5f5f5">
-          <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;flex-shrink:0"></div>
-          <div style="width:70px;height:10px;border-radius:5px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>
-          <div style="flex:1;height:10px;border-radius:5px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:9px 0">
-          <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;flex-shrink:0"></div>
-          <div style="width:70px;height:10px;border-radius:5px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>
-          <div style="flex:1;height:10px;border-radius:5px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>
-        </div>
-      </div>
-      <div style="height:44px;border-radius:12px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;margin-bottom:10px"></div>
-      <div style="height:44px;border-radius:12px;background:linear-gradient(90deg,#fdecea 25%,#fdd 50%,#fdecea 75%);background-size:200% 100%;animation:shimmer 1.4s infinite"></div>
+    <div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;flex-direction:column;gap:12px">
+      <div class="spinner"></div>
+      <p style="color:#bbb;font-family:'Hind Siliguri',sans-serif;font-size:13px">লোড হচ্ছে...</p>
     </div>
   </div>
 
   <div class="bnav">
-    <a class="bnav-item bnav-item--home" href="index.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg></span><span class="bl">হোম</span></a>
-    <a class="bnav-item bnav-item--search" href="search.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-3.5-3.5"/></svg></span><span class="bl">খুঁজুন</span></a>
-    <a class="bnav-center" href="request.html"><div class="bc-btn" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(-2.5 0) scale(.75)"/><path d="M12 22a6 6 0 0 0 6-6c0-4.5-6-12-6-12s-6 7.5-6 12a6 6 0 0 0 6 6z" transform="translate(4 -0.5) scale(.62)"/></svg></div><span class="bl">অনুরোধ</span></a>
-    <a class="bnav-item bnav-item--about" href="about.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span><span class="bl">About</span></a>
-    <a class="bnav-item bnav-item--profile active" href="profile.html"><span class="bnav-pill" aria-hidden="true"><svg class="bnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="bl">Profile</span></a>
+    <a class="bnav-item bnav-item--home" href="index.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V21H15V15H9V21H3V12Z"/></svg></span><span class="bl">হোম</span></a>
+    <a class="bnav-item bnav-item--search" href="search.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></span><span class="bl">খুঁজুন</span></a>
+    <a class="bnav-center" href="request.html"><div class="bc-btn"><svg class="bnav-svg bnav-svg--drop" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5c0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z"/></svg></div><span class="bl">অনুরোধ</span></a>
+    <a class="bnav-item bnav-item--about" href="about.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/></svg></span><span class="bl">About Us</span></a>
+    <a class="bnav-item bnav-item--profile active" href="profile.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></svg></span><span class="bl">প্রোফাইল</span></a>
   </div>
 </div>
 
@@ -207,74 +167,34 @@ body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-
   </div>
 </div>
 
-<!-- LOGOUT CONFIRM MODAL -->
-<div class="logout-modal-bg" id="logout-modal">
-  <div class="logout-modal-overlay" onclick="closeLogoutModal()"></div>
-  <div class="logout-modal">
-    <div class="logout-modal-top">
-      <div class="logout-modal-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
-          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-      </div>
-      <div class="logout-modal-title">লগআউট করবেন?</div>
-    </div>
-    <div class="logout-modal-body">
-      <div class="logout-modal-text">আপনি কি সত্যিই লগআউট করতে চান? পরে আবার লগইন করতে পারবেন।</div>
-      <div class="logout-modal-btns">
-        <button class="logout-cancel-btn" onclick="closeLogoutModal()">বাতিল</button>
-        <button class="logout-confirm-btn" onclick="confirmLogout()">লগআউট</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div id="loading" class="loading-overlay"><div class="spinner"></div></div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const cfg = {
-  apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
-  authDomain:"life-drop-d4784.firebaseapp.com",
-  projectId:"life-drop-d4784",
-  storageBucket:"life-drop-d4784.firebasestorage.app",
-  messagingSenderId:"671053363784",
-  appId:"1:671053363784:web:825fa9afa4f58a3ec2f67d"
-};
-const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
-const auth = getAuth(app);
-const db   = getFirestore(app);
-setPersistence(auth, browserLocalPersistence).catch(() => {});
+import { auth, db } from './firebase-config.js';
+import { esc, initials, isValidBdPhone, normalizeBdPhone } from './app.js';
+import { onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 let CU=null, UD=null, DD=null;
 
-auth.authStateReady().then(async () => {
-  const user = auth.currentUser;
+onAuthStateChanged(auth, async user => {
   if(!user){ window.location.replace('login.html?redirect=profile.html'); return; }
   CU = user;
   await loadData();
   render();
-  onAuthStateChanged(auth, async u => {
-    if(!u){ window.location.replace('login.html?redirect=profile.html'); return; }
-    CU = u;
-    await loadData();
-    render();
-  });
 });
 
 async function loadData(){
   try {
-    const [us, ds] = await Promise.all([
+    const [us, ds, ps] = await Promise.all([
       getDoc(doc(db,'users',CU.uid)),
-      getDoc(doc(db,'donors',CU.uid))
+      getDoc(doc(db,'donors',CU.uid)),
+      getDoc(doc(db,'donorsPrivate',CU.uid))
     ]);
     UD = us.exists() ? us.data() : {name:CU.displayName||'',email:CU.email,isDonor:false};
-    DD = ds.exists() ? ds.data() : null;
+    // নিজের প্রোফাইলে public+private দুটো একসাথে মার্জ করে দেখানো হয়
+    // (phone/wa এখন donorsPrivate-এ, donors ডকে আর নেই — অন্য কেউ list করলে ফোন পাবে না)
+    DD = ds.exists() ? { ...ds.data(), ...(ps.exists() ? ps.data() : {}) } : null;
   } catch(e){
     UD = {name:CU.displayName||'',email:CU.email,isDonor:false};
     DD = null;
@@ -283,21 +203,18 @@ async function loadData(){
 
 function render(){
   const el = document.getElementById('profile-content');
-  // Hide skeleton
-  const sk = document.getElementById('skeleton-loader');
-  if(sk) sk.style.display = 'none';
   const isGoogleUser = CU.providerData?.some(p => p.providerId === 'google.com');
 
   if(!DD){
     el.innerHTML = `
       <div class="profile-hero">
         <div class="p-avatar-wrap" onclick="pickPhoto()">
-          <div class="p-avatar">${CU.photoURL?`<img src="${CU.photoURL}"/>`:(CU.displayName?.[0]?.toUpperCase()||'👤')}</div>
+          <div class="p-avatar">${CU.photoURL?`<img src="${esc(CU.photoURL)}" alt=""/>`:esc(CU.displayName?.[0]?.toUpperCase()||'👤')}</div>
           <div class="p-camera">📷</div>
           <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="uploadPhoto(this)"/>
         </div>
-        <div class="p-name">${CU.displayName||'ব্যবহারকারী'}</div>
-        <div class="p-location">📧 ${CU.email||''}</div>
+        <div class="p-name">${esc(CU.displayName||'ব্যবহারকারী')}</div>
+        <div class="p-location">📧 ${esc(CU.email||'')}</div>
       </div>
       <div class="not-donor-box">
         <div style="font-size:48px;margin-bottom:12px">🩸</div>
@@ -317,13 +234,13 @@ function render(){
   el.innerHTML = `
     <div class="profile-hero">
       <div class="p-avatar-wrap" onclick="pickPhoto()">
-        <div class="p-avatar" id="p-av">${photo?`<img src="${photo}"/>`:ini(d.name)}</div>
+        <div class="p-avatar" id="p-av">${photo?`<img src="${esc(photo)}" alt=""/>`:esc(initials(d.name))}</div>
         <div class="p-camera">📷</div>
         <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="uploadPhoto(this)"/>
       </div>
-      <div class="p-name">${d.name}</div>
-      <div style="margin-bottom:5px"><span class="p-blood">${d.blood}</span></div>
-      <div class="p-location">📌 ${[d.area,d.district,d.division].filter(Boolean).join(', ')}</div>
+      <div class="p-name">${esc(d.name)}</div>
+      <div style="margin-bottom:5px"><span class="p-blood">${esc(d.blood)}</span></div>
+      <div class="p-location">📌 ${esc([d.area,d.district,d.division].filter(Boolean).join(', '))}</div>
     </div>
 
     <div class="avail-card ${av?'on':'off'}">
@@ -339,23 +256,23 @@ function render(){
     <div class="info-card">
       <div class="info-title">📋 ব্যক্তিগত তথ্য</div>
       <div class="info-row"><span class="info-ico">📞</span><span class="info-label">ফোন</span>
-        <span class="info-val ${av?'':'na'}">${av?(d.phone||'—'):'Phone number is not available'}</span></div>
+        <span class="info-val ${av?'':'na'}">${av?esc(d.phone||'—'):'নম্বর লুকানো আছে'}</span></div>
       <div class="info-row"><span class="info-ico">✉️</span><span class="info-label">ইমেইল</span>
-        <span class="info-val">${d.email||CU.email}</span></div>
+        <span class="info-val">${esc(d.email||CU.email)}</span></div>
       <div class="info-row"><span class="info-ico">🩸</span><span class="info-label">Blood Group</span>
-        <span class="info-val">${d.blood}</span></div>
+        <span class="info-val">${esc(d.blood)}</span></div>
       <div class="info-row"><span class="info-ico">📅</span><span class="info-label">শেষ দান</span>
-        <span class="info-val">${d.lastDonation||(d.neverDonated?'এখনো দেননি':'—')}</span></div>
-      ${d.wa?`<div class="info-row"><span class="info-ico">💬</span><span class="info-label">WhatsApp</span><span class="info-val">${d.wa}</span></div>`:''}
+        <span class="info-val">${esc(d.lastDonation||(d.neverDonated?'এখনো দেননি':'—'))}</span></div>
+      ${d.wa?`<div class="info-row"><span class="info-ico">💬</span><span class="info-label">WhatsApp</span><span class="info-val">${esc(d.wa)}</span></div>`:''}
     </div>
 
     <div class="history-card">
       <div class="info-title">রক্তদানের ইতিহাস</div>
       <div class="hist-row">
-        <div class="hist-num">${d.donations||0}</div>
+        <div class="hist-num">${esc(d.donations||0)}</div>
         <div class="hist-info">
-          <h4>মোট ${d.donations||0} বার রক্ত দিয়েছেন</h4>
-          <p>শেষ দান: ${d.lastDonation||(d.neverDonated?'এখনো দেননি':'—')}</p>
+          <h4>মোট ${esc(d.donations||0)} বার রক্ত দিয়েছেন</h4>
+          <p>শেষ দান: ${esc(d.lastDonation||(d.neverDonated?'এখনো দেননি':'—'))}</p>
         </div>
       </div>
     </div>
@@ -371,37 +288,56 @@ window.handleToggle = async val => {
     await updateDoc(doc(db,'donors',CU.uid),{available:val});
     try{ await updateDoc(doc(db,'users',CU.uid),{available:val}); }catch(e){}
     DD.available = val; toast(val?'✅ রক্ত দিতে প্রস্তুত':'❌ অপ্রস্তুত'); render();
-  } catch(e){ toast('Error: '+e.message); }
+  } catch(e){ toast('আপডেট করা যায়নি'); console.warn(e); }
 };
 
 // PHOTO
 window.pickPhoto = () => document.getElementById('photo-inp')?.click();
 window.uploadPhoto = inp => {
   const f = inp.files[0]; if(!f) return;
-  // No size limit — compress করবো
+  if(!/^image\//.test(f.type)){ toast('ছবির ফাইল বেছে নিন'); inp.value=''; return; }
   const reader = new FileReader();
+  reader.onerror = () => { toast('ছবি পড়া যায়নি'); inp.value=''; };
   reader.onload = async e => {
     const img = new Image();
+    img.onerror = () => { toast('ছবিটি ব্যবহার করা যাচ্ছে না'); inp.value=''; };
     img.onload = async () => {
+      // BUGFIX: Firestore-এর ডকুমেন্ট সীমা ১MB। আগে সীমা ছাড়ালে
+      // নীরবে ব্যর্থ হতো। এখন quality কমিয়ে সীমার ভেতরে আনা হয়,
+      // তাতেও না হলে ইউজারকে স্পষ্ট করে জানানো হয়।
+      const MAX = 640;                       // ৮০০ → ৬৪০, আকার অনেক কমে
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = Math.round(h * (MAX / w)); w = MAX; } }
+      else       { if (h > MAX) { w = Math.round(w * (MAX / h)); h = MAX; } }
+
       const canvas = document.createElement('canvas');
-      // Max 800px — quality ভালো থাকবে
-      const MAX = 800;
-      let w=img.width, h=img.height;
-      if(w>h){ if(w>MAX){h=Math.round(h*(MAX/w));w=MAX;} }
-      else { if(h>MAX){w=Math.round(w*(MAX/h));h=MAX;} }
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      // Quality 0.8 — ভালো quality, ছোট size
-      const b64 = canvas.toDataURL('image/jpeg',0.8);
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+      const LIMIT = 700 * 1024;              // ১MB সীমার নিরাপদ ভেতরে
+      let b64 = '', q = 0.8;
+      for (let i = 0; i < 5; i++) {
+        b64 = canvas.toDataURL('image/jpeg', q);
+        if (b64.length <= LIMIT) break;
+        q -= 0.15;
+        if (q < 0.3) break;
+      }
+      if (b64.length > LIMIT) { toast('ছবিটি খুব বড় — ছোট একটি ছবি দিন'); inp.value=''; return; }
+
       setLoad(true);
       try {
         await updateDoc(doc(db,'donors',CU.uid),{photo:b64});
-        try{ await updateDoc(doc(db,'users',CU.uid),{photo:b64}); }catch(e){}
-        if(DD) DD.photo=b64;
+        try{ await updateDoc(doc(db,'users',CU.uid),{photo:b64}); }catch(_){}
+        if(DD) DD.photo = b64;
         toast('✅ ছবি আপলোড হয়েছে!');
         render();
-      } catch(err){ toast('Error: '+err.message); }
-      finally{ setLoad(false); }
+      } catch(err){
+        toast('ছবি সেভ করা যায়নি');
+        console.warn('photo upload:', err);
+      } finally {
+        setLoad(false);
+        inp.value = '';
+      }
     };
     img.src = e.target.result;
   };
@@ -414,13 +350,13 @@ window.openEdit = () => {
   document.getElementById('edit-body').innerHTML = `
     <div class="section-divider">ব্যক্তিগত তথ্য</div>
     <div class="form-group"><label>পূর্ণ নাম *</label>
-      <div class="iw"><input id="e-name" value="${d.name||''}"/></div></div>
+      <div class="iw"><input id="e-name" value="${esc(d.name||'')}"/></div></div>
     <div class="form-group"><label>ফোন নম্বর *</label>
-      <div class="iw"><input id="e-phone" value="${d.phone||''}"/></div></div>
+      <div class="iw"><input id="e-phone" value="${esc(d.phone||'')}"/></div></div>
     <div class="form-group"><label>WhatsApp</label>
-      <div class="iw"><input id="e-wa" value="${d.wa||''}"/></div></div>
+      <div class="iw"><input id="e-wa" value="${esc(d.wa||'')}"/></div></div>
     <div class="form-group"><label>ইমেইল</label>
-      <div class="iw disabled"><input id="e-email" value="${d.email||CU.email}" readonly/></div>
+      <div class="iw disabled"><input id="e-email" value="${esc(d.email||CU.email)}" readonly/></div>
       <p class="hint">ইমেইল পরিবর্তন করা যাবে না</p></div>
 
     <div class="section-divider">রক্তের তথ্য</div>
@@ -430,14 +366,14 @@ window.openEdit = () => {
           ${['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(b=>`<option ${b===d.blood?'selected':''}>${b}</option>`).join('')}
         </select></div></div>
       <div class="form-group"><label>মোট রক্তদান (বার)</label>
-        <div class="iw"><input type="number" id="e-donations" value="${d.donations||0}" min="0"/></div></div>
+        <div class="iw"><input type="number" id="e-donations" value="${esc(d.donations||0)}" min="0"/></div></div>
     </div>
     <div class="form-group"><label>সর্বশেষ রক্তদানের তারিখ</label>
-      <div class="iw"><input type="date" id="e-last" value="${d.lastDonation||''}"/></div></div>
+      <div class="iw"><input type="date" id="e-last" value="${esc(d.lastDonation||'')}"/></div></div>
 
     <div class="section-divider">অবস্থান</div>
     <div class="form-group"><label>এলাকা</label>
-      <div class="iw"><input id="e-area" value="${d.area||''}"/></div></div>
+      <div class="iw"><input id="e-area" value="${esc(d.area||'')}"/></div></div>
 
     <button class="submit-btn" onclick="saveEdit()">✅ Save করুন</button>`;
   document.getElementById('edit-modal').classList.add('open');
@@ -453,13 +389,21 @@ window.saveEdit = async () => {
   const last      = document.getElementById('e-last').value;
   const area      = document.getElementById('e-area').value.trim();
   if(!name||!phone){ toast('নাম ও ফোন দিন'); return; }
+  if(!isValidBdPhone(phone)){ toast('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)'); return; }
+  if(wa && !isValidBdPhone(wa)){ toast('WhatsApp নম্বর সঠিক নয়'); return; }
+  const normPhone = normalizeBdPhone(phone);
+  const normWa    = wa ? normalizeBdPhone(wa) : '';
+
   setLoad(true);
   try {
-    await updateDoc(doc(db,'donors',CU.uid),{name,phone,wa,blood,donations,lastDonation:last||null,area});
-    try{ await updateDoc(doc(db,'users',CU.uid),{name,phone,blood}); }catch(e){}
-    Object.assign(DD,{name,phone,wa,blood,donations,lastDonation:last||null,area});
+    // BUGFIX: ফোন/WhatsApp এখন donorsPrivate-এ (public donors ডকে নেই)
+    // — search-এ তালিকা টানলে নম্বর আর client-এ আসে না।
+    await updateDoc(doc(db,'donors',CU.uid),{name,blood,donations,lastDonation:last||null,area});
+    await setDoc(doc(db,'donorsPrivate',CU.uid),{phone:normPhone,wa:normWa},{merge:true});
+    try{ await updateDoc(doc(db,'users',CU.uid),{name,blood}); }catch(e){}
+    Object.assign(DD,{name,phone:normPhone,wa:normWa,blood,donations,lastDonation:last||null,area});
     closeEdit(); toast('✅ Profile update হয়েছে!'); render();
-  } catch(e){ toast('Error: '+e.message); }
+  } catch(e){ toast('সেভ করা যায়নি — আবার চেষ্টা করুন'); console.warn(e); }
   finally{ setLoad(false); }
 };
 
@@ -494,19 +438,13 @@ window.changePassword = async () => {
   } catch(e){
     if(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential')
       showPassErr('বর্তমান পাসওয়ার্ড ভুল।');
-    else showPassErr('Error: '+e.message);
+    else { showPassErr('পাসওয়ার্ড পরিবর্তন করা যায়নি'); console.warn(e); }
   } finally{ btn.disabled=false; btn.textContent='✅ পাসওয়ার্ড পরিবর্তন করুন'; }
 };
 function showPassErr(m){ const e=document.getElementById('pass-err'); e.textContent=m; e.style.display='block'; }
 
-window.doLogout = () => {
-  document.getElementById('logout-modal').classList.add('open');
-};
-window.closeLogoutModal = () => {
-  document.getElementById('logout-modal').classList.remove('open');
-};
-window.confirmLogout = async () => {
-  closeLogoutModal();
+window.doLogout = async () => {
+  if(!confirm('লগআউট করবেন?')) return;
   await signOut(auth);
   window.location.replace('index.html');
 };

@@ -7,7 +7,8 @@
 <title>Sondhan — Donor নিবন্ধন</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="fonts.css">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -217,22 +218,10 @@ function setLoad(v) { document.getElementById('loading').classList.toggle('show'
 </script>
 
 <script type="module">
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, getDocs, collection, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const cfg = {
-  apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
-  authDomain:"life-drop-d4784.firebaseapp.com",
-  projectId:"life-drop-d4784",
-  storageBucket:"life-drop-d4784.firebasestorage.app",
-  messagingSenderId:"671053363784",
-  appId:"1:671053363784:web:825fa9afa4f58a3ec2f67d"
-};
-const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
-const auth = getAuth(app);
-const db   = getFirestore(app);
-
+import { auth, db } from './firebase-config.js';
+import { isValidBdPhone, normalizeBdPhone } from './app.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, setDoc, getDoc, updateDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const COORDS = {
   'ঢাকা':{lat:23.8103,lng:90.4125},'গাজীপুর':{lat:23.9999,lng:90.4203},
   'নারায়ণগঞ্জ':{lat:23.6238,lng:90.4997},'চট্টগ্রাম':{lat:22.3569,lng:91.7832},
@@ -288,29 +277,29 @@ window.registerDonor = async () => {
 
   if(!blood)    { showErr('রক্তের গ্রুপ বেছে নিন'); return; }
   if(!phone)    { showErr('মোবাইল নম্বর দিন'); return; }
+  if(!isValidBdPhone(phone)) { showErr('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)'); return; }
+  if(wa && !isValidBdPhone(wa)) { showErr('WhatsApp নম্বর সঠিক নয়'); return; }
   if(!division) { showErr('বিভাগ বেছে নিন'); return; }
   if(!district) { showErr('জেলা বেছে নিন'); return; }
+
+  const normPhone = normalizeBdPhone(phone);
+  const normWa    = wa ? normalizeBdPhone(wa) : '';
 
   setLoad(true);
   const btn = document.getElementById('reg-btn');
   btn.disabled = true;
 
   try {
-    // ── Duplicate phone check ─────────────────────────────
-    const phoneCheck = await getDocs(
-      query(collection(db,'donors'), where('phone','==',phone))
-    );
-    if(!phoneCheck.empty) {
-      showErr('এই ফোন নম্বর দিয়ে আগেই একজন Donor নিবন্ধিত আছেন।');
-      setLoad(false); btn.disabled = false; return;
-    }
     const coords = COORDS[district] || COORDS[division] || {lat:23.8103,lng:90.4125};
+    // নিরাপত্তা: phone/wa এখানে রাখা হয় না — donorsPrivate collection-এ আলাদা।
+    // (search-এ donors collection list/query হয়; ওখানে phone না থাকলে
+    //  কোনো bulk query দিয়েই নম্বর leak হতে পারবে না)
     const donorData = {
       uid          : CU.uid,
       name         : CU.displayName || '',
       email        : CU.email || '',
       photo        : CU.photoURL || '',
-      phone, wa, blood, division, district, area,
+      blood, division, district, area,
       lat          : coords.lat + (Math.random()-.5)*.04,
       lng          : coords.lng + (Math.random()-.5)*.04,
       lastDonation : lastDate || null,
@@ -324,20 +313,39 @@ window.registerDonor = async () => {
       createdAt    : serverTimestamp()
     };
 
-    // Save to donors collection
-    await setDoc(doc(db, 'donors', CU.uid), donorData);
+    // ── ডুপ্লিকেট ফোন ঠেকানো ─────────────────────────────────
+    // BUGFIX: আগে donors collection-এ where('phone','==',phone) দিয়ে চেক
+    // হতো। phone এখন donors ডকে নেই বলে এই চেক নীরবে সবসময় "খালি" ফল
+    // দিতো — মানে ডুপ্লিকেট চেক আসলে অকেজো হয়ে গিয়েছিল।
+    // এখন phoneIndex/{normalizedPhone} নামের একটা ছোট ডকুমেন্ট
+    // (শুধু uid রাখে, অন্য কোনো তথ্য না) ব্যবহার করে server-side rules
+    // দিয়েই আটকানো হয় — একই নম্বর দিয়ে দ্বিতীয়বার create করতে গেলে
+    // rules নিজেই reject করবে (নিচে ব্যাখ্যা করা হলো)।
+    // তিনটা ডকুমেন্ট একসাথে একটা batch-এ লেখা হচ্ছে, তাই কোনো একটা
+    // ব্যর্থ হলে বাকিগুলোও লেখা হবে না — আধা-অসম্পূর্ণ ডেটা তৈরি হবে না।
+    const batch = writeBatch(db);
+    batch.set(doc(db, 'phoneIndex', normPhone), { uid: CU.uid });
+    batch.set(doc(db, 'donors', CU.uid), donorData);
+    batch.set(doc(db, 'donorsPrivate', CU.uid), { phone: normPhone, wa: normWa });
+    try {
+      await batch.commit();
+    } catch(batchErr) {
+      showErr('এই ফোন নম্বর দিয়ে আগেই একজন Donor নিবন্ধিত আছেন, অথবা লেখার অনুমতি নেই।');
+      setLoad(false); btn.disabled = false;
+      return;
+    }
 
     // Update users collection
     await updateDoc(doc(db, 'users', CU.uid), {
       isDonor  : true,
       available: true,
-      blood, phone, division, district
+      blood, division, district
     }).catch(() => {
       // users doc might not exist — create it
       return setDoc(doc(db, 'users', CU.uid), {
         uid: CU.uid, name: CU.displayName||'',
         email: CU.email||'', photo: CU.photoURL||'',
-        isDonor:true, available:true, blood, phone,
+        isDonor:true, available:true, blood,
         division, district, donations:0, rating:0, raters:0,
         createdAt: serverTimestamp()
       });
@@ -347,7 +355,8 @@ window.registerDonor = async () => {
     setTimeout(() => window.location.href = 'profile.html', 1500);
 
   } catch(e) {
-    showErr('Error: ' + e.message);
+    showErr('নিবন্ধন সম্পন্ন করা যায়নি — আবার চেষ্টা করুন।');
+    console.warn('registerDonor error:', e);
     btn.disabled = false;
   } finally {
     setLoad(false);

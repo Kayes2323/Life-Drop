@@ -1,0 +1,6 @@
+.vscode/
+.cursor/
+node_modules/
+.vercel/
+
+.vercel

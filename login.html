@@ -7,7 +7,8 @@
 <title>Sondhan — লগইন</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="fonts.css">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -131,29 +132,10 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 </div>
 
 <script type="module">
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth, setPersistence, browserLocalPersistence,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signInWithPopup, GoogleAuthProvider,
-  signInWithPhoneNumber, RecaptchaVerifier
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const cfg = {
-  apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
-  authDomain:"life-drop-d4784.firebaseapp.com",
-  projectId:"life-drop-d4784",
-  storageBucket:"life-drop-d4784.firebasestorage.app",
-  messagingSenderId:"671053363784",
-  appId:"1:671053363784:web:825fa9afa4f58a3ec2f67d"
-};
-const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
-const auth = getAuth(app);
-const db   = getFirestore(app);
-setPersistence(auth, browserLocalPersistence).catch(()=>{});
-
+import { auth, db } from './firebase-config.js';
+import { normalizeBdPhone } from './app.js';
+import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const redir = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
 
 let confirmationResult = null;
@@ -171,11 +153,12 @@ window.switchTab = (tab) => {
     document.getElementById('t-'+t).classList.toggle('active', t===tab);
   });
   hideErr();
+  // Reset phone steps
   if(tab==='phone'){
     document.getElementById('phone-step1').style.display = 'block';
     document.getElementById('phone-step2').style.display = 'none';
     document.getElementById('otp-sent-msg').style.display = 'none';
-    destroyRecaptcha();
+    initRecaptcha(true);
   }
 };
 
@@ -236,17 +219,9 @@ function destroyRecaptcha(){
   if (el) el.innerHTML = '';
 }
 
-/** Accepts +880..., 880..., 01..., 1... (Bangladesh mobile) → E.164 +8801XXXXXXXXX */
-function normalizeBdPhone(raw){
-  let d = String(raw || '').replace(/\s+/g, '');
-  if (!d) return '';
-  if (d.startsWith('+')) d = d.slice(1);
-  if (d.startsWith('880')) d = d.slice(3);
-  if (d.startsWith('0')) d = d.slice(1);
-  if (d.startsWith('1') && d.length === 10) return '+880' + d;
-  if (/^\d{10,11}$/.test(d)) return '+880' + (d.startsWith('1') ? d : '');
-  return '+' + raw.replace(/\s+/g,'').replace(/^\+/, '');
-}
+// BUGFIX: আগের normalizeBdPhone-এ বাগ ছিল — নম্বর '1' দিয়ে শুরু না হলে
+// শুধু '+880' ফেরত দিতো (নম্বরটাই হারিয়ে যেতো)। এখন app.js-এর
+// একটাই সঠিক version ব্যবহার হচ্ছে (উপরে import করা আছে)।
 
 /** @returns {boolean} */
 function initRecaptcha(silent){
@@ -256,7 +231,6 @@ function initRecaptcha(silent){
       size:'invisible',
       callback: () => {}
     });
-    recaptchaVerifier.render().catch(() => {});
     return true;
   } catch(e){
     if(!silent){
@@ -271,23 +245,19 @@ window.sendOTP = async () => {
   const btn   = document.getElementById('otp-send-btn');
   hideErr();
 
-  let phone = raw.replace(/\s+/g, '').trim();
-  if (!phone){ showErr('ফোন নম্বর দিন'); return; }
-  if (!phone.startsWith('+')) phone = normalizeBdPhone(phone);
+  if (!raw){ showErr('ফোন নম্বর দিন'); return; }
+  // সব ফরম্যাট (+880…, 880…, 01…, 1…) একই পথে normalize হয়
+  const phone = normalizeBdPhone(raw);
   if (!/^\+8801\d{9}$/.test(phone)){
-    showErr('মোবাইল নম্বর সঠিক দিন: 01XXXXXXXXX বা +8801XXXXXXXXX'); return;
+    showErr('মোবাইল নম্বর সঠিক দিন: +880 দিয়ে ১১ টি সংখ্যা (যেমন +8801712345678) বা 01XXXXXXXXX'); return;
   }
 
   btn.textContent='OTP পাঠানো হচ্ছে...'; btn.disabled=true;
 
   try {
-    // Fresh verifier every time — avoids "already rendered" error
-    destroyRecaptcha();
-    recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-      size: 'invisible',
-      callback: () => {}
-    });
-    await recaptchaVerifier.render();
+    if (!recaptchaVerifier && !initRecaptcha(false)){
+      btn.textContent='OTP পাঠান'; btn.disabled=false; return;
+    }
     confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
     document.getElementById('phone-num').value = phone;
     document.getElementById('phone-step1').style.display='none';
@@ -295,9 +265,9 @@ window.sendOTP = async () => {
     document.getElementById('otp-sent-msg').style.display='block';
   } catch(e){
     const code = e?.code || '';
-    const msg = phoneErrMsg(code) || ('OTP পাঠানো যায়নি: ' + (e?.message || String(e)));
-    showErr(msg);
+    showErr(phoneErrMsg(code) || ('OTP পাঠানো যায়নি: ' + (e?.message || String(e))));
     destroyRecaptcha();
+    initRecaptcha(true);
     btn.textContent='OTP পাঠান'; btn.disabled=false;
   }
 };

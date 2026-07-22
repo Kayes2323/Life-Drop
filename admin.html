@@ -7,7 +7,8 @@
 <title>Sondhan — Admin Panel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="fonts.css">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -102,16 +103,6 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 
 <script>
 function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
-function ini(n){ return(n||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
-function timeAgo(ts){
-  if(!ts) return '';
-  const d=ts.toDate?ts.toDate():new Date(ts);
-  const s=Math.floor((Date.now()-d)/1000);
-  if(s<60) return 'এইমাত্র';
-  if(s<3600) return Math.floor(s/60)+' মিনিট আগে';
-  if(s<86400) return Math.floor(s/3600)+' ঘণ্টা আগে';
-  return Math.floor(s/86400)+' দিন আগে';
-}
 function stars(r){ return '⭐'.repeat(r||0)+'☆'.repeat(5-(r||0)); }
 
 window.switchTab = (tab) => {
@@ -125,46 +116,25 @@ window.switchTab = (tab) => {
 </script>
 
 <script type="module">
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const cfg = {
-  apiKey:"AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk",
-  authDomain:"life-drop-d4784.firebaseapp.com",
-  projectId:"life-drop-d4784",
-  storageBucket:"life-drop-d4784.firebasestorage.app",
-  messagingSenderId:"671053363784",
-  appId:"1:671053363784:web:825fa9afa4f58a3ec2f67d"
-};
-const app  = getApps().length ? getApps()[0] : initializeApp(cfg);
-const auth = getAuth(app);
-const db   = getFirestore(app);
-
-const SUPER_ADMIN_EMAIL = 'aakayes99@gmail.com';
-
-async function userIsAdmin(user){
-  if(!user?.uid) return false;
-  if((user.email||'').toLowerCase()===SUPER_ADMIN_EMAIL) return true;
-  try{
-    const snap = await getDoc(doc(db,'users',user.uid));
-    if(snap.exists()){
-      const d = snap.data();
-      return d.isAdmin===true || d.role==='admin';
-    }
-  }catch(e){}
-  return false;
-}
+import { auth, db } from './firebase-config.js';
+import { esc, initials, timeAgo, isSuperAdmin } from './app.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, getDocs, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// ⚠️ এই চেকটা Firestore rules-এর isAdmin() এর সাথে হুবহু মিলতে হবে।
+// rules বর্তমানে শুধু ইমেইল দেখে — তাই এখানেও শুধু ইমেইল।
+// (আগে এখানে users ডকের isAdmin:true-ও দেখা হতো, ফলে ভুয়া অ্যাডমিনের
+//  কাছে প্যানেল খুলে যেতো কিন্তু ডেটা লোড হতো না — বিভ্রান্তিকর।)
+// একাধিক অ্যাডমিন দরকার হলে Firebase custom claims ব্যবহার করতে হবে।
+const userIsAdmin = (user) => isSuperAdmin(user);
 
 onAuthStateChanged(auth, async user => {
   const el = document.getElementById('main-content');
   if(!user){
-    el.innerHTML=`<div class="denied"><div class="icon">🔒</div><h3>Access Denied</h3><p>Admin হিসেবে লগইন করুন।</p><a href="login.html" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#c0392b;color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif">লগইন করুন</a></div>`;
+    el.innerHTML=`<div class="denied"><div class="icon">🔒</div><h3>প্রবেশাধিকার নেই</h3><p>অ্যাডমিন হিসেবে লগইন করুন।</p><a href="login.html" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#c0392b;color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif">লগইন করুন</a></div>`;
     return;
   }
-  const ok = await userIsAdmin(user);
-  if(!ok){
-    el.innerHTML=`<div class="denied"><div class="icon">⛔</div><h3>Access Denied</h3><p>এই পেজ শুধু অনুমোদিত প্রশাসকের জন্য। মূল অ্যাডমিন অন্য অ্যাকাউন্টে প্রশাসক অ্যাক্সেস দিতে Firestore এর <strong>users</strong> ডকুমেন্টে <strong>isAdmin: true</strong> সেট করতে পারেন।</p></div>`;
+  if(!userIsAdmin(user)){
+    el.innerHTML=`<div class="denied"><div class="icon">⛔</div><h3>প্রবেশাধিকার নেই</h3><p>এই পেজ শুধু অনুমোদিত প্রশাসকের জন্য।</p></div>`;
     return;
   }
   document.getElementById('admin-tabs').style.display='flex';
@@ -183,23 +153,24 @@ window.loadFeedback = async () => {
     const avgRating = snap.docs.reduce((s,d)=>s+(d.data().rating||0),0)/snap.size;
     el.innerHTML=`
       <div style="background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.06);text-align:center">
-        <div style="font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:4px">মোট ${snap.size}টি feedback • গড় rating</div>
-        <div style="font-size:24px;font-weight:800;color:#2c3e50;font-family:'Inter',sans-serif">${avgRating.toFixed(1)} ⭐</div>
+        <div style="font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:4px">মোট ${esc(snap.size)}টি feedback • গড় rating</div>
+        <div style="font-size:24px;font-weight:800;color:#2c3e50;font-family:'Inter',sans-serif">${esc(avgRating.toFixed(1))} ⭐</div>
       </div>` +
     snap.docs.map(d => {
       const f = d.data();
-      const r = f.rating||0;
+      // rating সংখ্যা কি না যাচাই — নাহলে class নামে যা খুশি ঢুকে যেতে পারে
+      const r = Math.max(0, Math.min(5, Number(f.rating) || 0));
       return `
       <div class="fb-card rating-${r}">
         <div class="fb-top">
-          <div class="fb-avatar">${ini(f.name)}</div>
+          <div class="fb-avatar">${esc(initials(f.name))}</div>
           <div>
-            <div class="fb-name">${f.name||'অজ্ঞাত'}</div>
-            <div class="fb-time">${timeAgo(f.createdAt)}</div>
+            <div class="fb-name">${esc(f.name||'অজ্ঞাত')}</div>
+            <div class="fb-time">${esc(timeAgo(f.createdAt))}</div>
           </div>
           <div class="fb-stars">${stars(r)}</div>
         </div>
-        <div class="fb-text">${f.text}</div>
+        <div class="fb-text">${esc(f.text)}</div>
       </div>`;
     }).join('');
   } catch(e){
@@ -239,19 +210,26 @@ window.loadDonors = async () => {
   try {
     const snap = await getDocs(query(collection(db,'donors'), orderBy('createdAt','desc')));
     if(snap.empty){ el.innerHTML=`<div class="empty">কোনো donor নেই।</div>`; return; }
-    el.innerHTML = snap.docs.map(d => {
+    // phone/wa এখন donorsPrivate-এ — admin হিসেবে প্রতিটার জন্য আলাদা read
+    const rows = await Promise.all(snap.docs.map(async d => {
       const r = d.data();
+      let phone = '—';
+      try {
+        const ps = await getDoc(doc(db,'donorsPrivate',d.id));
+        if(ps.exists()) phone = ps.data().phone || '—';
+      } catch(_) {}
       return `
       <div class="donor-row">
-        <div class="d-avatar">${r.photo?`<img src="${r.photo}"/>`:ini(r.name)}</div>
+        <div class="d-avatar">${r.photo?`<img src="${esc(r.photo)}" alt=""/>`:esc(initials(r.name))}</div>
         <div class="d-info">
-          <div class="d-name">${(r.name||'').replace(/</g,'&lt;')} <span style="font-size:11px;color:#c0392b;font-weight:700">${(r.blood||'').replace(/</g,'&lt;')}</span></div>
-          <div class="d-sub">📌 ${[r.area,r.district,r.division].filter(Boolean).map(x=>x.replace(/</g,'&lt;')).join(', ')}</div>
-          <div class="d-sub">📞 ${(r.phone||'—').replace(/</g,'&lt;')}</div>
+          <div class="d-name">${esc(r.name)} <span style="font-size:11px;color:#c0392b;font-weight:700">${esc(r.blood)}</span></div>
+          <div class="d-sub">📌 ${esc([r.area,r.district,r.division].filter(Boolean).join(', '))}</div>
+          <div class="d-sub">📞 ${esc(phone)}</div>
         </div>
         <span class="d-badge ${r.available?'active':'inactive'}">${r.available?'সক্রিয়':'অপ্রস্তুত'}</span>
       </div>`;
-    }).join('');
+    }));
+    el.innerHTML = rows.join('');
   } catch(e){
     el.innerHTML=`<div class="empty" style="color:#c0392b">লোড করতে সমস্যা হয়েছে।</div>`;
   }
