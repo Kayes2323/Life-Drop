@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#c0392b"/>
+<title>Sondhan — অফলাইন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .offline-wrap{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;background:#f5f5f5}
+  .offline-icon{font-size:64px;margin-bottom:18px}
+  .offline-wrap h1{font-size:19px;font-weight:800;color:#222;font-family:'Hind Siliguri',sans-serif;margin-bottom:10px}
+  .offline-wrap p{font-size:13px;color:#888;font-family:'Hind Siliguri',sans-serif;line-height:1.7;margin-bottom:26px}
+  .retry-btn{padding:13px 28px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 5px 16px rgba(192,57,43,.3)}
+  .retry-btn:active{transform:scale(.97)}
+  .offline-note{margin-top:18px;font-size:11px;color:#bbb;font-family:'Hind Siliguri',sans-serif}
+</style>
+</head>
+<body>
+<div class="offline-wrap">
+  <div class="offline-icon">📡</div>
+  <h1>ইন্টারনেট সংযোগ নেই</h1>
+  <p>এই পেজটা আগে খোলা হয়নি বলে অফলাইনে দেখানো যাচ্ছে না।<br>আগে দেখা পেজগুলো (হোম, প্রোফাইল ইত্যাদি) অফলাইনেও কাজ করবে।</p>
+  <button class="retry-btn" onclick="location.reload()">🔄 আবার চেষ্টা করুন</button>
+  <div class="offline-note">সংযোগ ফিরলে স্বয়ংক্রিয়ভাবে সব ঠিক হয়ে যাবে</div>
+</div>
+</body>
+</html>

@@ -1,33 +1,19 @@
 {
-  "name": "Sondhan — রক্তের সন্ধানে",
+  "name": "Sondhan — রক্তদান সহায়ক",
   "short_name": "Sondhan",
-  "description": "জরুরি মুহূর্তে রক্তদাতা খুঁজুন",
+  "description": "বাংলাদেশে রক্তদাতা খোঁজা ও জরুরি রক্তের অনুরোধের অ্যাপ",
   "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#c0392b",
-  "theme_color": "#c0392b",
   "orientation": "portrait",
+  "background_color": "#f5f5f5",
+  "theme_color": "#c0392b",
+  "lang": "bn",
+  "dir": "ltr",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ],
-  "categories": ["health", "medical"],
-  "lang": "bn"
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
 }
