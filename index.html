@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<title>Sondhan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.brand-tagline{font-family:'Hind Siliguri',sans-serif;font-weight:400;color:#6B7280;font-size:12px}
+.loading-screen{position:fixed;inset:0;background:linear-gradient(135deg,#c0392b,#e74c3c);z-index:1200;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;transition:opacity .35s ease,visibility .35s ease}
+.loading-screen.hide{opacity:0;visibility:hidden}
+.loading-screen .brand-tagline{color:rgba(255,255,255,.92)}
+.loading-dots{display:flex;gap:6px}
+.loading-dots span{width:8px;height:8px;border-radius:50%;background:#fff;animation:dotPulse 1s infinite ease-in-out;opacity:.9}
+.loading-dots span:nth-child(2){animation-delay:.15s}
+.loading-dots span:nth-child(3){animation-delay:.3s}
+@keyframes dotPulse{0%,80%,100%{transform:scale(.6);opacity:.5}40%{transform:scale(1);opacity:1}}
+.lr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:20px}
+.lr-overlay.show{display:flex}
+.lr-card{background:#fff;border-radius:20px;padding:28px 22px;text-align:center;max-width:300px;width:100%}
+.lr-icon{font-size:44px;margin-bottom:10px}
+.lr-card h3{font-size:16px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:6px}
+.lr-card p{font-size:12px;color:#888;font-family:'Hind Siliguri',sans-serif;margin-bottom:16px;line-height:1.6}
+.lr-btn{display:block;padding:12px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:11px;font-size:14px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif;margin-bottom:8px}
+.lr-cancel{background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+
+</style>
+</head>
+<body>
+<div id="loading-screen" class="loading-screen">
+  <div class="sondhan-logo sondhan-logo--splash">
+    <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
+  </div>
+  <div class="brand-tagline">রক্তের সন্ধানে</div>
+  <div class="loading-dots"><span></span><span></span><span></span></div>
+</div>
+<div class="app">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="sondhan-logo sondhan-logo--navbar-crop">
+        <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
+      </div>
+    </div>
+    <div class="header-right" id="auth-btn">
+      <!-- default: login button, no wait -->
+      <a href="login.html" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);color:#fff;padding:6px 13px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;font-family:'Hind Siliguri',sans-serif">লগইন করুন</a>
+    </div>
+  </div>
+
+  <div class="scr" style="gap:0">
+
+    <!-- SLIDER -->
+    <div class="banner">
+      <div class="slider-wrap">
+        <div class="slide active" id="slide-0">
+          <div class="slide-tag">📖 কুরআনের বাণী</div>
+          <h2>যে একজনের প্রাণ বাঁচালো, সে যেন পুরো মানবজাতিকে বাঁচালো</h2>
+          <div class="ref">— সূরা আল-মায়েদা: ৩২</div>
+        </div>
+        <div class="slide" id="slide-1">
+          <div class="slide-tag">আমাদের আহ্বান</div>
+          <h2>ডোনার রেজিস্ট্রেশন ফর্ম পূরণ করে মানবতার কল্যাণে যুক্ত হোন।</h2>
+          <div class="ref">— Sondhan</div>
+        </div>
+        <div class="slide" id="slide-2">
+          <div class="slide-tag">📢 Notice </div>
+          <h2>Sondhan বর্তমানে উন্নয়ন ও পরীক্ষামূলক কার্যক্রমের মধ্যে রয়েছে। খুব শীঘ্রই পূর্ণাঙ্গ সেবা চালু হবে ইনশাআল্লাহ।</h2>
+          <div class="ref">— Sondhan Team</div>
+        </div>
+      </div>
+      <div class="slider-dots">
+        <div class="sdot active"></div>
+        <div class="sdot"></div>
+        <div class="sdot"></div>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="section" style="padding:12px 12px 0">
+      <div class="sec-title">দ্রুত একশন</div>
+      <div class="action-grid">
+        <button class="ac red" onclick="goGuarded('search.html')">
+          <div class="ac-bg">🔍</div>
+          <div class="ac-icon">🔍</div>
+          <div class="ac-label">রক্তদাতা খুঁজুন</div>
+        </button>
+        <button class="ac orange" onclick="goGuarded('request.html')">
+          <div class="ac-bg">🆘</div>
+          <div class="ac-icon">🆘</div>
+          <div class="ac-label">জরুরি অনুরোধ</div>
+        </button>
+        <button class="ac teal" onclick="goGuarded('ambulance.html')">
+          <div class="ac-bg">🚑</div>
+          <div class="ac-icon">🚑</div>
+          <div class="ac-label">অ্যাম্বুলেন্স খুঁজুন</div>
+        </button>
+        <button class="ac green" onclick="goGuarded('register.html')">
+          <div class="ac-bg">🩸</div>
+          <div class="ac-icon">🩸</div>
+          <div class="ac-label">Donor হোন</div>
+        </button>
+        <button class="ac blue full" onclick="window.location.href='about.html'">
+          <div class="ac-icon">ℹ️</div>
+          <div class="ac-label">আমাদের সম্পর্কে জানুন</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="section" style="padding:0 12px">
+      <div class="sec-title">আমাদের পরিসংখ্যান</div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-n" id="stat-donors">—</div><div class="stat-l">সক্রিয় Donor</div></div>
+        <div class="stat"><div class="stat-n" id="stat-requests">—</div><div class="stat-l">রক্তের অনুরোধ</div></div>
+        <div class="stat"><div class="stat-n">৬৪</div><div class="stat-l">জেলায় সেবা</div></div>
+      </div>
+    </div>
+
+    <!-- WHY -->
+    <div class="section" style="padding:0 12px">
+      <div class="sec-title">কেন রক্ত দেবেন?</div>
+      <div class="why-card">
+        <div class="why-ico" style="background:#fdecea">❤️</div>
+        <div><h4>জীবন বাঁচায়</h4><p>আপনার দেওয়া এক ব্যাগ রক্ত একজন মানুষের জীবন বাঁচাতে গুরুত্বপূর্ণ ভূমিকা রাখতে পারে।</p></div>
+      </div>
+      <div class="why-card">
+        <div class="why-ico" style="background:#d5f5e3">🛡️</div>
+        <div><h4>স্বাস্থ্য উপকারিতা</h4><p>হৃদরোগ ও ক্যান্সারের ঝুঁকি কমায়</p></div>
+      </div>
+    </div>
+
+    <!-- PREP -->
+    <div class="section" style="padding:0 12px;margin-bottom:16px">
+      <div class="sec-title">রক্তদানের পূর্বপ্রস্তুতি</div>
+      <div class="prep-list">
+        <div class="prep-item"><div class="prep-dot"></div><p>রক্তদানের আগে পর্যাপ্ত পানি পান করুন</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>আগের দানের কমপক্ষে <b>৪ মাস</b> পর রক্ত দিন</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>রক্তদানের পূর্বে হালকা খাবার গ্রহণ করুন</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>সর্বোচ্চ <b>~৪৫০ মি.লি.</b> রক্ত দেওয়া নিরাপদ</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>রক্ত দেওয়ার পর কিছুক্ষণ বিশ্রাম নিন</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>সুস্থ শরীর ও সুস্থ মন নিয়ে রক্তদান করুন</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>রোগীর জন্য প্রার্থনা করুন</p></div>
+        <div class="prep-item"><div class="prep-dot" style="background:#c0392b"></div>
+          <p><b>কোনো বিনিময় ছাড়া মানবতার সেবায় রক্ত দেওয়াই সর্বোত্তম</b></p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <a class="bnav-item active" data-tab="home" href="index.html"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V21H15V15H9V21H3V12Z"/></svg></span><span class="bl">হোম</span></a>
+    <a class="bnav-item " data-tab="search" href="#" onclick="goGuarded('search.html');return false"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></span><span class="bl">খুঁজুন</span></a>
+    <a class="bnav-center" href="#" onclick="goGuarded('request.html');return false"><div class="bc-btn"><svg viewBox="0 0 24 24" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div><span class="bl">পোস্ট</span></a>
+    <a class="bnav-item " data-tab="about" href="about.html"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/></svg></span><span class="bl">About Us</span></a>
+    <a class="bnav-item " data-tab="profile" href="#" onclick="goGuarded('profile.html');return false"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></svg></span><span class="bl">প্রোফাইল</span></a>
+  </div>
+</div>
+
+<!-- LOGIN REQUIRED OVERLAY -->
+<div class="lr-overlay" id="lr-overlay">
+  <div class="lr-card">
+    <div class="lr-icon">🔒</div>
+    <h3>লগইন প্রয়োজন</h3>
+    <p>এই সেবা ব্যবহার করতে লগইন করুন</p>
+    <a href="#" id="lr-btn" class="lr-btn">লগইন করুন</a>
+    <button class="lr-cancel" onclick="document.getElementById('lr-overlay').classList.remove('show')">বাতিল</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── SLIDER (runs immediately, no Firebase needed) ─────────────
+let cur = 0;
+function goSlide(n) {
+  document.getElementById('slide-'+cur).classList.remove('active');
+  document.querySelectorAll('.sdot')[cur].classList.remove('active');
+  cur = (n + 3) % 3;
+  document.getElementById('slide-'+cur).classList.add('active');
+  document.querySelectorAll('.sdot')[cur].classList.add('active');
+}
+setInterval(() => goSlide(cur + 1), 4000);
+
+// ── AUTH GUARD (non-blocking) ─────────────────────────────────
+// _authReady becomes true once Firebase responds (or times out)
+window._loggedIn  = false;
+window._authReady = false;
+
+// Firebase এখনো জবাব দেয়নি এমন সময়ে ক্লিক করলে সেটা এখানে জমা থাকে
+window._pendingPage = null;
+
+function _navigate(page) {
+  if (window._loggedIn) {
+    window.location.href = page;
+  } else {
+    document.getElementById('lr-btn').href = 'login.html?redirect=' + page;
+    document.getElementById('lr-overlay').classList.add('show');
+  }
+}
+
+window.goGuarded = (page) => {
+  // BUGFIX: আগে auth লোড হওয়ার আগে ক্লিক করলে লগইন করা ইউজারকেও
+  // "লগইন প্রয়োজন" দেখাতো। এখন auth-এর জবাবের জন্য অপেক্ষা করে।
+  if (window._authReady) { _navigate(page); return; }
+  window._pendingPage = page;
+  showToast('একটু অপেক্ষা করুন...');
+};
+
+// auth রেজলভ হলে জমে থাকা ক্লিকটা চালু করে
+window._onAuthResolved = () => {
+  if (window._pendingPage) {
+    const p = window._pendingPage;
+    window._pendingPage = null;
+    _navigate(p);
+  }
+};
+
+function showToast(m) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = m; t.classList.add('show');
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(() => t.classList.remove('show'), 2700);
+}
+
+// BUGFIX: আগে 'load' ইভেন্ট ব্যবহার হতো — সেটা ফন্ট ও Firebase SDK সহ
+// সব রিসোর্স নামার জন্য অপেক্ষা করে। নেটওয়ার্ক ধীর/ব্লকড হলে splash screen
+// চিরকাল আটকে থাকতো, ইউজার ভাবতো অ্যাপ খুলছে না।
+function hideSplash() {
+  document.getElementById('loading-screen')?.classList.add('hide');
+}
+document.addEventListener('DOMContentLoaded', hideSplash);
+setTimeout(hideSplash, 2500);          // সর্বোচ্চ ২.৫ সেকেন্ড, তারপর জোর করে সরাও
+if (document.readyState !== 'loading') hideSplash();
+</script>
+
+<!-- Firebase loads AFTER page is visible — non-blocking -->
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { esc } from './app.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+if(auth) {
+  // Timeout: if Firebase takes > 5s, give up waiting
+  const authTimeout = setTimeout(() => {
+    window._authReady = true;
+  }, 5000);
+
+  onAuthStateChanged(auth, user => {
+    clearTimeout(authTimeout);
+    window._authReady = true;
+    window._loggedIn  = !!user;
+
+    const el = document.getElementById('auth-btn');
+    if(user && el) {
+      const photo = user.photoURL || '';
+      const name  = (user.displayName || '').split(' ')[0] || 'Profile';
+      el.innerHTML = `
+        <a href="profile.html" style="display:flex;align-items:center;gap:6px;text-decoration:none">
+          <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">
+            ${photo
+              ? `<img src="${esc(photo)}" style="width:100%;height:100%;object-fit:cover" alt=""/>`
+              : `<span>${esc(name[0].toUpperCase())}</span>`}
+          </div>
+          <span style="font-size:11px;color:#fff;font-weight:600;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Hind Siliguri',sans-serif">${esc(name)}</span>
+        </a>`;
+    }
+    // লগইন না থাকলে HTML-এর default "লগইন করুন" বাটনই থেকে যায়
+
+    window._onAuthResolved?.();   // অপেক্ষায় থাকা ক্লিক থাকলে সেটা চালাও
+  });
+}
+
+// ── STATS ────────────────────────────────────────────────────
+// BUGFIX ১: আগে 'stat-donations' খোঁজা হতো, কিন্তু index.html-এ
+//   সেই element নেই → TypeError, স্ক্রিপ্ট ওখানেই থেমে যেতো।
+// BUGFIX ২: 'stat-requests' কখনো ভরাট হতো না → চিরকাল "—" দেখাতো।
+function setStat(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function toBn(n) {
+  return String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+}
+
+if(db) {
+  // সক্রিয় donor সংখ্যা
+  try {
+    onSnapshot(
+      query(collection(db,'donors'), where('available','==',true)),
+      snap => setStat('stat-donors', toBn(snap.size)),
+      ()   => setStat('stat-donors', '—')
+    );
+  } catch(e) { setStat('stat-donors', '—'); }
+
+  // রক্তের অনুরোধ সংখ্যা
+  try {
+    onSnapshot(
+      query(collection(db,'bloodRequests'), where('status','==','active')),
+      snap => setStat('stat-requests', toBn(snap.size)),
+      ()   => setStat('stat-requests', '—')
+    );
+  } catch(e) { setStat('stat-requests', '—'); }
+}
+</script>
+</body>
+</html>

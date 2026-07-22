@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<title>Sondhan — জরুরি অনুরোধ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding-bottom:76px}
+.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
+.back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header h1{color:#fff;font-size:16px;font-weight:800}
+.tabs{display:flex;background:#fff;border-bottom:2px solid #f0f0f0;flex-shrink:0;position:sticky;top:56px;z-index:240}
+.tab{flex:1;padding:11px 4px;border:none;background:transparent;font-size:12px;font-weight:600;color:#bbb;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Hind Siliguri',sans-serif;transition:.2s}
+.tab.active{color:#c0392b;border-bottom-color:#c0392b}
+.scr{flex:1;overflow-y:auto;padding:12px;padding-bottom:88px}
+
+/* ALERT BANNER */
+.alert-banner{background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:14px;padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.alert-icon{font-size:28px;flex-shrink:0}
+.alert-text h3{color:#fff;font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:3px}
+.alert-text p{color:rgba(255,255,255,.85);font-size:11px;font-family:'Hind Siliguri',sans-serif;line-height:1.5}
+
+/* FORM */
+.fcard{background:#fff;border-radius:14px;padding:14px;margin-bottom:11px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.fcard-title{font-size:12px;font-weight:700;color:#c0392b;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #fde;font-family:'Hind Siliguri',sans-serif}
+.iw{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:11px;padding:0 12px;margin-bottom:10px;transition:.2s}
+.iw:last-child{margin-bottom:0}
+.iw:focus-within{border-color:#c0392b;background:#fff}
+.ico{font-size:14px;margin-right:9px;opacity:.6;flex-shrink:0}
+.iw input,.iw select,.iw textarea{flex:1;border:none;background:transparent;padding:12px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif}
+.iw-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.iw-grid .iw{margin-bottom:0}
+.date-label{font-size:11px;font-weight:700;color:#666;margin-bottom:6px;font-family:'Hind Siliguri',sans-serif}
+.opt-label{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-left:4px}
+.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 14px rgba(192,57,43,.3);margin-bottom:16px}
+.submit-btn:disabled{background:#e0a0a0;box-shadow:none;cursor:not-allowed}
+
+/* EMERGENCY CARD */
+.e-card{background:#fff;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.e-card-header{display:flex;align-items:center;gap:10px;padding:13px 13px 0}
+.blood-circle{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;font-family:'Inter',sans-serif}
+.e-card-title{flex:1;min-width:0}
+.e-patient{font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;color:#222;margin-bottom:2px}
+.e-hospital{font-size:11px;color:#888;font-family:'Hind Siliguri',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.urgent-pill{background:#fdecea;color:#c0392b;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;font-family:'Inter',sans-serif}
+.e-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:10px 0 0;border-top:1px solid #f5f5f5}
+.e-info-item{padding:10px 13px;border-right:1px solid #f5f5f5}
+.e-info-item:last-child{border-right:none}
+.e-info-item:nth-child(3){border-top:1px solid #f5f5f5}
+.e-info-item:nth-child(4){border-top:1px solid #f5f5f5;border-right:none}
+.e-info-label{font-size:10px;color:#bbb;font-family:'Hind Siliguri',sans-serif;margin-bottom:3px}
+.e-info-val{font-size:12px;font-weight:700;color:#333;font-family:'Hind Siliguri',sans-serif;line-height:1.4}
+.e-location{padding:6px 13px;font-size:11px;color:#2980b9;font-family:'Hind Siliguri',sans-serif;background:#ebf5fb;border-top:1px solid #f0f0f0}
+.e-details{padding:8px 13px;background:#fafafa;font-size:12px;color:#555;font-family:'Hind Siliguri',sans-serif;line-height:1.6;border-top:1px solid #f0f0f0}
+.e-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;border-top:1px solid #f5f5f5}
+.e-time{font-size:10px;color:#bbb;font-family:'Inter',sans-serif}
+.e-actions{display:flex;gap:6px}
+.e-btn{padding:7px 14px;border-radius:9px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;text-decoration:none;display:flex;align-items:center;gap:4px}
+.e-btn.call{background:#27ae60;color:#fff}
+.e-btn.share{background:#f0f0f0;color:#555}
+
+/* BNAV */
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;font-family:'Hind Siliguri',sans-serif}
+.toast.show{opacity:1}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.loading-overlay.show{display:flex}
+.spinner{width:38px;height:38px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html" class="back">←</a>
+  <div class="sondhan-logo sondhan-logo--navbar-crop">
+    <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
+  </div>
+  <h1>🆘 জরুরি রক্তের অনুরোধ</h1>
+</div>
+
+<div class="tabs">
+  <button class="tab active" id="tab-new" onclick="switchTab('new')">➕ নতুন অনুরোধ</button>
+  <button class="tab" id="tab-all" onclick="switchTab('all')">📋 সকল অনুরোধ</button>
+</div>
+
+<!-- NEW REQUEST FORM -->
+<div class="scr" id="view-new">
+  <!-- লগইন না থাকলে শুরুতেই দেখাবে (ফর্ম পূরণের পর হতাশা এড়াতে) -->
+  <div id="login-banner" style="display:none;align-items:center;gap:12px;background:#fff8e1;border:1.5px solid #ffe082;border-radius:14px;padding:14px;margin-bottom:12px">
+    <div style="font-size:26px;flex-shrink:0">🔒</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:700;font-family:'Hind Siliguri',sans-serif;color:#8d6e00;margin-bottom:2px">অনুরোধ পাঠাতে লগইন প্রয়োজন</div>
+      <div style="font-size:11px;color:#a1870f;font-family:'Hind Siliguri',sans-serif;line-height:1.5">ভুয়া অনুরোধ ঠেকাতে এটি জরুরি</div>
+    </div>
+    <a href="login.html?redirect=request.html" style="flex-shrink:0;padding:9px 16px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif">লগইন</a>
+  </div>
+
+  <div class="alert-banner">
+    <div class="alert-icon">🆘</div>
+    <div class="alert-text">
+      <h3>জরুরি রক্তের প্রয়োজন?</h3>
+      <p>নিচের ফর্মটি পূরণ করুন — সবাই দেখতে পাবেন</p>
+    </div>
+  </div>
+
+  <!-- রোগীর তথ্য -->
+  <div class="fcard">
+    <div class="fcard-title">👤 রোগীর তথ্য</div>
+    <div class="iw"><span class="ico">👤</span><input type="text" id="f-pname" placeholder="রোগীর নাম *"/></div>
+    <div class="iw"><span class="ico">🏥</span><input type="text" id="f-prob" placeholder="কী সমস্যা? (যেমন: অপারেশন) *"/></div>
+    <div class="iw-grid">
+      <div class="iw">
+        <select id="f-blood" style="flex:1;border:none;background:transparent;padding:12px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif">
+          <option value="">রক্তের গ্রুপ *</option>
+          <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+        </select>
+      </div>
+      <div class="iw"><span class="ico">🩸</span><input type="number" id="f-bags" placeholder="কয় ব্যাগ *" min="1" max="20"/></div>
+    </div>
+  </div>
+
+  <!-- স্থান ও সময় -->
+  <div class="fcard">
+    <div class="fcard-title">📍 স্থান ও সময়</div>
+    <div class="date-label">কখন লাগবে? *</div>
+    <div class="iw" style="margin-bottom:10px"><span class="ico">📅</span><input type="datetime-local" id="f-when"/></div>
+    <div class="iw"><span class="ico">🏥</span><input type="text" id="f-hospital" placeholder="হাসপাতালের নাম *"/></div>
+    <div class="iw"><span class="ico">📌</span><input type="text" id="f-location" placeholder="হাসপাতালের এলাকা/ঠিকানা *"/></div>
+    <div class="iw"><span class="ico">📝</span><input type="text" id="f-details" placeholder="বিস্তারিত"/><span class="opt-label">(ঐচ্ছিক)</span></div>
+  </div>
+
+  <!-- যোগাযোগ -->
+  <div class="fcard">
+    <div class="fcard-title">📞 যোগাযোগ</div>
+    <div class="iw"><span class="ico">👤</span><input type="text" id="f-cname" placeholder="আপনার নাম *"/></div>
+    <div class="iw"><span class="ico">📞</span><input type="tel" id="f-cphone" placeholder="ফোন নম্বর *"/></div>
+  </div>
+
+  <button class="submit-btn" id="submit-btn" onclick="submitRequest()">🆘 অনুরোধ পাঠান</button>
+</div>
+
+<!-- ALL REQUESTS FEED -->
+<div class="scr" id="view-all" style="display:none">
+  <div id="posts-list">
+    <div style="text-align:center;padding:40px 20px">
+      <div class="spinner" style="margin:0 auto 12px"></div>
+      <p style="font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif">লোড হচ্ছে...</p>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+    <a class="bnav-item " data-tab="home" href="index.html"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V21H15V15H9V21H3V12Z"/></svg></span><span class="bl">হোম</span></a>
+    <a class="bnav-item " data-tab="search" href="search.html"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></span><span class="bl">খুঁজুন</span></a>
+    <a class="bnav-center" href="request.html"><div class="bc-btn"><svg viewBox="0 0 24 24" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div><span class="bl">পোস্ট</span></a>
+    <a class="bnav-item " data-tab="about" href="about.html"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/></svg></span><span class="bl">About Us</span></a>
+    <a class="bnav-item " data-tab="profile" href="profile.html"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></svg></span><span class="bl">প্রোফাইল</span></a>
+  </div>
+
+<div id="loading" class="loading-overlay"><div class="spinner"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+window.switchTab = tab => {
+  document.getElementById('view-new').style.display = tab==='new' ? 'flex':'none';
+  document.getElementById('view-all').style.display = tab==='all' ? 'flex':'none';
+  document.getElementById('tab-new').classList.toggle('active', tab==='new');
+  document.getElementById('tab-all').classList.toggle('active', tab==='all');
+  if(tab==='all') loadPosts();
+};
+
+function bloodColor(b){
+  return {'A+':'#c0392b','A-':'#e74c3c','B+':'#e67e22','B-':'#d35400','AB+':'#8e44ad','AB-':'#6c3483','O+':'#2980b9','O-':'#1a5276'}[b]||'#c0392b';
+}
+// timeAgo / formatDateTime এখন app.js থেকে আসে
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
+function setLoad(v){ document.getElementById('loading').classList.toggle('show',v); }
+
+</script>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { esc, timeAgo, formatDateTime, telLink, isValidBdPhone, normalizeBdPhone } from './app.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+let CU = null;
+let AUTH_READY = false;
+let LAST_POSTS = new Map();   // share-এর জন্য, নাম onclick-এ বসাতে হয় না
+
+// ── SHARE (delegation — inline onclick এর নিরাপদ বিকল্প) ────────
+document.getElementById('posts-list').addEventListener('click', e => {
+  const btn = e.target.closest('[data-share]');
+  if(!btn) return;
+  const r = LAST_POSTS.get(btn.dataset.share);
+  if(!r) return;
+  const text =
+    `🆘 জরুরি রক্তের প্রয়োজন!\n\n` +
+    `রোগী: ${r.patientName}\n` +
+    `রক্তের গ্রুপ: ${r.blood}\n` +
+    `হাসপাতাল: ${r.hospital}\n` +
+    `যোগাযোগ: ${r.contactPhone}\n\n` +
+    `Sondhan — ${location.origin}/request.html`;
+  if(navigator.share){
+    navigator.share({ title:'জরুরি রক্তের অনুরোধ', text }).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(text)
+      .then(()=>showToast('✅ কপি হয়েছে! Share করুন।'))
+      .catch(()=>showToast('কপি করা যায়নি'));
+  }
+});
+
+onAuthStateChanged(auth, user => {
+  CU = user;
+  AUTH_READY = true;
+  const banner = document.getElementById('login-banner');
+  const form   = document.getElementById('view-new');
+
+  if(user){
+    document.getElementById('f-cname').value = user.displayName||'';
+    if(banner) banner.style.display = 'none';
+  } else {
+    // BUGFIX: আগে লগইন ছাড়াই পুরো ফর্ম পূরণ করা যেতো, submit চাপলে
+    // লগইন পেজে পাঠিয়ে দিতো — সব লেখা হারিয়ে যেতো। এখন শুরুতেই জানায়।
+    if(banner) banner.style.display = 'flex';
+    if(form) form.querySelectorAll('input,select,textarea,button.submit-btn')
+                 .forEach(el => el.disabled = true);
+  }
+});
+
+window.submitRequest = async () => {
+  if(!AUTH_READY){ showToast('একটু অপেক্ষা করুন...'); return; }
+  if(!CU){ window.location.href='login.html?redirect=request.html'; return; }
+  const pname    = document.getElementById('f-pname').value.trim();
+  const prob     = document.getElementById('f-prob').value.trim();
+  const blood    = document.getElementById('f-blood').value;
+  const bags     = document.getElementById('f-bags').value;
+  const when     = document.getElementById('f-when').value;
+  const hospital = document.getElementById('f-hospital').value.trim();
+  const location = document.getElementById('f-location').value.trim();
+  const details  = document.getElementById('f-details').value.trim();
+  const cname    = document.getElementById('f-cname').value.trim();
+  const cphone   = document.getElementById('f-cphone').value.trim();
+
+  if(!pname||!prob||!blood||!bags||!when||!hospital||!location||!cname||!cphone){
+    showToast('সব * তথ্য পূরণ করুন'); return;
+  }
+  if(!isValidBdPhone(cphone)){ showToast('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)'); return; }
+  const nBags = parseInt(bags, 10);
+  if(!(nBags >= 1 && nBags <= 20)){ showToast('ব্যাগের সংখ্যা ১ থেকে ২০ এর মধ্যে দিন'); return; }
+  // rules-এ details.size() <= 500 — এখানে আটকালে বাজে error দেখাবে না
+  if(details.length > 500){ showToast('বিস্তারিত ৫০০ অক্ষরের কম রাখুন'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.textContent='পাঠানো হচ্ছে...'; btn.disabled=true;
+  try {
+    await addDoc(collection(db,'bloodRequests'),{
+      patientName:pname, problem:prob, blood,
+      bags:nBags, when, hospital, location,
+      details, contactName:cname, contactPhone:normalizeBdPhone(cphone),
+      uid:CU.uid, status:'active',
+      createdAt:serverTimestamp()
+    });
+    ['f-pname','f-prob','f-bags','f-when','f-hospital','f-location','f-details','f-cphone']
+      .forEach(id => document.getElementById(id).value='');
+    document.getElementById('f-blood').value='';
+    showToast('✅ অনুরোধ পাঠানো হয়েছে!');
+    setTimeout(()=>switchTab('all'), 1200);
+  } catch(e){ showToast('অনুরোধ পাঠানো যায়নি'); console.warn(e); }
+  finally{ btn.textContent='🆘 অনুরোধ পাঠান'; btn.disabled=false; }
+};
+
+window.loadPosts = () => {
+  const el = document.getElementById('posts-list');
+  el.innerHTML=`<div style="text-align:center;padding:30px 20px"><div class="spinner" style="margin:0 auto 12px"></div><p style="font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif">লোড হচ্ছে...</p></div>`;
+  try {
+    const q = query(collection(db,'bloodRequests'), orderBy('createdAt','desc'));
+    onSnapshot(q, snap => {
+      if(snap.empty){
+        el.innerHTML=`<div style="text-align:center;padding:40px 20px;color:#bbb"><div style="font-size:40px;margin-bottom:12px">📋</div><p style="font-size:13px;font-family:'Hind Siliguri',sans-serif">এখনো কোনো অনুরোধ নেই।</p></div>`;
+        return;
+      }
+      // নিরাপত্তা: প্রতিটা মান esc() দিয়ে; share বাটনে নাম বসানোর বদলে
+      // data-id + delegation (নামে ' থাকলে আগে JS ভেঙে যেতো)
+      LAST_POSTS = new Map(snap.docs.map(d => [d.id, d.data()]));
+      el.innerHTML = snap.docs.map(d => {
+        const r = d.data();
+        const c = bloodColor(r.blood);
+        return `
+        <div class="e-card">
+          <div class="e-card-header">
+            <div class="blood-circle" style="background:${esc(c)}">${esc(r.blood)}</div>
+            <div class="e-card-title">
+              <div class="e-patient">${esc(r.patientName)} — ${esc(r.bags)} ব্যাগ ${esc(r.blood)} দরকার</div>
+              <div class="e-hospital">🏥 ${esc(r.hospital)}, ${esc(r.location)}</div>
+            </div>
+            <span class="urgent-pill">🆘 জরুরি</span>
+          </div>
+          <div class="e-info-grid">
+            <div class="e-info-item">
+              <div class="e-info-label">🔴 সমস্যা</div>
+              <div class="e-info-val">${esc(r.problem)}</div>
+            </div>
+            <div class="e-info-item">
+              <div class="e-info-label">🩸 রক্তের গ্রুপ</div>
+              <div class="e-info-val" style="color:${esc(c)};font-size:15px;font-weight:800">${esc(r.blood)}</div>
+            </div>
+            <div class="e-info-item">
+              <div class="e-info-label">⏰ কখন লাগবে</div>
+              <div class="e-info-val">${esc(formatDateTime(r.when))}</div>
+            </div>
+            <div class="e-info-item">
+              <div class="e-info-label">📌 হাসপাতাল</div>
+              <div class="e-info-val">${esc(r.hospital)}</div>
+            </div>
+          </div>
+          ${r.location?`<div class="e-location">📍 ${esc(r.location)}</div>`:''}
+          ${r.details?`<div class="e-details">📝 ${esc(r.details)}</div>`:''}
+          <div class="e-footer">
+            <span class="e-time">${esc(timeAgo(r.createdAt))}</span>
+            <div class="e-actions">
+              <a class="e-btn call" href="${esc(telLink(r.contactPhone))}">📞 ${esc(r.contactPhone)}</a>
+              <button class="e-btn share" data-share="${esc(d.id)}">🔗 Share</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    });
+  } catch(e){
+    el.innerHTML=`<div style="text-align:center;padding:30px;color:#c0392b;font-family:'Hind Siliguri',sans-serif">লোড করতে সমস্যা হয়েছে।</div>`;
+  }
+};
+</script>
+</body>
+</html>

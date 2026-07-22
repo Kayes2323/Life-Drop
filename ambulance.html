@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<title>Sondhan — অ্যাম্বুলেন্স</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding-bottom:76px}
+.header{background:linear-gradient(135deg,#16a085,#1abc9c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
+.back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header h1{color:#fff;font-size:16px;font-weight:800}
+.scr{flex:1;overflow-y:auto;padding:12px;padding-bottom:88px}
+
+/* ALERT */
+.emergency-bar{background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:14px;padding:14px;margin-bottom:14px;text-align:center;color:#fff}
+.emergency-bar h3{font-size:15px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:4px}
+.emergency-bar p{font-size:12px;opacity:.9;font-family:'Hind Siliguri',sans-serif}
+.emergency-num{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px}
+.emergency-call{padding:10px 20px;background:#fff;color:#c0392b;border-radius:24px;font-size:16px;font-weight:800;text-decoration:none;font-family:'Inter',sans-serif}
+
+/* SECTION */
+.sec-title{font-size:13px;font-weight:700;color:#444;margin-bottom:10px;font-family:'Hind Siliguri',sans-serif}
+
+/* AMBULANCE CARD */
+.amb-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,.06);display:flex;gap:12px;align-items:flex-start}
+.amb-icon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#16a085,#1abc9c);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.amb-info{flex:1;min-width:0}
+.amb-name{font-size:14px;font-weight:700;color:#222;margin-bottom:2px;font-family:'Hind Siliguri',sans-serif}
+.amb-area{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:6px}
+.amb-actions{display:flex;gap:6px}
+.amb-btn{padding:6px 12px;border-radius:8px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:3px}
+.amb-btn.call{background:#27ae60;color:#fff}
+.amb-btn.wa{background:#25d366;color:#fff}
+
+/* ADD SECTION */
+.add-box{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.add-title{font-size:13px;font-weight:700;color:#16a085;margin-bottom:10px;font-family:'Hind Siliguri',sans-serif}
+.iw{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:11px;padding:0 12px;margin-bottom:9px;transition:.2s}
+.iw:last-of-type{margin-bottom:11px}
+.iw:focus-within{border-color:#16a085;background:#fff}
+.ico{font-size:14px;margin-right:9px;opacity:.6}
+.iw input,.iw select{flex:1;border:none;background:transparent;padding:11px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif}
+.submit-btn{width:100%;padding:13px;background:linear-gradient(135deg,#16a085,#1abc9c);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.submit-btn:disabled{background:#aaa;cursor:not-allowed}
+
+/* BNAV */
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:'Hind Siliguri',sans-serif}
+.toast.show{opacity:1}
+.spinner{width:36px;height:36px;border:4px solid #d5f5f0;border-top-color:#16a085;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html" class="back">←</a>
+  <div class="sondhan-logo sondhan-logo--navbar-crop">
+    <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
+  </div>
+  <h1>🚑 অ্যাম্বুলেন্স খুঁজুন</h1>
+</div>
+
+<div class="scr">
+
+  <!-- জরুরি নম্বর -->
+  <div class="emergency-bar">
+    <h3>জরুরি প্রয়োজনে এখনই call করুন</h3>
+    <p>জাতীয় জরুরি সেবা</p>
+    <div class="emergency-num">
+      <a href="tel:999" class="emergency-call">📞 999</a>
+      <a href="tel:16430" class="emergency-call">📞 16430</a>
+    </div>
+  </div>
+
+  <!-- LIST -->
+  <div class="sec-title">📋 অ্যাম্বুলেন্স তালিকা</div>
+  <div id="amb-list">
+    <div style="text-align:center;padding:30px 20px">
+      <div class="spinner"></div>
+      <p style="font-size:13px;color:#aaa;margin-top:12px;font-family:'Hind Siliguri',sans-serif">লোড হচ্ছে...</p>
+    </div>
+  </div>
+
+  <!-- ADD NEW (logged in users) -->
+  <div class="add-box" id="add-box" style="display:none">
+    <div class="add-title">➕ নতুন অ্যাম্বুলেন্স যোগ করুন</div>
+    <div class="iw"><span class="ico">👤</span><input type="text" id="a-name" placeholder="চালকের নাম *"/></div>
+    <div class="iw"><span class="ico">📞</span><input type="tel" id="a-phone" placeholder="ফোন নম্বর *"/></div>
+    <div class="iw"><span class="ico">💬</span><input type="tel" id="a-wa" placeholder="WhatsApp (optional)"/></div>
+    <div class="iw">
+      <span class="ico">🗺️</span>
+      <select id="a-division">
+        <option value="">বিভাগ *</option>
+        <option>ঢাকা</option><option>চট্টগ্রাম</option><option>খুলনা</option>
+        <option>রাজশাহী</option><option>রংপুর</option><option>সিলেট</option>
+        <option>বরিশাল</option><option>ময়মনসিংহ</option>
+      </select>
+    </div>
+    <div class="iw"><span class="ico">📌</span><input type="text" id="a-area" placeholder="এলাকা/থানা *"/></div>
+    <button class="submit-btn" id="a-btn" onclick="addAmbulance()">✅ যোগ করুন</button>
+  </div>
+
+</div>
+
+<div class="bnav">
+    <a class="bnav-item active" data-tab="home" href="index.html"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V21H15V15H9V21H3V12Z"/></svg></span><span class="bl">হোম</span></a>
+    <a class="bnav-item " data-tab="search" href="search.html"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></span><span class="bl">খুঁজুন</span></a>
+    <a class="bnav-center" href="request.html"><div class="bc-btn"><svg viewBox="0 0 24 24" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div><span class="bl">পোস্ট</span></a>
+    <a class="bnav-item " data-tab="about" href="about.html"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/></svg></span><span class="bl">About Us</span></a>
+    <a class="bnav-item " data-tab="profile" href="profile.html"><span class="bi"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></svg></span><span class="bl">প্রোফাইল</span></a>
+  </div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
+</script>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { esc, waLink, telLink, isSuperAdmin, isValidBdPhone } from './app.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, getDocs, addDoc, orderBy, query, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+let CU = null;
+
+// BUGFIX: আগে যেকোনো লগইন করা ইউজারকে ফর্ম দেখানো হতো, কিন্তু Firestore
+// rules অনুযায়ী শুধু অ্যাডমিন লিখতে পারে → ইউজার ফর্ম পূরণ করে
+// "Missing or insufficient permissions" error পেতো। এখন rules-এর সাথে মিল।
+onAuthStateChanged(auth, user => {
+  CU = user;
+  const box = document.getElementById('add-box');
+  if (box) box.style.display = isSuperAdmin(user) ? 'block' : 'none';
+});
+
+// Load ambulances
+async function loadAmbs() {
+  const el = document.getElementById('amb-list');
+  try {
+    const snap = await getDocs(query(collection(db,'ambulances'), orderBy('createdAt','desc')));
+    if(snap.empty) {
+      el.innerHTML=`<div style="text-align:center;padding:30px 20px;color:#aaa">
+        <div style="font-size:40px;margin-bottom:10px">🚑</div>
+        <p style="font-size:13px;font-family:'Hind Siliguri',sans-serif">এখনো কোনো অ্যাম্বুলেন্স যোগ হয়নি।<br>নিচে যোগ করুন।</p>
+      </div>`;
+      return;
+    }
+    el.innerHTML = snap.docs.map(d => {
+      const a = d.data();
+      return `
+      <div class="amb-card">
+        <div class="amb-icon">🚑</div>
+        <div class="amb-info">
+          <div class="amb-name">${esc(a.name)}</div>
+          <div class="amb-area">📌 ${esc([a.area,a.division].filter(Boolean).join(', '))}</div>
+          <div class="amb-actions">
+            <a class="amb-btn call" href="${esc(telLink(a.phone))}">📞 ${esc(a.phone)}</a>
+            ${a.wa?`<a class="amb-btn wa" href="${esc(waLink(a.wa))}" target="_blank" rel="noopener">💬 WA</a>`:''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    el.innerHTML=`<p style="text-align:center;padding:20px;color:#c0392b;font-family:'Hind Siliguri',sans-serif">লোড করতে সমস্যা হয়েছে।</p>`;
+  }
+}
+loadAmbs();
+
+window.addAmbulance = async () => {
+  if(!CU){ showToast('লগইন করুন'); return; }
+  const name     = document.getElementById('a-name').value.trim();
+  const phone    = document.getElementById('a-phone').value.trim();
+  const wa       = document.getElementById('a-wa').value.trim();
+  const division = document.getElementById('a-division').value;
+  const area     = document.getElementById('a-area').value.trim();
+  if(!name||!phone||!division||!area){ showToast('সব * তথ্য পূরণ করুন'); return; }
+  // rules-এ name.size() <= 200 আছে — এখানে আগেই আটকালে বাজে error দেখাবে না
+  if(name.length > 200){ showToast('নাম ২০০ অক্ষরের কম রাখুন'); return; }
+  if(!isValidBdPhone(phone)){ showToast('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)'); return; }
+  if(wa && !isValidBdPhone(wa)){ showToast('WhatsApp নম্বর সঠিক নয়'); return; }
+  const btn = document.getElementById('a-btn');
+  btn.disabled=true; btn.textContent='যোগ হচ্ছে...';
+  try {
+    await addDoc(collection(db,'ambulances'),{
+      name, phone, wa, division, area,
+      addedBy: CU.uid,
+      createdAt: serverTimestamp()
+    });
+    ['a-name','a-phone','a-wa','a-area'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('a-division').value='';
+    showToast('✅ অ্যাম্বুলেন্স যোগ হয়েছে!');
+    loadAmbs();
+  } catch(e){ showToast('অ্যাম্বুলেন্স যোগ করা যায়নি'); console.warn(e); }
+  finally{ btn.disabled=false; btn.textContent='✅ যোগ করুন'; }
+};
+</script>
+</body>
+</html>
