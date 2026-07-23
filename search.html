@@ -14,16 +14,44 @@
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-.search-top{background:#fff;padding:11px 12px;border-bottom:1px solid #f0f0f0;flex-shrink:0;display:flex;flex-direction:column;gap:7px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.search-row{display:flex;gap:6px}
-.sel-wrap{flex:1;display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:10px;padding:0 10px}
-.sel-wrap:focus-within{border-color:#c0392b}
-.sel-wrap select{flex:1;border:none;background:transparent;padding:10px 0;font-size:12px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif}
-.search-btn{padding:11px 16px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:700;font-family:'Hind Siliguri',sans-serif}
+.search-top{background:#c0392b;padding:14px 14px 0;flex-shrink:0}
+.search-top-title{color:#fff;font-size:15px;font-weight:800;font-family:'Hind Siliguri',sans-serif}
+.search-top-sub{color:rgba(255,255,255,.75);font-size:11px;font-family:'Hind Siliguri',sans-serif;margin-top:2px;margin-bottom:14px}
+.search-card{background:#fff;border-radius:16px 16px 0 0;padding:15px 14px 16px}
+.bg-label{font-size:11px;color:#999;font-family:'Hind Siliguri',sans-serif;margin-bottom:9px}
+.bg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}
+.bg-item{padding:12px 0;border-radius:11px;border:1.5px solid #fdecea;background:#fdecea;color:#c0392b;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s}
+.bg-item:active{transform:scale(.95)}
+.bg-item.on{background:#c0392b;border-color:#c0392b;color:#fff}
+.loc-row{display:flex;align-items:center;gap:9px;background:#fafafa;border:0.5px solid #eee;border-radius:11px;padding:11px 12px;margin-bottom:10px;cursor:pointer}
+.loc-row-icon{font-size:15px;color:#c0392b;flex-shrink:0}
+.loc-row-txt{flex:1;font-size:12.5px;color:#444;font-family:'Hind Siliguri',sans-serif}
+.loc-row-chev{color:#ccc;font-size:13px;flex-shrink:0;transition:transform .2s}
+.loc-row-chev.open{transform:rotate(180deg)}
+.loc-panel{display:none;background:#fafafa;border-radius:11px;padding:11px;margin:-4px 0 10px;gap:8px}
+.loc-panel.open{display:flex}
+.loc-panel select{flex:1;padding:9px 8px;border-radius:9px;border:1px solid #e5e5e5;background:#fff;font-size:12px;font-family:'Hind Siliguri',sans-serif;color:#333;outline:none}
+.search-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;background:#eee;color:#bbb;transition:.15s}
+.search-btn.ready{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;box-shadow:0 5px 16px rgba(192,57,43,.3)}
 .results-list{flex:1;overflow-y:auto;padding:11px}
 .hint-box{text-align:center;padding:40px 20px;color:#bbb}
 .hint-box p{margin-top:8px;font-size:13px;font-family:'Hind Siliguri',sans-serif}
 .result-header{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:9px}
+
+/* EMPTY STATE — কোনো donor না পেলে */
+.ns-wrap{padding:26px 4px 10px}
+.ns-icon{width:52px;height:52px;border-radius:50%;background:#fdecea;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px}
+.ns-title{text-align:center;font-size:14.5px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.ns-sub{text-align:center;font-size:11.5px;color:#999;font-family:'Hind Siliguri',sans-serif;margin-top:5px;margin-bottom:18px;line-height:1.6}
+.ns-action{display:flex;align-items:center;gap:11px;background:#fff;border:0.5px solid #eee;border-radius:12px;padding:12px;margin-bottom:9px;cursor:pointer;text-decoration:none}
+.ns-action.accent{border:1.5px solid #c0392b}
+.ns-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px}
+.ns-txt{flex:1;min-width:0}
+.ns-txt-t{font-size:12.5px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.ns-txt-s{font-size:10.5px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-top:1px}
+.ns-action.accent .ns-txt-s{color:#c0392b}
+.ns-chev{color:#ddd;font-size:16px;flex-shrink:0}
+.ns-action.accent .ns-chev{color:#c0392b}
 .dcard{background:#fff;border-radius:14px;padding:13px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);border:1px solid #f0f0f0}
 .dcard.featured{border-color:#c0392b;border-width:1.5px}
 .dcard-top{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
@@ -130,33 +158,45 @@
   </div>
 
   <div class="search-top">
-    <div class="search-row">
-      <div class="sel-wrap">
-        <select id="blood-filter">
-          <option value="">রক্তের গ্রুপ</option>
-          <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
-          <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
-        </select>
+    <div class="search-top-title">রক্তদাতা খুঁজুন</div>
+    <div class="search-top-sub">গ্রুপ বেছে নিন, তারপর খুঁজুন</div>
+    <div class="search-card">
+      <div class="bg-label">রক্তের গ্রুপ বেছে নিন</div>
+      <div class="bg-grid" id="bg-grid">
+        <button class="bg-item" data-g="A+">A+</button>
+        <button class="bg-item" data-g="A-">A-</button>
+        <button class="bg-item" data-g="B+">B+</button>
+        <button class="bg-item" data-g="B-">B-</button>
+        <button class="bg-item" data-g="AB+">AB+</button>
+        <button class="bg-item" data-g="AB-">AB-</button>
+        <button class="bg-item" data-g="O+">O+</button>
+        <button class="bg-item" data-g="O-">O-</button>
       </div>
-      <div class="sel-wrap">
+
+      <div class="loc-row" id="loc-row">
+        <span class="loc-row-icon">📍</span>
+        <span class="loc-row-txt" id="loc-row-txt">সব বিভাগ</span>
+        <span style="font-size:11.5px;color:#c0392b;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-right:2px">বদলান</span>
+        <span class="loc-row-chev" id="loc-chev">▾</span>
+      </div>
+      <div class="loc-panel" id="loc-panel">
         <select id="div-filter" onchange="fillDist()">
-          <option value="">বিভাগ</option>
+          <option value="">সব বিভাগ</option>
           <option>ঢাকা</option><option>চট্টগ্রাম</option><option>খুলনা</option>
           <option>রাজশাহী</option><option>রংপুর</option><option>সিলেট</option>
           <option>বরিশাল</option><option>ময়মনসিংহ</option>
         </select>
+        <select id="dist-filter"><option value="">সব জেলা</option></select>
       </div>
-      <div class="sel-wrap">
-        <select id="dist-filter"><option value="">জেলা</option></select>
-      </div>
+
+      <button class="search-btn" id="search-btn" disabled onclick="searchDonors()">খুঁজুন</button>
     </div>
-    <button class="search-btn" onclick="searchDonors()">🔍 রক্তদাতা খুঁজুন</button>
   </div>
 
   <div class="results-list" id="results-list">
     <div class="hint-box">
       <div style="font-size:40px">🩸</div>
-      <p>Blood group ও বিভাগ দিয়ে search করুন</p>
+      <p>উপরে রক্তের গ্রুপ বেছে নিয়ে খুঁজুন শুরু করুন</p>
     </div>
   </div>
 
@@ -218,9 +258,38 @@ const DISTRICTS={
 window.fillDist=()=>{
   const d=document.getElementById('div-filter').value;
   const s=document.getElementById('dist-filter');
-  s.innerHTML='<option value="">জেলা</option>';
+  s.innerHTML='<option value="">সব জেলা</option>';
   (DISTRICTS[d]||[]).forEach(x=>s.innerHTML+=`<option>${x}</option>`);
+  updateLocText();
 };
+
+// ── রক্তের গ্রুপ গ্রিড — সিলেক্ট করলে হাইলাইট + সার্চ বাটন সক্রিয় ──
+let SELECTED_GROUP = null;
+document.getElementById('bg-grid').addEventListener('click', e => {
+  const btn = e.target.closest('.bg-item');
+  if (!btn) return;
+  document.querySelectorAll('.bg-item').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  SELECTED_GROUP = btn.dataset.g;
+  const sb = document.getElementById('search-btn');
+  sb.disabled = false;
+  sb.classList.add('ready');
+  sb.textContent = `${SELECTED_GROUP} রক্তদাতা খুঁজুন`;
+});
+
+// ── এলাকা প্যানেল খোলা/বন্ধ ──
+document.getElementById('loc-row').addEventListener('click', () => {
+  document.getElementById('loc-panel').classList.toggle('open');
+  document.getElementById('loc-chev').classList.toggle('open');
+});
+document.getElementById('dist-filter').addEventListener('change', updateLocText);
+function updateLocText() {
+  const div = document.getElementById('div-filter').value;
+  const dist = document.getElementById('dist-filter').value;
+  document.getElementById('loc-row-txt').textContent =
+    dist ? dist : (div ? div : 'সব বিভাগ');
+}
+
 // ini() সরানো হয়েছে — app.js এর initials() এখন ব্যবহার হচ্ছে
 function starsHtml(r){let s='';for(let i=1;i<=5;i++)s+=`<span style="color:${i<=Math.round(r)?'#f39c12':'#ddd'};font-size:11px">★</span>`;return s;}
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2700);}
@@ -263,10 +332,10 @@ onAuthStateChanged(auth, user => {
 });
 
 // SEARCH — donors collection, JS filter
-window.searchDonors = async () => {
-  const blood = document.getElementById('blood-filter').value;
-  const div   = document.getElementById('div-filter').value;
-  const dist  = document.getElementById('dist-filter').value;
+window.searchDonors = async (overrideDiv, overrideDist) => {
+  const blood = SELECTED_GROUP;
+  const div   = overrideDiv  !== undefined ? overrideDiv  : document.getElementById('div-filter').value;
+  const dist  = overrideDist !== undefined ? overrideDist : document.getElementById('dist-filter').value;
   if(!blood){ showToast('রক্তের গ্রুপ বেছে নিন'); return; }
 
   // Nice loading UI
@@ -310,7 +379,7 @@ window.searchDonors = async () => {
     // rating বেশি যার আগে
     donors.sort((a,b) => (b.rating||0) - (a.rating||0));
     stopLoadingMsgs();
-    renderResults(donors, blood);
+    renderResults(donors, blood, div, dist);
   } catch(e){
     stopLoadingMsgs();
     console.warn('search error (Firestore composite index লাগতে পারে):', e);
@@ -322,12 +391,55 @@ window.searchDonors = async () => {
 // পড়তে হয় না (একটা কম read, আর দ্রুত)
 let LAST_RESULTS = new Map();
 
-function renderResults(donors, blood) {
+function renderResults(donors, blood, div, dist) {
   const el = document.getElementById('results-list');
   LAST_RESULTS = new Map(donors.map(d => [d.id, d]));
 
   if(!donors.length){
-    el.innerHTML=`<div class="hint-box"><div style="font-size:36px">🩸</div><p><b>${esc(blood)}</b> donor পাওয়া যায়নি।</p></div>`;
+    const areaText = dist ? esc(dist) : (div ? esc(div) : '');
+    const hasAreaFilter = !!(div || dist);
+    el.innerHTML = `
+      <div class="ns-wrap">
+        <div class="ns-icon">🔍</div>
+        <div class="ns-title">${areaText ? areaText+'য়' : 'এই মুহূর্তে'} ${esc(blood)} রক্তদাতা পাওয়া যায়নি</div>
+        <div class="ns-sub">হাল ছাড়বেন না — নিচের যেকোনো উপায়ে চেষ্টা করুন</div>
+
+        ${hasAreaFilter ? `
+        <div class="ns-action" data-act="nationwide">
+          <div class="ns-ico" style="background:#E6F1FB">📍</div>
+          <div class="ns-txt">
+            <div class="ns-txt-t">সারা দেশে খুঁজুন</div>
+            <div class="ns-txt-s">এলাকার সীমা তুলে দিন</div>
+          </div>
+          <span class="ns-chev">›</span>
+        </div>` : ''}
+
+        <a class="ns-action" href="request.html">
+          <div class="ns-ico" style="background:#FAEEDA">🆘</div>
+          <div class="ns-txt">
+            <div class="ns-txt-t">জরুরি অনুরোধ পোস্ট করুন</div>
+            <div class="ns-txt-s">সব রক্তদাতা দেখতে পাবেন</div>
+          </div>
+          <span class="ns-chev">›</span>
+        </a>
+
+        <a class="ns-action accent" href="bloodbank.html">
+          <div class="ns-ico" style="background:#fdecea">🩸</div>
+          <div class="ns-txt">
+            <div class="ns-txt-t">কাছের ব্লাড ব্যাংকে যোগাযোগ</div>
+            <div class="ns-txt-s">স্বেচ্ছাসেবী সংগঠনের সাহায্য নিন</div>
+          </div>
+          <span class="ns-chev">›</span>
+        </a>
+      </div>`;
+
+    const nw = el.querySelector('[data-act="nationwide"]');
+    if (nw) nw.addEventListener('click', () => {
+      document.getElementById('div-filter').value = '';
+      document.getElementById('dist-filter').value = '';
+      updateLocText();
+      searchDonors('', '');
+    });
     return;
   }
   // নিরাপত্তা: Firestore থেকে আসা প্রতিটা মান esc() দিয়ে পাস করানো হয়েছে,
