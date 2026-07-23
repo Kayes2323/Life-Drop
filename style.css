@@ -74,12 +74,12 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;color:#22
 .bnav-svg{width:23px;height:23px;display:block;flex-shrink:0;stroke:currentColor;fill:none}
 .bnav-item--home .bnav-pill{background:#FFE4EA;color:#9B1B2E}
 .bnav-item--search .bnav-pill{background:#E3F1FF;color:#2270C9}
-.bnav-item--about .bnav-pill{background:#E4F6EC;color:#1F8A52}
+.bnav-item--bloodbank .bnav-pill{background:#fdecea;color:#c0392b}
 .bnav-item--profile .bnav-pill{background:#EDE7F6;color:#5C3D9E}
 .bnav-item.active .bnav-pill{box-shadow:none}
 .bnav-item--home.active .bnav-pill{border:2.5px solid #9B1B2E;box-shadow:0 0 0 3px rgba(155,27,46,0.12)}
 .bnav-item--search.active .bnav-pill{border:2.5px solid #2270C9;box-shadow:0 0 0 3px rgba(34,112,201,0.12)}
-.bnav-item--about.active .bnav-pill{border:2.5px solid #1F8A52;box-shadow:0 0 0 3px rgba(31,138,82,0.12)}
+.bnav-item--bloodbank.active .bnav-pill{border:2.5px solid #c0392b;box-shadow:0 0 0 3px rgba(192,57,43,0.12)}
 .bnav-item--profile.active .bnav-pill{border:2.5px solid #5C3D9E;box-shadow:0 0 0 3px rgba(92,61,158,0.12)}
 .bnav-item.active .bl{font-weight:700}
 .bl{
@@ -127,7 +127,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;color:#22
 .bnav-center .bl{font-size:11px;color:#141414;font-weight:600;font-family:'Hind Siliguri','Inter',sans-serif}
 .bnav-center.active .bc-btn{background:#991515;box-shadow:0 9px 26px rgba(183,28,28,.55)}
 .bnav-center.active .bl{font-weight:700}
-.bnav-item--about .bl,.bnav-item--profile .bl{font-family:'Inter',sans-serif}
+.bnav-item--profile .bl{font-family:'Inter',sans-serif}
 
 /* ══ HOME BANNER / SLIDER ══ */
 .banner{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:0 14px 14px;flex-shrink:0}

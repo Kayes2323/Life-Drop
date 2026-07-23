@@ -7,7 +7,7 @@
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন,
 // নাহলে ইউজাররা পুরনো ক্যাশ করা ফাইল দেখতে থাকবে।
-const CACHE_VERSION = 'sondhan-v3';
+const CACHE_VERSION = 'sondhan-v4';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -19,6 +19,7 @@ const APP_SHELL = [
   './about.html',
   './admin.html',
   './ambulance.html',
+  './bloodbank.html',
   './offline.html',
   './style.css',
   './app.js',

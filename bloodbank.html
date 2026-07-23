@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#c0392b"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>Sondhan — ব্লাড ব্যাংক</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding-bottom:102px}
+.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260;box-shadow:0 2px 8px rgba(192,57,43,.3)}
+.back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header h1{color:#fff;font-size:16px;font-weight:800}
+.scr{flex:1;overflow-y:auto;padding:12px;padding-bottom:110px}
+
+/* SEARCH + FILTERS */
+.bb-search{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #eee;border-radius:12px;padding:0 12px;margin-bottom:10px}
+.bb-search:focus-within{border-color:#c0392b}
+.bb-search input{flex:1;border:none;background:transparent;padding:12px 0;font-size:14px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif}
+.bb-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.bb-chip{font-size:11.5px;padding:6px 13px;border-radius:20px;cursor:pointer;border:1px solid #eee;background:#fff;color:#888;font-family:'Hind Siliguri',sans-serif;transition:.15s}
+.bb-chip.on{border-color:#c0392b;background:#c0392b;color:#fff;font-weight:600}
+
+/* LOCATION PROMPT */
+.loc-prompt{display:flex;align-items:center;gap:11px;background:#fff8e1;border:1.5px solid #ffe082;border-radius:13px;padding:12px;margin-bottom:12px}
+.loc-prompt-txt{flex:1;min-width:0}
+.loc-prompt-txt h4{font-size:12.5px;font-weight:700;color:#8d6e00;font-family:'Hind Siliguri',sans-serif;margin-bottom:2px}
+.loc-prompt-txt p{font-size:10.5px;color:#a1870f;font-family:'Hind Siliguri',sans-serif;line-height:1.5}
+.loc-btn{flex-shrink:0;padding:9px 15px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+
+/* LIST */
+.bb-label{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:9px}
+.bb-card{background:#fff;border:1px solid #f0f0f0;border-radius:13px;padding:12px;margin-bottom:9px;box-shadow:0 1px 5px rgba(0,0,0,.04);cursor:pointer}
+.bb-card:active{transform:scale(.995)}
+.bb-top{display:flex;align-items:flex-start;gap:10px}
+.bb-ico{width:36px;height:36px;border-radius:10px;background:#fdecea;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+.bb-info{flex:1;min-width:0}
+.bb-name{font-size:13.5px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif;line-height:1.4}
+.bb-area{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-top:2px}
+.bb-dist{font-size:11.5px;color:#c0392b;font-weight:700;font-family:'Inter',sans-serif;flex-shrink:0;white-space:nowrap}
+.bb-tags{display:flex;align-items:center;gap:5px;margin-top:9px;padding-left:46px;flex-wrap:wrap}
+.bb-tag{font-size:10px;padding:3px 9px;border-radius:20px;font-family:'Hind Siliguri',sans-serif;white-space:nowrap}
+.bb-tag.volunteer{background:#EAF3DE;color:#3B6D11}
+.bb-tag.govt{background:#E6F1FB;color:#185FA5}
+.bb-tag.private{background:#F3EDF9;color:#5C3D9E}
+.bb-tag.plain{background:#f5f5f5;color:#777}
+.bb-call{margin-left:auto;background:#27ae60;color:#fff;border:none;width:34px;height:34px;border-radius:10px;font-size:15px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.bb-empty{text-align:center;padding:44px 20px;color:#bbb}
+.bb-empty p{font-size:13px;font-family:'Hind Siliguri',sans-serif;margin-top:8px;line-height:1.7}
+
+/* DETAIL MODAL */
+.d-head{display:flex;align-items:flex-start;gap:9px;margin-bottom:4px}
+.d-name{flex:1;font-size:16px;font-weight:800;color:#222;font-family:'Hind Siliguri',sans-serif;line-height:1.4}
+.d-sub{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:13px}
+.d-boxes{display:flex;gap:8px;margin-bottom:12px}
+.d-box{flex:1;border-radius:11px;padding:10px;text-align:center}
+.d-box.green{background:#EAF3DE}
+.d-box.blue{background:#E6F1FB}
+.d-box-l{font-size:10px;font-family:'Hind Siliguri',sans-serif}
+.d-box.green .d-box-l{color:#3B6D11}
+.d-box.blue .d-box-l{color:#185FA5}
+.d-box-v{font-size:12.5px;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-top:3px}
+.d-box.green .d-box-v{color:#27500A}
+.d-box.blue .d-box-v{color:#0C447C}
+.d-rows{border:1px solid #eee;border-radius:11px;padding:2px 12px;margin-bottom:11px}
+.d-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f5}
+.d-row:last-child{border-bottom:none}
+.d-row-i{font-size:15px;flex-shrink:0;width:20px;text-align:center}
+.d-row-l{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;width:52px;flex-shrink:0;padding-top:1px}
+.d-row-v{font-size:12px;color:#333;font-family:'Hind Siliguri',sans-serif;flex:1;line-height:1.6}
+.d-verify{display:flex;align-items:center;gap:7px;margin-bottom:13px;padding:0 3px}
+.d-verify span{font-size:10.5px;color:#999;font-family:'Hind Siliguri',sans-serif}
+.d-report{margin-left:auto;background:none;border:none;font-size:10.5px;color:#c0392b;text-decoration:underline;cursor:pointer;font-family:'Hind Siliguri',sans-serif;padding:2px}
+.d-actions{display:flex;gap:8px}
+.d-btn{border-radius:11px;padding:12px;text-align:center;font-size:12.5px;font-weight:700;font-family:'Hind Siliguri',sans-serif;border:none;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px}
+.d-btn.call{flex:1.4;background:#27ae60;color:#fff}
+.d-btn.dir{flex:1;background:#c0392b;color:#fff}
+
+/* ADMIN ADD */
+.add-box{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.06);display:none}
+.add-title{font-size:12px;font-weight:700;color:#c0392b;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid #fde;font-family:'Hind Siliguri',sans-serif}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html" class="back">←</a>
+  <h1>ব্লাড ব্যাংক ও সংগঠন</h1>
+</div>
+
+<div class="scr">
+
+  <!-- অ্যাডমিন ছাড়া দেখাবে না -->
+  <div class="add-box" id="add-box">
+    <div class="add-title">নতুন ব্লাড ব্যাংক যোগ করুন</div>
+    <div class="iw"><span class="ico">🏥</span><input id="f-name" placeholder="নাম *"/></div>
+    <div class="iw"><span class="ico">🏷️</span>
+      <select id="f-type">
+        <option value="স্বেচ্ছাসেবী">স্বেচ্ছাসেবী সংগঠন</option>
+        <option value="সরকারি">সরকারি</option>
+        <option value="বেসরকারি">বেসরকারি</option>
+      </select>
+    </div>
+    <div class="iw-grid">
+      <div class="iw"><span class="ico">🗺️</span><select id="f-division"><option value="">বিভাগ *</option></select></div>
+      <div class="iw"><span class="ico">📍</span><select id="f-district"><option value="">জেলা *</option></select></div>
+    </div>
+    <div class="iw"><span class="ico">🏠</span><input id="f-address" placeholder="ঠিকানা *"/></div>
+    <div class="iw"><span class="ico">📞</span><input id="f-phone" placeholder="মোবাইল নম্বর * (01XXXXXXXXX)"/></div>
+    <div class="iw"><span class="ico">📞</span><input id="f-phone2" placeholder="বিকল্প নম্বর (ঐচ্ছিক)"/></div>
+    <div class="iw-grid">
+      <div class="iw"><span class="ico">💰</span>
+        <select id="f-cost">
+          <option value="বিনামূল্যে">বিনামূল্যে</option>
+          <option value="স্বল্প খরচ">স্বল্প খরচ</option>
+          <option value="টাকা লাগে">টাকা লাগে</option>
+        </select>
+      </div>
+      <div class="iw"><span class="ico">🕐</span>
+        <select id="f-hours">
+          <option value="true">২৪ ঘণ্টা খোলা</option>
+          <option value="false">নির্দিষ্ট সময়</option>
+        </select>
+      </div>
+    </div>
+    <div class="iw-grid">
+      <div class="iw"><span class="ico">🧭</span><input id="f-lat" placeholder="অক্ষাংশ (latitude)"/></div>
+      <div class="iw"><span class="ico">🧭</span><input id="f-lng" placeholder="দ্রাঘিমাংশ (longitude)"/></div>
+    </div>
+    <button class="submit-btn" id="add-btn" onclick="addBank()">যোগ করুন</button>
+  </div>
+
+  <div class="bb-search">
+    <span style="font-size:15px;opacity:.5">🔍</span>
+    <input id="q" type="text" placeholder="নাম বা এলাকা লিখুন" oninput="applyFilters()"/>
+  </div>
+
+  <div class="bb-chips" id="chips"></div>
+
+  <div class="loc-prompt" id="loc-prompt">
+    <div style="font-size:24px;flex-shrink:0">📍</div>
+    <div class="loc-prompt-txt">
+      <h4>কাছেরটা আগে দেখুন</h4>
+      <p>অবস্থান চালু করলে দূরত্ব অনুযায়ী সাজানো হবে</p>
+    </div>
+    <button class="loc-btn" onclick="askLocation()">চালু করুন</button>
+  </div>
+
+  <div class="bb-label" id="label">সব ব্লাড ব্যাংক</div>
+  <div id="list"></div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-bg" id="d-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>বিস্তারিত</h3>
+      <button class="modal-close" onclick="closeDetail()">×</button>
+    </div>
+    <div class="modal-body" id="d-body"></div>
+  </div>
+</div>
+
+<div class="bnav">
+    <a class="bnav-item bnav-item--home" href="index.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V21H15V15H9V21H3V12Z"/></svg></span><span class="bl">হোম</span></a>
+    <a class="bnav-item bnav-item--search" href="search.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></span><span class="bl">খুঁজুন</span></a>
+    <a class="bnav-center" href="request.html"><div class="bc-btn"><svg class="bnav-svg bnav-svg--drop" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5c0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z"/></svg></div><span class="bl">অনুরোধ</span></a>
+    <a class="bnav-item bnav-item--bloodbank active" href="bloodbank.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><path d="M12 13.2c1.4 0 2.4-1.1 2.4-2.4c0-1.6-2.4-3.8-2.4-3.8s-2.4 2.2-2.4 3.8c0 1.3 1 2.4 2.4 2.4z" fill="currentColor" stroke="none"/></svg></span><span class="bl">ব্লাড ব্যাংক</span></a>
+    <a class="bnav-item bnav-item--profile" href="profile.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></svg></span><span class="bl">প্রোফাইল</span></a>
+  </div>
+
+<div class="toast" id="toast"></div>
+<div class="loading-overlay" id="loading"><div class="spinner"></div></div>
+
+<div class="install-banner" id="install-banner">
+  <img src="icon-192.png" alt="" class="install-banner-icon"/>
+  <div class="install-banner-text">
+    <div class="install-banner-title">Sondhan ইনস্টল করুন</div>
+    <div class="install-banner-sub">হোম স্ক্রিন থেকে সরাসরি খুলুন, দ্রুত ও অফলাইনেও কাজ করবে</div>
+  </div>
+  <button class="install-banner-btn" onclick="installApp()">ইনস্টল</button>
+  <button class="install-banner-close" onclick="dismissInstall()" aria-label="বন্ধ করুন">✕</button>
+</div>
+<script>
+(function(){
+  var deferredPrompt = null;
+  var shown = false;
+  var KEY = 'sondhan-install-dismissed-at';
+  var COOLDOWN = 7 * 24 * 60 * 60 * 1000;
+
+  function isInstalled(){
+    return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  }
+  function recentlyDismissed(){
+    var t = localStorage.getItem(KEY);
+    return t && (Date.now() - parseInt(t, 10)) < COOLDOWN;
+  }
+  function showBanner(){
+    if (shown || !deferredPrompt || isInstalled() || recentlyDismissed()) return;
+    shown = true;
+    document.getElementById('install-banner').classList.add('show');
+  }
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(showBanner, 20000);
+  });
+
+  window.installApp = function(){
+    document.getElementById('install-banner').classList.remove('show');
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(choice){
+      deferredPrompt = null;
+      if (choice.outcome !== 'accepted') localStorage.setItem(KEY, Date.now().toString());
+    });
+  };
+
+  window.dismissInstall = function(){
+    document.getElementById('install-banner').classList.remove('show');
+    localStorage.setItem(KEY, Date.now().toString());
+  };
+
+  window.addEventListener('appinstalled', function(){
+    document.getElementById('install-banner').classList.remove('show');
+  });
+})();
+</script>
+<div class="offline-banner" id="offline-banner">📡 ইন্টারনেট সংযোগ নেই — লেখা তথ্য নেট ফিরলে নিজে থেকেই জমা হবে</div>
+<script>
+(function(){
+  var b = document.getElementById('offline-banner');
+  function update(){ b.classList.toggle('show', !navigator.onLine); }
+  window.addEventListener('online', update);
+  window.addEventListener('offline', update);
+  update();
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW register failed:', err));
+  });
+}
+</script>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { esc, telLink, isValidBdPhone, normalizeBdPhone, isSuperAdmin,
+         DIVISIONS, DISTRICTS, fillDistrictSelect, toast, setLoading } from './app.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, getDocs, addDoc, query, orderBy, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let ALL = [];          // Firestore থেকে আসা সব ব্লাড ব্যাংক
+let USER_POS = null;   // ইউজারের অবস্থান (অনুমতি দিলে)
+let activeChip = 'সব';
+
+const CHIPS = ['সব', 'স্বেচ্ছাসেবী', 'সরকারি', 'বেসরকারি', '২৪ ঘণ্টা'];
+
+/* ── দূরত্ব: Haversine সূত্র (সোজা রেখা, কোনো API লাগে না) ── */
+function distanceKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) ** 2 +
+            Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+            Math.sin(dLng/2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+const toBn = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+
+function distText(b) {
+  if (!USER_POS || typeof b.lat !== 'number' || typeof b.lng !== 'number') return '';
+  const km = distanceKm(USER_POS.lat, USER_POS.lng, b.lat, b.lng);
+  return km < 1 ? toBn(Math.round(km * 1000)) + ' মিটার' : toBn(km.toFixed(1)) + ' কিমি';
+}
+
+/* ── অবস্থানের অনুমতি ── */
+window.askLocation = () => {
+  if (!navigator.geolocation) { toast('এই ব্রাউজারে অবস্থান সুবিধা নেই'); return; }
+  toast('অবস্থান খোঁজা হচ্ছে...');
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      USER_POS = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      document.getElementById('loc-prompt').style.display = 'none';
+      applyFilters();
+      toast('✅ দূরত্ব অনুযায়ী সাজানো হয়েছে');
+    },
+    err => {
+      // অনুমতি না দিলেও পেজ স্বাভাবিকভাবে কাজ করবে — শুধু দূরত্ব দেখাবে না
+      toast(err.code === 1 ? 'অবস্থানের অনুমতি দেওয়া হয়নি' : 'অবস্থান পাওয়া যায়নি');
+    },
+    { timeout: 10000, maximumAge: 300000 }
+  );
+};
+
+/* ── ফিল্টার চিপ ── */
+function drawChips() {
+  document.getElementById('chips').innerHTML = CHIPS.map(c =>
+    `<span class="bb-chip ${c === activeChip ? 'on' : ''}" data-chip="${esc(c)}">${esc(c)}</span>`
+  ).join('');
+}
+document.getElementById('chips').addEventListener('click', e => {
+  const chip = e.target.closest('[data-chip]');
+  if (!chip) return;
+  activeChip = chip.dataset.chip;
+  drawChips();
+  applyFilters();
+});
+
+/* ── তালিকা রেন্ডার ── */
+function render(items) {
+  const el = document.getElementById('list');
+  if (!items.length) {
+    el.innerHTML = `<div class="bb-empty"><div style="font-size:38px">🩸</div>
+      <p>কিছু পাওয়া যায়নি।<br>অন্য নাম বা এলাকা দিয়ে খুঁজে দেখুন।</p></div>`;
+    return;
+  }
+  el.innerHTML = items.map(b => {
+    const typeCls = b.type === 'স্বেচ্ছাসেবী' ? 'volunteer' : (b.type === 'সরকারি' ? 'govt' : 'private');
+    const d = distText(b);
+    return `
+    <div class="bb-card" data-open="${esc(b.id)}">
+      <div class="bb-top">
+        <div class="bb-ico">🩸</div>
+        <div class="bb-info">
+          <div class="bb-name">${esc(b.name)}</div>
+          <div class="bb-area">${esc([b.address, b.district].filter(Boolean).join(', '))}</div>
+        </div>
+        ${d ? `<div class="bb-dist">${esc(d)}</div>` : ''}
+      </div>
+      <div class="bb-tags">
+        <span class="bb-tag ${typeCls}">${esc(b.type || '—')}</span>
+        ${b.cost ? `<span class="bb-tag plain">${esc(b.cost)}</span>` : ''}
+        ${b.open24 ? '<span class="bb-tag plain">২৪ ঘণ্টা</span>' : ''}
+        <button class="bb-call" data-call="${esc(b.phone || '')}" aria-label="কল করুন">📞</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* কার্ডে ক্লিক — বিস্তারিত খোলে; কল আইকনে ক্লিক — সরাসরি কল */
+document.getElementById('list').addEventListener('click', e => {
+  const callBtn = e.target.closest('[data-call]');
+  if (callBtn) {
+    e.stopPropagation();
+    const p = callBtn.dataset.call;
+    if (!p) { toast('নম্বর নেই'); return; }
+    window.location.href = telLink(p);
+    return;
+  }
+  const card = e.target.closest('[data-open]');
+  if (card) openDetail(card.dataset.open);
+});
+
+/* ── ফিল্টার প্রয়োগ ── */
+window.applyFilters = () => {
+  const q = document.getElementById('q').value.trim();
+  let items = ALL.filter(b => {
+    const okChip =
+      activeChip === 'সব' ? true :
+      activeChip === '২৪ ঘণ্টা' ? !!b.open24 :
+      b.type === activeChip;
+    const hay = [b.name, b.address, b.district, b.division].filter(Boolean).join(' ');
+    const okQ = !q || hay.includes(q);
+    return okChip && okQ;
+  });
+
+  // অবস্থান জানা থাকলে কাছেরটা আগে
+  if (USER_POS) {
+    items.sort((a, b) => {
+      const da = (typeof a.lat === 'number') ? distanceKm(USER_POS.lat, USER_POS.lng, a.lat, a.lng) : 1e9;
+      const dbb = (typeof b.lat === 'number') ? distanceKm(USER_POS.lat, USER_POS.lng, b.lat, b.lng) : 1e9;
+      return da - dbb;
+    });
+  }
+
+  const filtering = q || activeChip !== 'সব';
+  document.getElementById('label').textContent =
+    filtering ? `${toBn(items.length)} টি ফলাফল`
+              : (USER_POS ? 'কাছের থেকে সাজানো' : 'সব ব্লাড ব্যাংক');
+  render(items);
+};
+
+/* ── বিস্তারিত ── */
+function openDetail(id) {
+  const b = ALL.find(x => x.id === id);
+  if (!b) return;
+  const typeCls = b.type === 'স্বেচ্ছাসেবী' ? 'volunteer' : (b.type === 'সরকারি' ? 'govt' : 'private');
+  const d = distText(b);
+  const hasCoords = typeof b.lat === 'number' && typeof b.lng === 'number';
+
+  document.getElementById('d-body').innerHTML = `
+    <div class="d-head">
+      <div class="d-name">${esc(b.name)}</div>
+      <span class="bb-tag ${typeCls}" style="flex-shrink:0">${esc(b.type || '—')}</span>
+    </div>
+    <div class="d-sub">${esc([b.district, b.division].filter(Boolean).join(', '))}${d ? ' · ' + esc(d) : ''}</div>
+
+    <div class="d-boxes">
+      <div class="d-box green">
+        <div class="d-box-l">খরচ</div>
+        <div class="d-box-v">${esc(b.cost || 'জানা নেই')}</div>
+      </div>
+      <div class="d-box blue">
+        <div class="d-box-l">সময়</div>
+        <div class="d-box-v">${b.open24 ? '২৪ ঘণ্টা' : 'নির্দিষ্ট সময়'}</div>
+      </div>
+    </div>
+
+    <div class="d-rows">
+      <div class="d-row">
+        <span class="d-row-i">📍</span><span class="d-row-l">ঠিকানা</span>
+        <span class="d-row-v">${esc(b.address || '—')}</span>
+      </div>
+      <div class="d-row">
+        <span class="d-row-i">📞</span><span class="d-row-l">ফোন</span>
+        <span class="d-row-v">${esc(b.phone || '—')}${b.phone2 ? '<br>' + esc(b.phone2) : ''}</span>
+      </div>
+    </div>
+
+    <div class="d-verify">
+      <span style="color:#1e8449">✔</span>
+      <span>সর্বশেষ যাচাই: ${esc(b.verifiedAt || 'জানা নেই')}</span>
+      <button class="d-report" data-report="${esc(b.id)}">নম্বর ভুল?</button>
+    </div>
+
+    <div class="d-actions">
+      <a class="d-btn call" href="${esc(telLink(b.phone || ''))}">📞 কল করুন</a>
+      ${hasCoords
+        ? `<a class="d-btn dir" target="_blank" rel="noopener"
+             href="https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}">🧭 দিকনির্দেশ</a>`
+        : ''}
+    </div>`;
+  document.getElementById('d-modal').classList.add('open');
+}
+
+window.closeDetail = () => document.getElementById('d-modal').classList.remove('open');
+document.getElementById('d-modal').addEventListener('click', e => {
+  if (e.target.id === 'd-modal') closeDetail();
+});
+
+/* "নম্বর ভুল?" — ইউজারের রিপোর্ট */
+document.getElementById('d-body').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-report]');
+  if (!btn) return;
+  const b = ALL.find(x => x.id === btn.dataset.report);
+  if (!b) return;
+  btn.disabled = true; btn.textContent = 'পাঠানো হচ্ছে...';
+  try {
+    await addDoc(collection(db, 'bankReports'), {
+      bankId: b.id,
+      bankName: b.name,
+      phone: b.phone || '',
+      uid: auth.currentUser ? auth.currentUser.uid : null,
+      createdAt: serverTimestamp()
+    });
+    btn.textContent = '✔ জানানো হয়েছে';
+    toast('ধন্যবাদ! আমরা যাচাই করে দেখব।');
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'নম্বর ভুল?';
+    toast(auth.currentUser ? 'পাঠানো যায়নি' : 'রিপোর্ট করতে লগইন করুন');
+    console.warn('report error:', err);
+  }
+});
+
+/* ── ডেটা লোড ── */
+async function load() {
+  setLoading(true);
+  try {
+    const snap = await getDocs(query(collection(db, 'bloodBanks'), orderBy('name')));
+    ALL = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    console.warn('load error:', e);
+    document.getElementById('list').innerHTML =
+      `<div class="bb-empty"><div style="font-size:38px">⚠️</div>
+       <p>তালিকা লোড করা যায়নি।<br>ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।</p></div>`;
+    setLoading(false);
+    return;
+  }
+  setLoading(false);
+  applyFilters();
+}
+
+/* ── অ্যাডমিন: নতুন যোগ করা ── */
+onAuthStateChanged(auth, user => {
+  const box = document.getElementById('add-box');
+  if (box) box.style.display = isSuperAdmin(user) ? 'block' : 'none';
+});
+
+// বিভাগ/জেলা ড্রপডাউন
+const divSel = document.getElementById('f-division');
+DIVISIONS.forEach(d => {
+  const o = document.createElement('option');
+  o.value = d; o.textContent = d;
+  divSel.appendChild(o);
+});
+divSel.addEventListener('change', () =>
+  fillDistrictSelect(document.getElementById('f-district'), divSel.value, 'জেলা *'));
+
+window.addBank = async () => {
+  const name = document.getElementById('f-name').value.trim();
+  const type = document.getElementById('f-type').value;
+  const division = document.getElementById('f-division').value;
+  const district = document.getElementById('f-district').value;
+  const address = document.getElementById('f-address').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const phone2 = document.getElementById('f-phone2').value.trim();
+  const cost = document.getElementById('f-cost').value;
+  const open24 = document.getElementById('f-hours').value === 'true';
+  const lat = parseFloat(document.getElementById('f-lat').value);
+  const lng = parseFloat(document.getElementById('f-lng').value);
+
+  if (!name || !division || !district || !address || !phone) { toast('সব * তথ্য পূরণ করুন'); return; }
+  if (name.length > 200) { toast('নাম ২০০ অক্ষরের কম রাখুন'); return; }
+  if (!isValidBdPhone(phone)) { toast('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)'); return; }
+  if (phone2 && !isValidBdPhone(phone2)) { toast('বিকল্প নম্বর সঠিক নয়'); return; }
+
+  const btn = document.getElementById('add-btn');
+  btn.disabled = true; btn.textContent = 'যোগ হচ্ছে...';
+  try {
+    const data = {
+      name, type, division, district, address,
+      phone: normalizeBdPhone(phone),
+      phone2: phone2 ? normalizeBdPhone(phone2) : '',
+      cost, open24,
+      verifiedAt: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
+      createdAt: serverTimestamp()
+    };
+    if (!isNaN(lat) && !isNaN(lng)) { data.lat = lat; data.lng = lng; }
+    await addDoc(collection(db, 'bloodBanks'), data);
+    toast('✅ যোগ হয়েছে');
+    ['f-name','f-address','f-phone','f-phone2','f-lat','f-lng'].forEach(id =>
+      document.getElementById(id).value = '');
+    load();
+  } catch (e) {
+    toast('যোগ করা যায়নি');
+    console.warn('addBank error:', e);
+  } finally {
+    btn.disabled = false; btn.textContent = 'যোগ করুন';
+  }
+};
+
+drawChips();
+load();
+</script>
+</body>
+</html>
