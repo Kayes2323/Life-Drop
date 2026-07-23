@@ -7,9 +7,8 @@
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন,
 // নাহলে ইউজাররা পুরনো ক্যাশ করা ফাইল দেখতে থাকবে।
-const CACHE_VERSION = 'sondhan-v1';
+const CACHE_VERSION = 'sondhan-v3';
 const APP_SHELL = [
-  './',
   './index.html',
   './search.html',
   './request.html',
@@ -34,10 +33,21 @@ const APP_SHELL = [
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_VERSION)
-      .then(cache => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
-      .catch(err => console.warn('SW install cache error:', err))
+    caches.open(CACHE_VERSION).then(cache =>
+      // BUGFIX: cache.addAll() ছিল all-or-nothing — একটা ফাইল fetch
+      // fail করলেই পুরো cache খালি থেকে যেতো, অথচ .catch() দিয়ে error
+      // ঢাকা থাকায় install "সফল" দেখাতো। এখন প্রতিটা ফাইল আলাদাভাবে
+      // cache হয় — একটা fail করলে বাকিগুলো ঠিকই cache থেকে যায়,
+      // আর কোনটা fail করলো তা console-এ স্পষ্ট দেখা যায়।
+      Promise.allSettled(
+        APP_SHELL.map(url =>
+          cache.add(url).catch(err => {
+            console.warn('[SW] cache করা যায়নি:', url, err.message);
+            return null;
+          })
+        )
+      )
+    ).then(() => self.skipWaiting())
   );
 });
 

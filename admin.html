@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#c0392b"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
 <title>Sondhan — Admin Panel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -234,6 +237,78 @@ window.loadDonors = async () => {
     el.innerHTML=`<div class="empty" style="color:#c0392b">লোড করতে সমস্যা হয়েছে।</div>`;
   }
 };
+</script>
+<div class="install-banner" id="install-banner">
+  <img src="icon-192.png" alt="" class="install-banner-icon"/>
+  <div class="install-banner-text">
+    <div class="install-banner-title">Sondhan ইনস্টল করুন</div>
+    <div class="install-banner-sub">হোম স্ক্রিন থেকে সরাসরি খুলুন, দ্রুত ও অফলাইনেও কাজ করবে</div>
+  </div>
+  <button class="install-banner-btn" onclick="installApp()">ইনস্টল</button>
+  <button class="install-banner-close" onclick="dismissInstall()" aria-label="বন্ধ করুন">✕</button>
+</div>
+<script>
+(function(){
+  var deferredPrompt = null;
+  var shown = false;
+  var KEY = 'sondhan-install-dismissed-at';
+  var COOLDOWN = 7 * 24 * 60 * 60 * 1000; // ৭ দিন পর আবার দেখাবে
+
+  function isInstalled(){
+    return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  }
+  function recentlyDismissed(){
+    var t = localStorage.getItem(KEY);
+    return t && (Date.now() - parseInt(t, 10)) < COOLDOWN;
+  }
+  function showBanner(){
+    if (shown || !deferredPrompt || isInstalled() || recentlyDismissed()) return;
+    shown = true;
+    document.getElementById('install-banner').classList.add('show');
+  }
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(showBanner, 20000); // অ্যাপে ঢোকার ২০ সেকেন্ড পর
+  });
+
+  window.installApp = function(){
+    document.getElementById('install-banner').classList.remove('show');
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(choice){
+      deferredPrompt = null;
+      if (choice.outcome !== 'accepted') localStorage.setItem(KEY, Date.now().toString());
+    });
+  };
+
+  window.dismissInstall = function(){
+    document.getElementById('install-banner').classList.remove('show');
+    localStorage.setItem(KEY, Date.now().toString());
+  };
+
+  window.addEventListener('appinstalled', function(){
+    document.getElementById('install-banner').classList.remove('show');
+  });
+})();
+</script>
+<div class="offline-banner" id="offline-banner">📡 ইন্টারনেট সংযোগ নেই — লেখা তথ্য নেট ফিরলে নিজে থেকেই জমা হবে</div>
+<script>
+(function(){
+  var b = document.getElementById('offline-banner');
+  function update(){ b.classList.toggle('show', !navigator.onLine); }
+  window.addEventListener('online', update);
+  window.addEventListener('offline', update);
+  update();
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW register failed:', err));
+  });
+}
 </script>
 </body>
 </html>
