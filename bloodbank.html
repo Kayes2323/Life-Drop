@@ -87,12 +87,75 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 /* ADMIN ADD */
 .add-box{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.06);display:none}
 .add-title{font-size:12px;font-weight:700;color:#c0392b;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid #fde;font-family:'Hind Siliguri',sans-serif}
+
+/* ── আইকন ── */
+.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;display:block}
+.ic-sm{width:15px;height:15px}
+.ic-lg{width:21px;height:21px}
+.ic-tile{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ══ ব্লাড ব্যাংক কার্ড (পলিশড) ══ */
+.b2{background:#fff;border:1px solid #EBEBEB;border-radius:13px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden;cursor:pointer}
+.b2-top{display:flex;gap:12px;align-items:flex-start;padding:14px 14px 12px}
+.b2-name{font-size:13.5px;font-weight:700;color:#1A1A1A;line-height:1.45;font-family:'Hind Siliguri',sans-serif}
+.b2-addr{font-size:11px;color:#B4B4B4;margin-top:4px;display:flex;align-items:center;gap:4px;font-family:'Hind Siliguri',sans-serif}
+.b2-dist{flex-shrink:0;text-align:center;background:#FDECEA;border-radius:10px;padding:7px 10px;min-width:56px}
+.b2-dist-n{font-family:'Inter',sans-serif;font-size:14px;font-weight:700;color:#C0392B;line-height:1.1}
+.b2-dist-u{font-size:9px;color:#C0392B;opacity:.75;margin-top:1px;font-family:'Hind Siliguri',sans-serif}
+.b2-tags{display:flex;gap:5px;flex-wrap:wrap;padding:0 14px 12px}
+.tag{font-size:10px;padding:3px 9px;border-radius:20px;font-family:'Hind Siliguri',sans-serif;white-space:nowrap}
+.tag-vol{background:#EAF3DE;color:#3B6D11}
+.tag-gov{background:#E6F1FB;color:#185FA5}
+.tag-pri{background:#EDE7F6;color:#5C3D9E}
+.tag-n{background:#F4F4F4;color:#8E8E8E}
+.b2-foot{display:flex;align-items:center;gap:8px;border-top:1px solid #F4F4F4;padding:11px 14px;background:#FCFCFC}
+.b2-status{flex:1;font-size:11px;display:flex;align-items:center;gap:6px;font-family:'Hind Siliguri',sans-serif;min-width:0}
+.live{width:7px;height:7px;border-radius:50%;background:#2E7D32;flex-shrink:0}
+.live.off{background:#B4B4B4}
+.b2-btns{display:flex;gap:7px;flex-shrink:0}
+.b2-btn{padding:8px 13px;border-radius:10px;border:1px solid #EBEBEB;background:#fff;font-family:'Hind Siliguri',sans-serif;font-size:11.5px;font-weight:700;color:#5C5C5C;cursor:pointer;display:flex;align-items:center;gap:5px;text-decoration:none}
+.b2-btn.call{background:#2E7D32;border-color:#2E7D32;color:#fff}
+.b2-empty{text-align:center;padding:44px 20px;color:#B4B4B4}
+.b2-empty p{font-size:13px;font-family:'Hind Siliguri',sans-serif;margin-top:10px;line-height:1.7}
+.ico2{color:#8E8E8E;margin-right:10px;flex-shrink:0}
+.d-row-i2{color:#8E8E8E;flex-shrink:0;width:20px}
 </style>
 </head>
 <body>
+<!-- ═══ আইকন সেট — ইমোজির বদলে একই ধাঁচের SVG (একবার সংজ্ঞায়িত, সব জায়গায় <use> দিয়ে ব্যবহার) ═══ -->
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol>
+  <symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5 0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z"/></symbol>
+  <symbol id="i-droplet-f" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5 0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 12 12 3l9 9v9h-6v-6H9v6H3v-9z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 3h4l2 5-2.5 1.5a12 12 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L3 21l2-6.2A8 8 0 1 1 21 12z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 21l8.8-8.3a5 5 0 0 0 0-7.1z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="m2 7 10 6 10-6"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-hospital" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M12 9v6M9 12h6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+  <symbol id="i-nav" viewBox="0 0 24 24"><path d="M3 11 22 2l-9 19-2-8-8-2z"/></symbol>
+  <symbol id="i-stetho" viewBox="0 0 24 24"><path d="M5 3v5a4 4 0 0 0 8 0V3"/><path d="M9 12v3a5 5 0 0 0 10 0v-2"/><circle cx="19" cy="10" r="2"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M8 3h8v3a4 4 0 0 1-1 2.6V19a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V8.6A4 4 0 0 1 8 6V3z"/></symbol>
+  <symbol id="i-shield-lock" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/><rect x="9.5" y="10.5" width="5" height="4" rx="1"/><path d="M10.5 10.5V9a1.5 1.5 0 0 1 3 0v1.5"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 12h5l2 3h4l2-3h5"/><path d="M5 5h14l2 7v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6l2-7z"/></symbol>
+</svg>
+
 
 <div class="header">
-  <a href="index.html" class="back">←</a>
+  <a href="index.html" class="back"><svg class="ic" style="transform:rotate(180deg)"><use href="#i-right"/></svg></a>
   <h1>ব্লাড ব্যাংক ও সংগঠন</h1>
 </div>
 
@@ -101,8 +164,8 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
   <!-- অ্যাডমিন ছাড়া দেখাবে না -->
   <div class="add-box" id="add-box">
     <div class="add-title">নতুন ব্লাড ব্যাংক যোগ করুন</div>
-    <div class="iw"><span class="ico">🏥</span><input id="f-name" placeholder="নাম *"/></div>
-    <div class="iw"><span class="ico">🏷️</span>
+    <div class="iw"><svg class="ic ico2"><use href="#i-hospital"/></svg><input id="f-name" placeholder="নাম *"/></div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-bag"/></svg>
       <select id="f-type">
         <option value="স্বেচ্ছাসেবী">স্বেচ্ছাসেবী সংগঠন</option>
         <option value="সরকারি">সরকারি</option>
@@ -110,21 +173,21 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
       </select>
     </div>
     <div class="iw-grid">
-      <div class="iw"><span class="ico">🗺️</span><select id="f-division"><option value="">বিভাগ *</option></select></div>
-      <div class="iw"><span class="ico">📍</span><select id="f-district"><option value="">জেলা *</option></select></div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-pin"/></svg><select id="f-division"><option value="">বিভাগ *</option></select></div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-pin"/></svg><select id="f-district"><option value="">জেলা *</option></select></div>
     </div>
-    <div class="iw"><span class="ico">🏠</span><input id="f-address" placeholder="ঠিকানা *"/></div>
-    <div class="iw"><span class="ico">📞</span><input id="f-phone" placeholder="মোবাইল নম্বর * (01XXXXXXXXX)"/></div>
-    <div class="iw"><span class="ico">📞</span><input id="f-phone2" placeholder="বিকল্প নম্বর (ঐচ্ছিক)"/></div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-home"/></svg><input id="f-address" placeholder="ঠিকানা *"/></div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-phone"/></svg><input id="f-phone" placeholder="মোবাইল নম্বর * (01XXXXXXXXX)"/></div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-phone"/></svg><input id="f-phone2" placeholder="বিকল্প নম্বর (ঐচ্ছিক)"/></div>
     <div class="iw-grid">
-      <div class="iw"><span class="ico">💰</span>
+      <div class="iw"><svg class="ic ico2"><use href="#i-bag"/></svg>
         <select id="f-cost">
           <option value="বিনামূল্যে">বিনামূল্যে</option>
           <option value="স্বল্প খরচ">স্বল্প খরচ</option>
           <option value="টাকা লাগে">টাকা লাগে</option>
         </select>
       </div>
-      <div class="iw"><span class="ico">🕐</span>
+      <div class="iw"><svg class="ic ico2"><use href="#i-clock"/></svg>
         <select id="f-hours">
           <option value="true">২৪ ঘণ্টা খোলা</option>
           <option value="false">নির্দিষ্ট সময়</option>
@@ -132,21 +195,21 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
       </div>
     </div>
     <div class="iw-grid">
-      <div class="iw"><span class="ico">🧭</span><input id="f-lat" placeholder="অক্ষাংশ (latitude)"/></div>
-      <div class="iw"><span class="ico">🧭</span><input id="f-lng" placeholder="দ্রাঘিমাংশ (longitude)"/></div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-nav"/></svg><input id="f-lat" placeholder="অক্ষাংশ (latitude)"/></div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-nav"/></svg><input id="f-lng" placeholder="দ্রাঘিমাংশ (longitude)"/></div>
     </div>
     <button class="submit-btn" id="add-btn" onclick="addBank()">যোগ করুন</button>
   </div>
 
   <div class="bb-search">
-    <span style="font-size:15px;opacity:.5">🔍</span>
+    <svg class="ic" style="color:#B4B4B4"><use href="#i-search"/></svg>
     <input id="q" type="text" placeholder="নাম বা এলাকা লিখুন" oninput="applyFilters()"/>
   </div>
 
   <div class="bb-chips" id="chips"></div>
 
   <div class="loc-prompt" id="loc-prompt">
-    <div style="font-size:24px;flex-shrink:0">📍</div>
+    <div class="ic-tile" style="background:#F5E9CE;color:#8A6410"><svg class="ic ic-lg"><use href="#i-pin"/></svg></div>
     <div class="loc-prompt-txt">
       <h4>কাছেরটা আগে দেখুন</h4>
       <p>অবস্থান চালু করলে দূরত্ব অনুযায়ী সাজানো হবে</p>
@@ -181,13 +244,13 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 <div class="loading-overlay" id="loading"><div class="spinner"></div></div>
 
 <div class="install-banner" id="install-banner">
-  <img src="icon-192.png" alt="" class="install-banner-icon"/>
-  <div class="install-banner-text">
-    <div class="install-banner-title">Sondhan ইনস্টল করুন</div>
-    <div class="install-banner-sub">হোম স্ক্রিন থেকে সরাসরি খুলুন, দ্রুত ও অফলাইনেও কাজ করবে</div>
+  <div class="install-modal">
+    <div class="install-modal-icon"><img src="icon-192.png" alt="Sondhan"/></div>
+    <div class="install-modal-title">Sondhan ইনস্টল করুন</div>
+    <div class="install-modal-sub">ভালো অভিজ্ঞতার জন্য অ্যাপটি ডাউনলোড করুন</div>
+    <button class="install-modal-btn" onclick="installApp()">ইনস্টল করুন</button>
+    <div class="install-modal-later" onclick="dismissInstall()">পরে করবো</div>
   </div>
-  <button class="install-banner-btn" onclick="installApp()">ইনস্টল</button>
-  <button class="install-banner-close" onclick="dismissInstall()" aria-label="বন্ধ করুন">✕</button>
 </div>
 <script>
 (function(){
@@ -212,7 +275,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
     deferredPrompt = e;
-    setTimeout(showBanner, 20000);
+    setTimeout(showBanner, 10000);
   });
 
   window.installApp = function(){
@@ -232,6 +295,10 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 
   window.addEventListener('appinstalled', function(){
     document.getElementById('install-banner').classList.remove('show');
+  });
+
+  document.getElementById('install-banner').addEventListener('click', function(e){
+    if (e.target.id === 'install-banner') window.dismissInstall();
   });
 })();
 </script>
@@ -280,10 +347,13 @@ function distanceKm(lat1, lng1, lat2, lng2) {
 
 const toBn = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
 
+// দূরত্ব — সংখ্যা ও একক আলাদা করে ফেরত দেয়, যাতে ব্যাজে বড় করে দেখানো যায়
 function distText(b) {
-  if (!USER_POS || typeof b.lat !== 'number' || typeof b.lng !== 'number') return '';
+  if (!USER_POS || typeof b.lat !== 'number' || typeof b.lng !== 'number') return null;
   const km = distanceKm(USER_POS.lat, USER_POS.lng, b.lat, b.lng);
-  return km < 1 ? toBn(Math.round(km * 1000)) + ' মিটার' : toBn(km.toFixed(1)) + ' কিমি';
+  return km < 1
+    ? { n: toBn(Math.round(km * 1000)), u: 'মিটার' }
+    : { n: toBn(km.toFixed(1)), u: 'কিমি' };
 }
 
 /* ── অবস্থানের অনুমতি ── */
@@ -295,7 +365,7 @@ window.askLocation = () => {
       USER_POS = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       document.getElementById('loc-prompt').style.display = 'none';
       applyFilters();
-      toast('✅ দূরত্ব অনুযায়ী সাজানো হয়েছে');
+      toast('দূরত্ব অনুযায়ী সাজানো হয়েছে');
     },
     err => {
       // অনুমতি না দিলেও পেজ স্বাভাবিকভাবে কাজ করবে — শুধু দূরত্ব দেখাবে না
@@ -323,43 +393,65 @@ document.getElementById('chips').addEventListener('click', e => {
 function render(items) {
   const el = document.getElementById('list');
   if (!items.length) {
-    el.innerHTML = `<div class="bb-empty"><div style="font-size:38px">🩸</div>
+    el.innerHTML = `<div class="b2-empty">
+      <svg class="ic" style="width:38px;height:38px;color:#D0D0D0;margin:0 auto"><use href="#i-search"/></svg>
       <p>কিছু পাওয়া যায়নি।<br>অন্য নাম বা এলাকা দিয়ে খুঁজে দেখুন।</p></div>`;
     return;
   }
   el.innerHTML = items.map(b => {
-    const typeCls = b.type === 'স্বেচ্ছাসেবী' ? 'volunteer' : (b.type === 'সরকারি' ? 'govt' : 'private');
+    const typeCls = b.type === 'স্বেচ্ছাসেবী' ? 'tag-vol' : (b.type === 'সরকারি' ? 'tag-gov' : 'tag-pri');
+    // আইকনের রংও ধরন অনুযায়ী — তালিকা একঘেয়ে লাগে না
+    const tile = b.type === 'স্বেচ্ছাসেবী' ? 'background:#EAF3DE;color:#3B6D11'
+               : b.type === 'সরকারি'      ? 'background:#E6F1FB;color:#185FA5'
+               :                             'background:#EDE7F6;color:#5C3D9E';
+    const icon = b.type === 'সরকারি' ? 'i-hospital' : 'i-bag';
     const d = distText(b);
+    const hasCoords = typeof b.lat === 'number' && typeof b.lng === 'number';
     return `
-    <div class="bb-card" data-open="${esc(b.id)}">
-      <div class="bb-top">
-        <div class="bb-ico">🩸</div>
-        <div class="bb-info">
-          <div class="bb-name">${esc(b.name)}</div>
-          <div class="bb-area">${esc([b.address, b.district].filter(Boolean).join(', '))}</div>
+    <div class="b2" data-open="${esc(b.id)}">
+      <div class="b2-top">
+        <div class="ic-tile" style="${tile}"><svg class="ic ic-lg"><use href="#${icon}"/></svg></div>
+        <div style="flex:1;min-width:0">
+          <div class="b2-name">${esc(b.name)}</div>
+          <div class="b2-addr">
+            <svg class="ic" style="width:11px;height:11px"><use href="#i-pin"/></svg>${esc([b.address, b.district].filter(Boolean).join(', '))}
+          </div>
         </div>
-        ${d ? `<div class="bb-dist">${esc(d)}</div>` : ''}
+        ${d ? `<div class="b2-dist">
+          <div class="b2-dist-n">${esc(d.n)}</div>
+          <div class="b2-dist-u">${esc(d.u)}</div>
+        </div>` : ''}
       </div>
-      <div class="bb-tags">
-        <span class="bb-tag ${typeCls}">${esc(b.type || '—')}</span>
-        ${b.cost ? `<span class="bb-tag plain">${esc(b.cost)}</span>` : ''}
-        ${b.open24 ? '<span class="bb-tag plain">২৪ ঘণ্টা</span>' : ''}
-        <button class="bb-call" data-call="${esc(b.phone || '')}" aria-label="কল করুন">📞</button>
+      <div class="b2-tags">
+        <span class="tag ${typeCls}">${esc(b.type || '—')}</span>
+        ${b.cost ? `<span class="tag tag-n">${esc(b.cost)}</span>` : ''}
+        ${b.service ? `<span class="tag tag-n">${esc(b.service)}</span>` : ''}
+      </div>
+      <div class="b2-foot">
+        <span class="b2-status">
+          <span class="live ${b.open24 ? '' : 'off'}"></span>
+          ${b.open24
+            ? '<span style="color:#2E7D32;font-weight:700">এখন খোলা</span><span style="color:#B4B4B4">· ২৪ ঘণ্টা</span>'
+            : '<span style="color:#8E8E8E;font-weight:700">নির্দিষ্ট সময়</span>'}
+        </span>
+        <div class="b2-btns">
+          ${hasCoords ? `<a class="b2-btn" target="_blank" rel="noopener"
+             href="https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}"
+             data-stop aria-label="দিকনির্দেশ"><svg class="ic ic-sm"><use href="#i-nav"/></svg></a>` : ''}
+          <a class="b2-btn call" href="${esc(telLink(b.phone || ''))}" data-stop>
+            <svg class="ic ic-sm"><use href="#i-phone"/></svg>কল
+          </a>
+        </div>
       </div>
     </div>`;
   }).join('');
 }
 
-/* কার্ডে ক্লিক — বিস্তারিত খোলে; কল আইকনে ক্লিক — সরাসরি কল */
+/* কার্ডে ক্লিক — বিস্তারিত খোলে।
+   কল/দিকনির্দেশ বাটনে [data-stop] আছে — সেগুলো নিজের কাজ করবে,
+   কার্ড খুলবে না। */
 document.getElementById('list').addEventListener('click', e => {
-  const callBtn = e.target.closest('[data-call]');
-  if (callBtn) {
-    e.stopPropagation();
-    const p = callBtn.dataset.call;
-    if (!p) { toast('নম্বর নেই'); return; }
-    window.location.href = telLink(p);
-    return;
-  }
+  if (e.target.closest('[data-stop]')) return;
   const card = e.target.closest('[data-open]');
   if (card) openDetail(card.dataset.open);
 });
@@ -406,7 +498,7 @@ function openDetail(id) {
       <div class="d-name">${esc(b.name)}</div>
       <span class="bb-tag ${typeCls}" style="flex-shrink:0">${esc(b.type || '—')}</span>
     </div>
-    <div class="d-sub">${esc([b.district, b.division].filter(Boolean).join(', '))}${d ? ' · ' + esc(d) : ''}</div>
+    <div class="d-sub">${esc([b.district, b.division].filter(Boolean).join(', '))}${d ? ' · ' + esc(d.n + ' ' + d.u) : ''}</div>
 
     <div class="d-boxes">
       <div class="d-box green">
@@ -421,26 +513,26 @@ function openDetail(id) {
 
     <div class="d-rows">
       <div class="d-row">
-        <span class="d-row-i">📍</span><span class="d-row-l">ঠিকানা</span>
+        <svg class="ic d-row-i2"><use href="#i-pin"/></svg><span class="d-row-l">ঠিকানা</span>
         <span class="d-row-v">${esc(b.address || '—')}</span>
       </div>
       <div class="d-row">
-        <span class="d-row-i">📞</span><span class="d-row-l">ফোন</span>
+        <svg class="ic d-row-i2"><use href="#i-phone"/></svg><span class="d-row-l">ফোন</span>
         <span class="d-row-v">${esc(b.phone || '—')}${b.phone2 ? '<br>' + esc(b.phone2) : ''}</span>
       </div>
     </div>
 
     <div class="d-verify">
-      <span style="color:#1e8449">✔</span>
+      <svg class="ic ic-sm" style="color:#2E7D32"><use href="#i-check"/></svg>
       <span>সর্বশেষ যাচাই: ${esc(b.verifiedAt || 'জানা নেই')}</span>
       <button class="d-report" data-report="${esc(b.id)}">নম্বর ভুল?</button>
     </div>
 
     <div class="d-actions">
-      <a class="d-btn call" href="${esc(telLink(b.phone || ''))}">📞 কল করুন</a>
+      <a class="d-btn call" href="${esc(telLink(b.phone || ''))}"><svg class="ic ic-sm"><use href="#i-phone"/></svg>কল করুন</a>
       ${hasCoords
         ? `<a class="d-btn dir" target="_blank" rel="noopener"
-             href="https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}">🧭 দিকনির্দেশ</a>`
+             href="https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}"><svg class="ic ic-sm"><use href="#i-nav"/></svg>দিকনির্দেশ</a>`
         : ''}
     </div>`;
   document.getElementById('d-modal').classList.add('open');
@@ -466,7 +558,7 @@ document.getElementById('d-body').addEventListener('click', async e => {
       uid: auth.currentUser ? auth.currentUser.uid : null,
       createdAt: serverTimestamp()
     });
-    btn.textContent = '✔ জানানো হয়েছে';
+    btn.textContent = 'জানানো হয়েছে';
     toast('ধন্যবাদ! আমরা যাচাই করে দেখব।');
   } catch (err) {
     btn.disabled = false; btn.textContent = 'নম্বর ভুল?';
@@ -484,7 +576,7 @@ async function load() {
   } catch (e) {
     console.warn('load error:', e);
     document.getElementById('list').innerHTML =
-      `<div class="bb-empty"><div style="font-size:38px">⚠️</div>
+      `<div class="bb-empty"><svg class="ic" style="width:38px;height:38px;color:#D0D0D0;margin:0 auto"><use href="#i-alert"/></svg>
        <p>তালিকা লোড করা যায়নি।<br>ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।</p></div>`;
     setLoading(false);
     return;
@@ -540,7 +632,7 @@ window.addBank = async () => {
     };
     if (!isNaN(lat) && !isNaN(lng)) { data.lat = lat; data.lng = lng; }
     await addDoc(collection(db, 'bloodBanks'), data);
-    toast('✅ যোগ হয়েছে');
+    toast('যোগ হয়েছে');
     ['f-name','f-address','f-phone','f-phone2','f-lat','f-lng'].forEach(id =>
       document.getElementById(id).value = '');
     load();

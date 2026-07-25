@@ -342,13 +342,13 @@ document.addEventListener('keydown', e => {
 });
 </script>
 <div class="install-banner" id="install-banner">
-  <img src="icon-192.png" alt="" class="install-banner-icon"/>
-  <div class="install-banner-text">
-    <div class="install-banner-title">Sondhan ইনস্টল করুন</div>
-    <div class="install-banner-sub">হোম স্ক্রিন থেকে সরাসরি খুলুন, দ্রুত ও অফলাইনেও কাজ করবে</div>
+  <div class="install-modal">
+    <div class="install-modal-icon"><img src="icon-192.png" alt="Sondhan"/></div>
+    <div class="install-modal-title">Sondhan ইনস্টল করুন</div>
+    <div class="install-modal-sub">ভালো অভিজ্ঞতার জন্য অ্যাপটি ডাউনলোড করুন</div>
+    <button class="install-modal-btn" onclick="installApp()">📲 ইনস্টল করুন</button>
+    <div class="install-modal-later" onclick="dismissInstall()">পরে করবো</div>
   </div>
-  <button class="install-banner-btn" onclick="installApp()">ইনস্টল</button>
-  <button class="install-banner-close" onclick="dismissInstall()" aria-label="বন্ধ করুন">✕</button>
 </div>
 <script>
 (function(){
@@ -373,7 +373,7 @@ document.addEventListener('keydown', e => {
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
     deferredPrompt = e;
-    setTimeout(showBanner, 20000); // অ্যাপে ঢোকার ২০ সেকেন্ড পর
+    setTimeout(showBanner, 10000); // অ্যাপে ঢোকার ১০ সেকেন্ড পর
   });
 
   window.installApp = function(){
@@ -393,6 +393,10 @@ document.addEventListener('keydown', e => {
 
   window.addEventListener('appinstalled', function(){
     document.getElementById('install-banner').classList.remove('show');
+  });
+
+  document.getElementById('install-banner').addEventListener('click', function(e){
+    if (e.target.id === 'install-banner') window.dismissInstall();
   });
 })();
 </script>

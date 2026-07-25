@@ -86,6 +86,90 @@ export function formatDateTime(str) {
   } catch (_) { return '—'; }
 }
 
+/** তারিখ (YYYY-MM-DD) → "৭ মে, ২০২৬" */
+export function formatBnDate(str) {
+  if (!str) return '—';
+  const d = new Date(str);
+  if (isNaN(d)) return '—';
+  return d.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/** ইংরেজি সংখ্যা → বাংলা সংখ্যা (২৩, ৬৪ ইত্যাদি) */
+export function toBn(n) {
+  return String(n ?? '').replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+}
+
+/** দিনের সময় অনুযায়ী বাংলা নাম (সকাল/দুপুর/বিকাল/সন্ধ্যা/রাত) */
+function banglaPeriod(h) {
+  if (h < 6)  return 'ভোর';
+  if (h < 12) return 'সকাল';
+  if (h < 15) return 'দুপুর';
+  if (h < 18) return 'বিকাল';
+  if (h < 20) return 'সন্ধ্যা';
+  return 'রাত';
+}
+
+/**
+ * "কখন রক্ত লাগবে" — আপেক্ষিক ও পড়তে সহজ ফরম্যাটে।
+ * আজ হলে "আজ সন্ধ্যা ৬:৩০", কাল হলে "আগামীকাল সকাল ৯:০০",
+ * নাহলে "১৫ মে, সন্ধ্যা ৬:৩০"। পেরিয়ে গেলে "সময় পেরিয়ে গেছে"।
+ */
+export function formatWhen(str) {
+  if (!str) return '—';
+  const d = new Date(str);
+  if (isNaN(d)) return '—';
+
+  const now = new Date();
+  const startOf = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const dayDiff = Math.round((startOf(d) - startOf(now)) / 86400000);
+
+  let h = d.getHours();
+  const m = d.getMinutes();
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  const time = `${banglaPeriod(h)} ${toBn(h12)}:${toBn(String(m).padStart(2, '0'))}`;
+
+  if (dayDiff === 0)  return 'আজ ' + time;
+  if (dayDiff === 1)  return 'আগামীকাল ' + time;
+  if (dayDiff === -1) return 'গতকাল ' + time;
+  if (dayDiff < 0)    return d.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long' }) + ', ' + time;
+  return d.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long' }) + ', ' + time;
+}
+
+/** অনুরোধের সময় পেরিয়ে গেছে কি না */
+export function isPast(str) {
+  if (!str) return false;
+  const d = new Date(str);
+  return !isNaN(d) && d.getTime() < Date.now();
+}
+
+/**
+ * পরবর্তী রক্তদানের যোগ্যতা — শেষ দানের ১২০ দিন (৪ মাস) পর নিরাপদ।
+ * ফেরত দেয়: { ready, daysLeft, percent, fromLabel, toLabel }
+ * শেষ দানের তারিখ না থাকলে ready = true।
+ */
+export const DONATION_GAP_DAYS = 120;
+
+export function eligibility(lastDonation) {
+  if (!lastDonation) return { ready: true, daysLeft: 0, percent: 100, fromLabel: '', toLabel: '' };
+  const from = new Date(lastDonation);
+  if (isNaN(from)) return { ready: true, daysLeft: 0, percent: 100, fromLabel: '', toLabel: '' };
+
+  const to = new Date(from.getTime() + DONATION_GAP_DAYS * 86400000);
+  const elapsed = Date.now() - from.getTime();
+  const total = to.getTime() - from.getTime();
+  const daysLeft = Math.ceil((to.getTime() - Date.now()) / 86400000);
+  const percent = Math.max(0, Math.min(100, Math.round((elapsed / total) * 100)));
+  const fmt = d => d.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long' });
+
+  return {
+    ready: daysLeft <= 0,
+    daysLeft: Math.max(0, daysLeft),
+    percent,
+    fromLabel: fmt(from),
+    toLabel: fmt(to)
+  };
+}
+
 /* ── বিভাগ ও জেলা (আগে ২ ফাইলে কপি ছিল) ─────────────────── */
 export const DIVISIONS = ['ঢাকা','চট্টগ্রাম','খুলনা','রাজশাহী','রংপুর','সিলেট','বরিশাল','ময়মনসিংহ'];
 

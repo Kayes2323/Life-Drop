@@ -78,28 +78,92 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .spinner{width:38px;height:38px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+
+/* ── আইকন ── */
+.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;display:block}
+.ic-sm{width:15px;height:15px}
+.ic-lg{width:21px;height:21px}
+.ic-tile{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ══ অনুরোধ কার্ড (পলিশড) ══ */
+.r2{background:#fff;border:1px solid #EBEBEB;border-radius:13px;margin-bottom:11px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.r2.urgent{border-color:#EFC9C4}
+.r2-strip{background:#C0392B;color:#fff;font-size:10.5px;font-weight:600;padding:6px 14px;display:flex;align-items:center;gap:6px;font-family:'Hind Siliguri',sans-serif}
+.r2-strip.past{background:#8E8E8E}
+.r2-top{display:flex;gap:13px;align-items:center;padding:14px}
+.r2-blood{width:56px;height:56px;border-radius:13px;background:#FDECEA;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.r2-blood-g{font-family:'Inter',sans-serif;font-size:16px;font-weight:700;color:#C0392B;line-height:1}
+.r2-blood-b{font-size:9.5px;color:#C0392B;opacity:.8;margin-top:3px;font-family:'Hind Siliguri',sans-serif}
+.r2-hosp{font-size:14px;font-weight:700;color:#1A1A1A;line-height:1.4;font-family:'Hind Siliguri',sans-serif}
+.r2-reason{font-size:11.5px;color:#8E8E8E;margin-top:5px;display:flex;align-items:center;gap:5px;font-family:'Hind Siliguri',sans-serif}
+.r2-when{display:flex;align-items:center;gap:9px;background:#FCFCFC;border-top:1px solid #F4F4F4;border-bottom:1px solid #F4F4F4;padding:11px 14px}
+.r2-when-l{font-size:10.5px;color:#B4B4B4;font-family:'Hind Siliguri',sans-serif}
+.r2-when-v{font-size:12.5px;font-weight:700;color:#1A1A1A;margin-top:2px;font-family:'Hind Siliguri',sans-serif}
+.r2-note{padding:12px 14px;font-size:12px;color:#7A6528;background:#FFFCF5;line-height:1.65;border-bottom:1px solid #F4F4F4;font-family:'Hind Siliguri',sans-serif}
+.r2-acts{display:flex;align-items:center;gap:8px;padding:12px 14px}
+.r2-by{flex:1;min-width:0}
+.r2-by-n{font-size:11.5px;font-weight:700;color:#5C5C5C;font-family:'Hind Siliguri',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r2-by-t{font-size:10px;color:#B4B4B4;margin-top:1px;font-family:'Hind Siliguri',sans-serif}
+.r2-call{padding:10px 18px;border-radius:10px;border:none;background:#2E7D32;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;flex-shrink:0;text-decoration:none}
+.r2-share{width:38px;height:38px;border-radius:10px;border:1px solid #EBEBEB;background:#fff;color:#8E8E8E;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.r2-empty{text-align:center;padding:44px 20px;color:#B4B4B4}
+.r2-empty p{font-size:13px;font-family:'Hind Siliguri',sans-serif;margin-top:10px;line-height:1.7}
+.ico2{color:#8E8E8E;margin-right:10px;flex-shrink:0}
+.fct-i{vertical-align:-2px;margin-right:6px;display:inline-block}
+.submit-btn{display:flex;align-items:center;justify-content:center;gap:7px}
 </style>
 </head>
 <body>
+<!-- ═══ আইকন সেট — ইমোজির বদলে একই ধাঁচের SVG (একবার সংজ্ঞায়িত, সব জায়গায় <use> দিয়ে ব্যবহার) ═══ -->
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol>
+  <symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5 0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z"/></symbol>
+  <symbol id="i-droplet-f" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5 0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 12 12 3l9 9v9h-6v-6H9v6H3v-9z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 3h4l2 5-2.5 1.5a12 12 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L3 21l2-6.2A8 8 0 1 1 21 12z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 21l8.8-8.3a5 5 0 0 0 0-7.1z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="m2 7 10 6 10-6"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-hospital" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M12 9v6M9 12h6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+  <symbol id="i-nav" viewBox="0 0 24 24"><path d="M3 11 22 2l-9 19-2-8-8-2z"/></symbol>
+  <symbol id="i-stetho" viewBox="0 0 24 24"><path d="M5 3v5a4 4 0 0 0 8 0V3"/><path d="M9 12v3a5 5 0 0 0 10 0v-2"/><circle cx="19" cy="10" r="2"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M8 3h8v3a4 4 0 0 1-1 2.6V19a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V8.6A4 4 0 0 1 8 6V3z"/></symbol>
+  <symbol id="i-shield-lock" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/><rect x="9.5" y="10.5" width="5" height="4" rx="1"/><path d="M10.5 10.5V9a1.5 1.5 0 0 1 3 0v1.5"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 12h5l2 3h4l2-3h5"/><path d="M5 5h14l2 7v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6l2-7z"/></symbol>
+</svg>
+
 
 <div class="header">
-  <a href="index.html" class="back">←</a>
+  <a href="index.html" class="back"><svg class="ic" style="transform:rotate(180deg)"><use href="#i-right"/></svg></a>
   <div class="sondhan-logo sondhan-logo--navbar-crop">
     <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
   </div>
-  <h1>🆘 জরুরি রক্তের অনুরোধ</h1>
+  <h1>রক্তের অনুরোধ</h1>
 </div>
 
 <div class="tabs">
-  <button class="tab active" id="tab-new" onclick="switchTab('new')">➕ নতুন অনুরোধ</button>
-  <button class="tab" id="tab-all" onclick="switchTab('all')">📋 সকল অনুরোধ</button>
+  <button class="tab active" id="tab-new" onclick="switchTab('new')">নতুন অনুরোধ</button>
+  <button class="tab" id="tab-all" onclick="switchTab('all')">সকল অনুরোধ</button>
 </div>
 
 <!-- NEW REQUEST FORM -->
 <div class="scr" id="view-new">
   <!-- লগইন না থাকলে শুরুতেই দেখাবে (ফর্ম পূরণের পর হতাশা এড়াতে) -->
   <div id="login-banner" style="display:none;align-items:center;gap:12px;background:#fff8e1;border:1.5px solid #ffe082;border-radius:14px;padding:14px;margin-bottom:12px">
-    <div style="font-size:26px;flex-shrink:0">🔒</div>
+    <div class="ic-tile" style="background:#F5E9CE;color:#8A6410"><svg class="ic ic-lg"><use href="#i-shield-lock"/></svg></div>
     <div style="flex:1;min-width:0">
       <div style="font-size:13px;font-weight:700;font-family:'Hind Siliguri',sans-serif;color:#8d6e00;margin-bottom:2px">অনুরোধ পাঠাতে লগইন প্রয়োজন</div>
       <div style="font-size:11px;color:#a1870f;font-family:'Hind Siliguri',sans-serif;line-height:1.5">ভুয়া অনুরোধ ঠেকাতে এটি জরুরি</div>
@@ -108,7 +172,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
   </div>
 
   <div class="alert-banner">
-    <div class="alert-icon">🆘</div>
+    <div class="ic-tile" style="background:rgba(255,255,255,.22);color:#fff"><svg class="ic ic-lg"><use href="#i-alert"/></svg></div>
     <div class="alert-text">
       <h3>জরুরি রক্তের প্রয়োজন?</h3>
       <p>নিচের ফর্মটি পূরণ করুন — সবাই দেখতে পাবেন</p>
@@ -117,9 +181,9 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 
   <!-- রোগীর তথ্য -->
   <div class="fcard">
-    <div class="fcard-title">👤 রোগীর তথ্য</div>
-    <div class="iw"><span class="ico">👤</span><input type="text" id="f-pname" placeholder="রোগীর নাম *"/></div>
-    <div class="iw"><span class="ico">🏥</span><input type="text" id="f-prob" placeholder="কী সমস্যা? (যেমন: অপারেশন) *"/></div>
+    <div class="fcard-title"><svg class="ic ic-sm fct-i"><use href="#i-user"/></svg>রোগীর তথ্য</div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-user"/></svg><input type="text" id="f-pname" placeholder="রোগীর নাম *"/></div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-hospital"/></svg><input type="text" id="f-prob" placeholder="কী সমস্যা? (যেমন: অপারেশন) *"/></div>
     <div class="iw-grid">
       <div class="iw">
         <select id="f-blood" style="flex:1;border:none;background:transparent;padding:12px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif">
@@ -128,28 +192,28 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
           <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
         </select>
       </div>
-      <div class="iw"><span class="ico">🩸</span><input type="number" id="f-bags" placeholder="কয় ব্যাগ *" min="1" max="20"/></div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-droplet"/></svg><input type="number" id="f-bags" placeholder="কয় ব্যাগ *" min="1" max="20"/></div>
     </div>
   </div>
 
   <!-- স্থান ও সময় -->
   <div class="fcard">
-    <div class="fcard-title">📍 স্থান ও সময়</div>
+    <div class="fcard-title"><svg class="ic ic-sm fct-i"><use href="#i-pin"/></svg>স্থান ও সময়</div>
     <div class="date-label">কখন লাগবে? *</div>
-    <div class="iw" style="margin-bottom:10px"><span class="ico">📅</span><input type="datetime-local" id="f-when"/></div>
-    <div class="iw"><span class="ico">🏥</span><input type="text" id="f-hospital" placeholder="হাসপাতালের নাম *"/></div>
-    <div class="iw"><span class="ico">📌</span><input type="text" id="f-location" placeholder="হাসপাতালের এলাকা/ঠিকানা *"/></div>
-    <div class="iw"><span class="ico">📝</span><input type="text" id="f-details" placeholder="বিস্তারিত"/><span class="opt-label">(ঐচ্ছিক)</span></div>
+    <div class="iw" style="margin-bottom:10px"><svg class="ic ico2"><use href="#i-cal"/></svg><input type="datetime-local" id="f-when"/></div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-hospital"/></svg><input type="text" id="f-hospital" placeholder="হাসপাতালের নাম *"/></div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-pin"/></svg><input type="text" id="f-location" placeholder="হাসপাতালের এলাকা/ঠিকানা *"/></div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-edit"/></svg><input type="text" id="f-details" placeholder="বিস্তারিত"/><span class="opt-label">(ঐচ্ছিক)</span></div>
   </div>
 
   <!-- যোগাযোগ -->
   <div class="fcard">
-    <div class="fcard-title">📞 যোগাযোগ</div>
-    <div class="iw"><span class="ico">👤</span><input type="text" id="f-cname" placeholder="আপনার নাম *"/></div>
-    <div class="iw"><span class="ico">📞</span><input type="tel" id="f-cphone" placeholder="ফোন নম্বর *"/></div>
+    <div class="fcard-title"><svg class="ic ic-sm fct-i"><use href="#i-phone"/></svg>যোগাযোগ</div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-user"/></svg><input type="text" id="f-cname" placeholder="আপনার নাম *"/></div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-phone"/></svg><input type="tel" id="f-cphone" placeholder="ফোন নম্বর *"/></div>
   </div>
 
-  <button class="submit-btn" id="submit-btn" onclick="submitRequest()">🆘 অনুরোধ পাঠান</button>
+  <button class="submit-btn" id="submit-btn" onclick="submitRequest()"><svg class="ic ic-sm"><use href="#i-alert"/></svg>অনুরোধ পাঠান</button>
 </div>
 
 <!-- ALL REQUESTS FEED -->
@@ -194,7 +258,7 @@ function setLoad(v){ document.getElementById('loading').classList.toggle('show',
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { esc, timeAgo, formatDateTime, telLink, isValidBdPhone, normalizeBdPhone } from './app.js';
+import { esc, timeAgo, formatWhen, isPast, toBn, telLink, isValidBdPhone, normalizeBdPhone } from './app.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 let CU = null;
@@ -208,7 +272,7 @@ document.getElementById('posts-list').addEventListener('click', e => {
   const r = LAST_POSTS.get(btn.dataset.share);
   if(!r) return;
   const text =
-    `🆘 জরুরি রক্তের প্রয়োজন!\n\n` +
+    `জরুরি রক্তের প্রয়োজন!\n\n` +
     `রোগী: ${r.patientName}\n` +
     `রক্তের গ্রুপ: ${r.blood}\n` +
     `হাসপাতাল: ${r.hospital}\n` +
@@ -218,7 +282,7 @@ document.getElementById('posts-list').addEventListener('click', e => {
     navigator.share({ title:'জরুরি রক্তের অনুরোধ', text }).catch(()=>{});
   } else {
     navigator.clipboard?.writeText(text)
-      .then(()=>showToast('✅ কপি হয়েছে! Share করুন।'))
+      .then(()=>showToast(' কপি হয়েছে! Share করুন।'))
       .catch(()=>showToast('কপি করা যায়নি'));
   }
 });
@@ -277,10 +341,10 @@ window.submitRequest = async () => {
     ['f-pname','f-prob','f-bags','f-when','f-hospital','f-location','f-details','f-cphone']
       .forEach(id => document.getElementById(id).value='');
     document.getElementById('f-blood').value='';
-    showToast('✅ অনুরোধ পাঠানো হয়েছে!');
+    showToast(' অনুরোধ পাঠানো হয়েছে!');
     setTimeout(()=>switchTab('all'), 1200);
   } catch(e){ showToast('অনুরোধ পাঠানো যায়নি'); console.warn(e); }
-  finally{ btn.textContent='🆘 অনুরোধ পাঠান'; btn.disabled=false; }
+  finally{ btn.innerHTML='<svg class=\'ic ic-sm\'><use href=\'#i-alert\'/></svg>অনুরোধ পাঠান'; btn.disabled=false; }
 };
 
 window.loadPosts = () => {
@@ -290,7 +354,10 @@ window.loadPosts = () => {
     const q = query(collection(db,'bloodRequests'), orderBy('createdAt','desc'));
     onSnapshot(q, snap => {
       if(snap.empty){
-        el.innerHTML=`<div style="text-align:center;padding:40px 20px;color:#bbb"><div style="font-size:40px;margin-bottom:12px">📋</div><p style="font-size:13px;font-family:'Hind Siliguri',sans-serif">এখনো কোনো অনুরোধ নেই।</p></div>`;
+        el.innerHTML=`<div class="r2-empty">
+          <svg class="ic" style="width:38px;height:38px;color:#D0D0D0;margin:0 auto"><use href="#i-inbox"/></svg>
+          <p>এখনো কোনো অনুরোধ নেই।<br>কারও রক্ত প্রয়োজন হলে এখানে দেখা যাবে।</p>
+        </div>`;
         return;
       }
       // নিরাপত্তা: প্রতিটা মান esc() দিয়ে; share বাটনে নাম বসানোর বদলে
@@ -298,43 +365,48 @@ window.loadPosts = () => {
       LAST_POSTS = new Map(snap.docs.map(d => [d.id, d.data()]));
       el.innerHTML = snap.docs.map(d => {
         const r = d.data();
-        const c = bloodColor(r.blood);
+        const past = isPast(r.when);
         return `
-        <div class="e-card">
-          <div class="e-card-header">
-            <div class="blood-circle" style="background:${esc(c)}">${esc(r.blood)}</div>
-            <div class="e-card-title">
-              <div class="e-patient">${esc(r.patientName)} — ${esc(r.bags)} ব্যাগ ${esc(r.blood)} দরকার</div>
-              <div class="e-hospital">🏥 ${esc(r.hospital)}, ${esc(r.location)}</div>
-            </div>
-            <span class="urgent-pill">🆘 জরুরি</span>
+        <div class="r2 urgent">
+          <div class="r2-strip ${past ? 'past' : ''}">
+            <svg class="ic" style="width:13px;height:13px"><use href="#i-alert"/></svg>
+            ${past ? 'সময় পেরিয়ে গেছে' : 'জরুরি — ' + esc(formatWhen(r.when)) + ' রক্ত প্রয়োজন'}
           </div>
-          <div class="e-info-grid">
-            <div class="e-info-item">
-              <div class="e-info-label">🔴 সমস্যা</div>
-              <div class="e-info-val">${esc(r.problem)}</div>
+          <div class="r2-top">
+            <div class="r2-blood">
+              <span class="r2-blood-g">${esc(r.blood)}</span>
+              <span class="r2-blood-b">${esc(toBn(r.bags))} ব্যাগ</span>
             </div>
-            <div class="e-info-item">
-              <div class="e-info-label">🩸 রক্তের গ্রুপ</div>
-              <div class="e-info-val" style="color:${esc(c)};font-size:15px;font-weight:800">${esc(r.blood)}</div>
-            </div>
-            <div class="e-info-item">
-              <div class="e-info-label">⏰ কখন লাগবে</div>
-              <div class="e-info-val">${esc(formatDateTime(r.when))}</div>
-            </div>
-            <div class="e-info-item">
-              <div class="e-info-label">📌 হাসপাতাল</div>
-              <div class="e-info-val">${esc(r.hospital)}</div>
+            <div style="flex:1;min-width:0">
+              <div class="r2-hosp">${esc(r.hospital)}</div>
+              <div class="r2-reason">
+                <svg class="ic" style="width:13px;height:13px"><use href="#i-stetho"/></svg>${esc(r.problem)}
+              </div>
             </div>
           </div>
-          ${r.location?`<div class="e-location">📍 ${esc(r.location)}</div>`:''}
-          ${r.details?`<div class="e-details">📝 ${esc(r.details)}</div>`:''}
-          <div class="e-footer">
-            <span class="e-time">${esc(timeAgo(r.createdAt))}</span>
-            <div class="e-actions">
-              <a class="e-btn call" href="${esc(telLink(r.contactPhone))}">📞 ${esc(r.contactPhone)}</a>
-              <button class="e-btn share" data-share="${esc(d.id)}">🔗 Share</button>
+          <div class="r2-when">
+            <svg class="ic" style="color:#8E8E8E"><use href="#i-clock"/></svg>
+            <div style="flex:1;min-width:0">
+              <div class="r2-when-l">কখন লাগবে</div>
+              <div class="r2-when-v">${esc(formatWhen(r.when))}</div>
             </div>
+            ${r.location ? `<div style="text-align:right;min-width:0">
+              <div class="r2-when-l">অবস্থান</div>
+              <div class="r2-when-v">${esc(r.location)}</div>
+            </div>` : ''}
+          </div>
+          ${r.details ? `<div class="r2-note">${esc(r.details)}</div>` : ''}
+          <div class="r2-acts">
+            <div class="r2-by">
+              <div class="r2-by-n">${esc(r.contactName || 'অজ্ঞাত')}</div>
+              <div class="r2-by-t">${esc(timeAgo(r.createdAt))} পোস্ট করেছেন</div>
+            </div>
+            <button class="r2-share" data-share="${esc(d.id)}" aria-label="শেয়ার করুন">
+              <svg class="ic ic-sm"><use href="#i-share"/></svg>
+            </button>
+            <a class="r2-call" href="${esc(telLink(r.contactPhone))}">
+              <svg class="ic ic-sm"><use href="#i-phone"/></svg>কল করুন
+            </a>
           </div>
         </div>`;
       }).join('');
@@ -345,13 +417,13 @@ window.loadPosts = () => {
 };
 </script>
 <div class="install-banner" id="install-banner">
-  <img src="icon-192.png" alt="" class="install-banner-icon"/>
-  <div class="install-banner-text">
-    <div class="install-banner-title">Sondhan ইনস্টল করুন</div>
-    <div class="install-banner-sub">হোম স্ক্রিন থেকে সরাসরি খুলুন, দ্রুত ও অফলাইনেও কাজ করবে</div>
+  <div class="install-modal">
+    <div class="install-modal-icon"><img src="icon-192.png" alt="Sondhan"/></div>
+    <div class="install-modal-title">Sondhan ইনস্টল করুন</div>
+    <div class="install-modal-sub">ভালো অভিজ্ঞতার জন্য অ্যাপটি ডাউনলোড করুন</div>
+    <button class="install-modal-btn" onclick="installApp()">ইনস্টল করুন</button>
+    <div class="install-modal-later" onclick="dismissInstall()">পরে করবো</div>
   </div>
-  <button class="install-banner-btn" onclick="installApp()">ইনস্টল</button>
-  <button class="install-banner-close" onclick="dismissInstall()" aria-label="বন্ধ করুন">✕</button>
 </div>
 <script>
 (function(){
@@ -376,7 +448,7 @@ window.loadPosts = () => {
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
     deferredPrompt = e;
-    setTimeout(showBanner, 20000); // অ্যাপে ঢোকার ২০ সেকেন্ড পর
+    setTimeout(showBanner, 10000); // অ্যাপে ঢোকার ১০ সেকেন্ড পর
   });
 
   window.installApp = function(){
@@ -396,6 +468,10 @@ window.loadPosts = () => {
 
   window.addEventListener('appinstalled', function(){
     document.getElementById('install-banner').classList.remove('show');
+  });
+
+  document.getElementById('install-banner').addEventListener('click', function(e){
+    if (e.target.id === 'install-banner') window.dismissInstall();
   });
 })();
 </script>
