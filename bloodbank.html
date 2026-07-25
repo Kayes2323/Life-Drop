@@ -194,9 +194,10 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
         </select>
       </div>
     </div>
-    <div class="iw-grid">
-      <div class="iw"><svg class="ic ico2"><use href="#i-nav"/></svg><input id="f-lat" placeholder="অক্ষাংশ (latitude)"/></div>
-      <div class="iw"><svg class="ic ico2"><use href="#i-nav"/></svg><input id="f-lng" placeholder="দ্রাঘিমাংশ (longitude)"/></div>
+    <div class="iw"><svg class="ic ico2"><use href="#i-nav"/></svg><input id="f-maplink" placeholder="Google Maps লিংক (ঐচ্ছিক)"/></div>
+    <div id="maplink-hint" style="font-size:10.5px;color:#8E8E8E;font-family:'Hind Siliguri',sans-serif;margin:-4px 2px 10px;line-height:1.6">
+      কম্পিউটারে Google Maps খুলে জায়গাটির উপর ক্লিক করুন — উপরের URL বার থেকে পুরো লিংক কপি করে এখানে বসান। লোকেশন নিজে থেকে বসে যাবে।<br>
+      <span style="color:#B4B4B4">সংক্ষিপ্ত <b>maps.app.goo.gl</b> লিংক কাজ করবে না — পুরো লিংক লাগবে।</span>
     </div>
     <button class="submit-btn" id="add-btn" onclick="addBank()">যোগ করুন</button>
   </div>
@@ -601,6 +602,53 @@ DIVISIONS.forEach(d => {
 divSel.addEventListener('change', () =>
   fillDistrictSelect(document.getElementById('f-district'), divSel.value, 'জেলা *'));
 
+/**
+ * Google Maps লিংক থেকে অক্ষাংশ/দ্রাঘিমাংশ বের করে।
+ * Google নানা রকম URL দেয় — সবকটা ধরার চেষ্টা:
+ *   .../@23.7808,90.4142,17z...      (ম্যাপ ভিউ)
+ *   ...!3d23.7808!4d90.4142...       (শেয়ার লিংকের ভেতরের অংশ)
+ *   ...?q=23.7808,90.4142            (কুয়েরি প্যারাম)
+ *   ...?ll=23.7808,90.4142
+ *   ...&destination=23.7808,90.4142
+ *   সরাসরি "23.7808, 90.4142" লেখা থাকলেও চলবে।
+ * পাওয়া গেলে { lat, lng } নাহলে null ফেরত দেয়।
+ * (bit.ly/goo.gl-এর মতো ছোট করা লিংক এখানে খোলা যায় না — সেক্ষেত্রে
+ *  null আসবে, ইউজারকে পূর্ণ লিংক দিতে বলা হবে।)
+ */
+function parseMapLink(raw) {
+  if (!raw) return null;
+  const s = raw.trim();
+
+  // বাংলাদেশের বৈধ পরিসীমার মধ্যে কিনা যাচাই (ভুল সংখ্যা ঠেকাতে)
+  const inBD = (lat, lng) =>
+    lat >= 20 && lat <= 27 && lng >= 88 && lng <= 93;
+
+  const tryPair = (a, b) => {
+    const lat = parseFloat(a), lng = parseFloat(b);
+    if (isNaN(lat) || isNaN(lng)) return null;
+    return inBD(lat, lng) ? { lat, lng } : null;
+  };
+
+  let m;
+  // !3d<lat>!4d<lng>  — শেয়ার লিংকে এটাই আসল স্থান (সবচেয়ে নির্ভরযোগ্য)
+  if ((m = s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/))) {
+    const r = tryPair(m[1], m[2]); if (r) return r;
+  }
+  // @<lat>,<lng>
+  if ((m = s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/))) {
+    const r = tryPair(m[1], m[2]); if (r) return r;
+  }
+  // q= / ll= / destination= / query= এর পরে "lat,lng"
+  if ((m = s.match(/[?&](?:q|ll|destination|query|center)=(-?\d+\.\d+),(-?\d+\.\d+)/))) {
+    const r = tryPair(m[1], m[2]); if (r) return r;
+  }
+  // শুধু "lat, lng" লেখা (কোনো URL ছাড়া)
+  if ((m = s.match(/^\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/))) {
+    const r = tryPair(m[1], m[2]); if (r) return r;
+  }
+  return null;
+}
+
 window.addBank = async () => {
   const name = document.getElementById('f-name').value.trim();
   const type = document.getElementById('f-type').value;
@@ -611,13 +659,18 @@ window.addBank = async () => {
   const phone2 = document.getElementById('f-phone2').value.trim();
   const cost = document.getElementById('f-cost').value;
   const open24 = document.getElementById('f-hours').value === 'true';
-  const lat = parseFloat(document.getElementById('f-lat').value);
-  const lng = parseFloat(document.getElementById('f-lng').value);
+  const mapLink = document.getElementById('f-maplink').value.trim();
+  const coords = parseMapLink(mapLink);
 
   if (!name || !division || !district || !address || !phone) { toast('সব * তথ্য পূরণ করুন'); return; }
   if (name.length > 200) { toast('নাম ২০০ অক্ষরের কম রাখুন'); return; }
   if (!isValidBdPhone(phone)) { toast('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)'); return; }
   if (phone2 && !isValidBdPhone(phone2)) { toast('বিকল্প নম্বর সঠিক নয়'); return; }
+  // লিংক দেওয়া হয়েছে কিন্তু coordinate বের করা গেল না — ভুল লিংক
+  if (mapLink && !coords) {
+    toast('লোকেশন বের করা গেল না — সম্পূর্ণ Google Maps লিংক দিন');
+    return;
+  }
 
   const btn = document.getElementById('add-btn');
   btn.disabled = true; btn.textContent = 'যোগ হচ্ছে...';
@@ -630,10 +683,10 @@ window.addBank = async () => {
       verifiedAt: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       createdAt: serverTimestamp()
     };
-    if (!isNaN(lat) && !isNaN(lng)) { data.lat = lat; data.lng = lng; }
+    if (coords) { data.lat = coords.lat; data.lng = coords.lng; }
     await addDoc(collection(db, 'bloodBanks'), data);
-    toast('যোগ হয়েছে');
-    ['f-name','f-address','f-phone','f-phone2','f-lat','f-lng'].forEach(id =>
+    toast(coords ? 'যোগ হয়েছে — লোকেশনসহ' : 'যোগ হয়েছে');
+    ['f-name','f-address','f-phone','f-phone2','f-maplink'].forEach(id =>
       document.getElementById(id).value = '');
     load();
   } catch (e) {
