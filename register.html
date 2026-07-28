@@ -48,6 +48,21 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .toggle-sw input:checked+.slider:before{transform:translateX(20px)}
 .submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;margin-top:4px;box-shadow:0 4px 14px rgba(192,57,43,.3)}
 .submit-btn:disabled{background:#e0a0a0;box-shadow:none;cursor:not-allowed}
+
+/* ── ধাপে ধাপে ফর্ম ── */
+.step-head{display:flex;align-items:center;gap:9px;margin-bottom:16px}
+.step-dot-row{display:flex;gap:6px;flex:1}
+.step-dot{flex:1;height:4px;border-radius:4px;background:#eee;transition:.25s}
+.step-dot.done{background:#c0392b}
+.step-dot.current{background:#e8998c}
+.step-count{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;white-space:nowrap;flex-shrink:0}
+.step{display:none}
+.step.active{display:block}
+.step-nav{display:flex;gap:9px;margin-top:4px}
+.step-back{flex:0 0 auto;padding:14px 20px;background:#fff;border:1.5px solid #eee;color:#666;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.step-next{flex:1;padding:14px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 14px rgba(192,57,43,.3)}
+.step-title{font-size:15px;font-weight:700;color:#222;margin-bottom:4px;font-family:'Hind Siliguri',sans-serif}
+.step-sub{font-size:12px;color:#999;margin-bottom:16px;font-family:'Hind Siliguri',sans-serif}
 .loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.9);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
 .loading-overlay.show{display:flex}
 .spinner{width:38px;height:38px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:spin 1s linear infinite}
@@ -110,78 +125,126 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
       <p id="user-greeting">আপনার donor তথ্য পূরণ করুন।</p>
     </div>
 
-    <!-- রক্তের তথ্য -->
-    <div class="reg-section">
-      <div class="reg-title">রক্তের তথ্য</div>
-      <div class="iw">
-        <span class="ico">🩸</span>
-        <select id="r-blood">
-          <option value="">রক্তের গ্রুপ বেছে নিন *</option>
-          <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
-          <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
-        </select>
+    <!-- অগ্রগতি -->
+    <div class="step-head">
+      <div class="step-dot-row" id="step-dots">
+        <div class="step-dot current" data-d="1"></div>
+        <div class="step-dot" data-d="2"></div>
+        <div class="step-dot" data-d="3"></div>
       </div>
-      <div class="date-label">সর্বশেষ রক্তদানের তারিখ</div>
-      <div class="iw" id="date-row">
-        <span class="ico">📅</span>
-        <input type="date" id="r-lastdate"/>
-      </div>
-      <div class="never-row">
-        <input type="checkbox" id="never-check" onchange="toggleNever()"/>
-        <label for="never-check">এখনো রক্ত দেইনি</label>
-      </div>
+      <div class="step-count" id="step-count">১ / ৩</div>
     </div>
 
-    <!-- ফোন -->
-    <div class="reg-section">
-      <div class="reg-title">📞 যোগাযোগ</div>
-      <div class="iw">
-        <span class="ico">📞</span>
-        <input type="tel" id="r-phone" placeholder="মোবাইল নম্বর *"/>
-      </div>
-      <div class="iw">
-        <span class="ico">💬</span>
-        <input type="tel" id="r-wa" placeholder="WhatsApp নম্বর (optional)"/>
-      </div>
-    </div>
+    <!-- ── ধাপ ১: সবচেয়ে জরুরি তথ্য ── -->
+    <div class="step active" data-step="1">
+      <div class="step-title">রক্তের গ্রুপ ও যোগাযোগ</div>
+      <div class="step-sub">এই দুটো ছাড়া নিবন্ধন করা যাবে না</div>
 
-    <!-- অবস্থান -->
-    <div class="reg-section">
-      <div class="reg-title">📍 অবস্থান</div>
-      <div class="loc-grid">
+      <div class="reg-section">
+        <div class="reg-title">রক্তের তথ্য</div>
         <div class="iw">
-          <select id="r-division" onchange="fillDistricts()">
-            <option value="">বিভাগ *</option>
-            <option>ঢাকা</option><option>চট্টগ্রাম</option><option>খুলনা</option>
-            <option>রাজশাহী</option><option>রংপুর</option><option>সিলেট</option>
-            <option>বরিশাল</option><option>ময়মনসিংহ</option>
+          <span class="ico">🩸</span>
+          <select id="r-blood">
+            <option value="">রক্তের গ্রুপ বেছে নিন *</option>
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
           </select>
         </div>
+      </div>
+
+      <div class="reg-section">
+        <div class="reg-title">যোগাযোগ</div>
         <div class="iw">
-          <select id="r-district"><option value="">জেলা *</option></select>
+          <span class="ico">📞</span>
+          <input type="tel" id="r-phone" placeholder="মোবাইল নম্বর *"/>
         </div>
       </div>
-      <div class="iw">
-        <span class="ico">🏘️</span>
-        <input type="text" id="r-area" placeholder="এলাকা / থানা"/>
+
+      <div class="step-nav">
+        <button class="step-next" onclick="goStep(2)">পরবর্তী ধাপ</button>
       </div>
     </div>
 
-    <!-- জরুরি -->
-    <div class="reg-section">
-      <div class="avail-row">
-        <div class="avail-text">
-          <div class="avail-t1">⚡ জরুরি রক্তদানের জন্য প্রস্তুত</div>
-          <div class="avail-t2">চালু থাকলে জরুরি অনুরোধে অগ্রাধিকার পাবেন</div>
+    <!-- ── ধাপ ২: অবস্থান ── -->
+    <div class="step" data-step="2">
+      <div class="step-title">আপনার অবস্থান</div>
+      <div class="step-sub">কাছাকাছি কেউ খুঁজলে যাতে আপনাকে পায়</div>
+
+      <div class="reg-section">
+        <div class="reg-title">📍 অবস্থান</div>
+        <div class="loc-grid">
+          <div class="iw">
+            <select id="r-division" onchange="fillDistricts()">
+              <option value="">বিভাগ *</option>
+              <option>ঢাকা</option><option>চট্টগ্রাম</option><option>খুলনা</option>
+              <option>রাজশাহী</option><option>রংপুর</option><option>সিলেট</option>
+              <option>বরিশাল</option><option>ময়মনসিংহ</option>
+            </select>
+          </div>
+          <div class="iw">
+            <select id="r-district"><option value="">জেলা *</option></select>
+          </div>
         </div>
-        <label class="toggle-sw">
-          <input type="checkbox" id="r-urgent" checked/>
-          <span class="slider"></span>
-        </label>
+        <div class="iw">
+          <span class="ico">🏘️</span>
+          <input type="text" id="r-area" placeholder="এলাকা / থানা"/>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="step-back" onclick="goStep(1)">পেছনে</button>
+        <button class="step-next" onclick="goStep(3)">পরবর্তী ধাপ</button>
       </div>
     </div>
 
-    <button class="submit-btn" id="reg-btn" onclick="registerDonor()">🩸 নিবন্ধন সম্পন্ন করুন</button>
+    <!-- ── ধাপ ৩: বিস্তারিত ও সাবমিট ── -->
+    <div class="step" data-step="3">
+      <div class="step-title">বিস্তারিত তথ্য</div>
+      <div class="step-sub">শেষ ধাপ — এগুলো ঐচ্ছিক তবে সাহায্য করে</div>
+
+      <div class="reg-section">
+        <div class="reg-title">রক্তদানের ইতিহাস</div>
+        <div class="date-label">সর্বশেষ রক্তদানের তারিখ</div>
+        <div class="iw" id="date-row">
+          <span class="ico">📅</span>
+          <input type="date" id="r-lastdate"/>
+        </div>
+        <div class="never-row">
+          <input type="checkbox" id="never-check" onchange="toggleNever()"/>
+          <label for="never-check">এখনো রক্ত দেইনি</label>
+        </div>
+        <div class="iw" style="margin-top:10px">
+          <span class="ico">🧪</span>
+          <input type="text" id="r-hemoglobin" placeholder="হিমোগ্লোবিন (ঐচ্ছিক), যেমন: ১৩ গ্রাম/ডিএল"/>
+        </div>
+      </div>
+
+      <div class="reg-section">
+        <div class="reg-title">💬 বাড়তি যোগাযোগ</div>
+        <div class="iw">
+          <span class="ico">💬</span>
+          <input type="tel" id="r-wa" placeholder="WhatsApp নম্বর (optional)"/>
+        </div>
+      </div>
+
+      <div class="reg-section">
+        <div class="avail-row">
+          <div class="avail-text">
+            <div class="avail-t1">⚡ জরুরি রক্তদানের জন্য প্রস্তুত</div>
+            <div class="avail-t2">চালু থাকলে জরুরি অনুরোধে অগ্রাধিকার পাবেন</div>
+          </div>
+          <label class="toggle-sw">
+            <input type="checkbox" id="r-urgent" checked/>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="step-back" onclick="goStep(2)">পেছনে</button>
+      </div>
+      <button class="submit-btn" id="reg-btn" onclick="registerDonor()" style="margin-top:9px">🩸 নিবন্ধন সম্পন্ন করুন</button>
+    </div>
   </div>
 </div>
 
@@ -202,6 +265,49 @@ const DISTRICTS = {
   'বরিশাল':['বরিশাল','ভোলা','পটুয়াখালী','পিরোজপুর','ঝালকাঠি','বরগুনা'],
   'ময়মনসিংহ':['ময়মনসিংহ','জামালপুর','শেরপুর','নেত্রকোণা']
 };
+/* ── ধাপে ধাপে ফর্ম নেভিগেশন ── */
+const TOTAL_STEPS = 3;
+const bnDigits = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+
+// ধাপ ১ থেকে ২-এ যাওয়ার আগে, ২ থেকে ৩-এ যাওয়ার আগে — জরুরি ফিল্ড
+// পূরণ হয়েছে কিনা যাচাই করে, নাহলে খালি ফর্ম নিয়ে এগোনো যাবে
+function validateStep(n) {
+  if (n === 1) {
+    if (!document.getElementById('r-blood').value) { showErr('রক্তের গ্রুপ বেছে নিন'); return false; }
+    const phone = document.getElementById('r-phone').value.trim();
+    if (!phone) { showErr('মোবাইল নম্বর দিন'); return false; }
+    if (!isValidBdPhone(phone)) { showErr('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)'); return false; }
+  }
+  if (n === 2) {
+    if (!document.getElementById('r-division').value) { showErr('বিভাগ বেছে নিন'); return false; }
+    if (!document.getElementById('r-district').value) { showErr('জেলা বেছে নিন'); return false; }
+  }
+  return true;
+}
+
+window.goStep = (to) => {
+  const from = parseInt(document.querySelector('.step.active').dataset.step, 10);
+  // শুধু সামনে এগোনোর সময়ই যাচাই করি — পেছনে যেতে বাধা নেই
+  if (to > from && !validateStep(from)) return;
+  hideErr();
+
+  document.querySelectorAll('.step').forEach(el =>
+    el.classList.toggle('active', parseInt(el.dataset.step, 10) === to));
+
+  document.querySelectorAll('.step-dot').forEach(dot => {
+    const d = parseInt(dot.dataset.d, 10);
+    dot.classList.toggle('done', d < to);
+    dot.classList.toggle('current', d === to);
+  });
+  document.getElementById('step-count').textContent = `${bnDigits(to)} / ${bnDigits(TOTAL_STEPS)}`;
+  document.getElementById('donor-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+function hideErr() {
+  const e = document.getElementById('err');
+  if (e) e.style.display = 'none';
+}
+
 window.fillDistricts = () => {
   const d = document.getElementById('r-division').value;
   const s = document.getElementById('r-district');
@@ -276,6 +382,7 @@ window.registerDonor = async () => {
   const wa       = document.getElementById('r-wa').value.trim();
   const never    = document.getElementById('never-check').checked;
   const lastDate = never ? null : document.getElementById('r-lastdate').value;
+  const hemoglobin = document.getElementById('r-hemoglobin').value.trim().slice(0, 30);
   const urgent   = document.getElementById('r-urgent').checked;
 
   if(!blood)    { showErr('রক্তের গ্রুপ বেছে নিন'); return; }
@@ -307,6 +414,7 @@ window.registerDonor = async () => {
       lng          : coords.lng + (Math.random()-.5)*.04,
       lastDonation : lastDate || null,
       neverDonated : never,
+      hemoglobin   : hemoglobin || '',
       urgentReady  : urgent,
       available    : true,
       isDonor      : true,
