@@ -45,6 +45,21 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 14px rgba(192,57,43,.3);margin-bottom:16px}
 .submit-btn:disabled{background:#e0a0a0;box-shadow:none;cursor:not-allowed}
 
+/* ── ধাপে ধাপে ফর্ম ── */
+.step-head{display:flex;align-items:center;gap:9px;margin-bottom:16px}
+.step-dot-row{display:flex;gap:6px;flex:1}
+.step-dot{flex:1;height:4px;border-radius:4px;background:#eee;transition:.25s}
+.step-dot.done{background:#c0392b}
+.step-dot.current{background:#e8998c}
+.step-count{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;white-space:nowrap;flex-shrink:0}
+.step{display:none}
+.step.active{display:block}
+.step-nav{display:flex;gap:9px;margin-top:4px}
+.step-back{flex:0 0 auto;padding:14px 20px;background:#fff;border:1.5px solid #eee;color:#666;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.step-next{flex:1;padding:14px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 14px rgba(192,57,43,.3)}
+.step-title{font-size:15px;font-weight:700;color:#222;margin-bottom:4px;font-family:'Hind Siliguri',sans-serif}
+.step-sub{font-size:12px;color:#999;margin-bottom:16px;font-family:'Hind Siliguri',sans-serif}
+
 /* EMERGENCY CARD */
 .e-card{background:#fff;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)}
 .e-card-header{display:flex;align-items:center;gap:10px;padding:13px 13px 0}
@@ -179,41 +194,79 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
     </div>
   </div>
 
-  <!-- রোগীর তথ্য -->
-  <div class="fcard">
-    <div class="fcard-title"><svg class="ic ic-sm fct-i"><use href="#i-user"/></svg>রোগীর তথ্য</div>
-    <div class="iw"><svg class="ic ico2"><use href="#i-user"/></svg><input type="text" id="f-pname" placeholder="রোগীর নাম *"/></div>
-    <div class="iw"><svg class="ic ico2"><use href="#i-hospital"/></svg><input type="text" id="f-prob" placeholder="কী সমস্যা? (যেমন: অপারেশন) *"/></div>
-    <div class="iw-grid">
-      <div class="iw">
-        <select id="f-blood" style="flex:1;border:none;background:transparent;padding:12px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif">
-          <option value="">রক্তের গ্রুপ *</option>
-          <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
-          <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
-        </select>
+  <!-- অগ্রগতি -->
+  <div class="step-head">
+    <div class="step-dot-row" id="req-step-dots">
+      <div class="step-dot current" data-d="1"></div>
+      <div class="step-dot" data-d="2"></div>
+      <div class="step-dot" data-d="3"></div>
+    </div>
+    <div class="step-count" id="req-step-count">১ / ৩</div>
+  </div>
+
+  <!-- ── ধাপ ১: রোগীর তথ্য ── -->
+  <div class="step active" data-rstep="1">
+    <div class="step-title">রোগীর তথ্য</div>
+    <div class="step-sub">রক্তের গ্রুপ ও পরিমাণ সবচেয়ে জরুরি</div>
+
+    <div class="fcard">
+      <div class="fcard-title"><svg class="ic ic-sm fct-i"><use href="#i-user"/></svg>রোগীর তথ্য</div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-user"/></svg><input type="text" id="f-pname" placeholder="রোগীর নাম *"/></div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-hospital"/></svg><input type="text" id="f-prob" placeholder="কী সমস্যা? (যেমন: অপারেশন) *"/></div>
+      <div class="iw-grid">
+        <div class="iw">
+          <select id="f-blood" style="flex:1;border:none;background:transparent;padding:12px 0;font-size:13px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif">
+            <option value="">রক্তের গ্রুপ *</option>
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+          </select>
+        </div>
+        <div class="iw"><svg class="ic ico2"><use href="#i-droplet"/></svg><input type="number" id="f-bags" placeholder="কয় ব্যাগ *" min="1" max="20"/></div>
       </div>
-      <div class="iw"><svg class="ic ico2"><use href="#i-droplet"/></svg><input type="number" id="f-bags" placeholder="কয় ব্যাগ *" min="1" max="20"/></div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-stetho"/></svg><input type="text" id="f-hemoglobin" placeholder="হিমোগ্লোবিন (ঐচ্ছিক), যেমন: ১০ গ্রাম/ডিএল"/></div>
+    </div>
+
+    <div class="step-nav">
+      <button class="step-next" onclick="goReqStep(2)">পরবর্তী ধাপ</button>
     </div>
   </div>
 
-  <!-- স্থান ও সময় -->
-  <div class="fcard">
-    <div class="fcard-title"><svg class="ic ic-sm fct-i"><use href="#i-pin"/></svg>স্থান ও সময়</div>
-    <div class="date-label">কখন লাগবে? *</div>
-    <div class="iw" style="margin-bottom:10px"><svg class="ic ico2"><use href="#i-cal"/></svg><input type="datetime-local" id="f-when"/></div>
-    <div class="iw"><svg class="ic ico2"><use href="#i-hospital"/></svg><input type="text" id="f-hospital" placeholder="হাসপাতালের নাম *"/></div>
-    <div class="iw"><svg class="ic ico2"><use href="#i-pin"/></svg><input type="text" id="f-location" placeholder="হাসপাতালের এলাকা/ঠিকানা *"/></div>
-    <div class="iw"><svg class="ic ico2"><use href="#i-edit"/></svg><input type="text" id="f-details" placeholder="বিস্তারিত"/><span class="opt-label">(ঐচ্ছিক)</span></div>
+  <!-- ── ধাপ ২: স্থান ও সময় ── -->
+  <div class="step" data-rstep="2">
+    <div class="step-title">স্থান ও সময়</div>
+    <div class="step-sub">কোথায়, কখন রক্ত লাগবে</div>
+
+    <div class="fcard">
+      <div class="fcard-title"><svg class="ic ic-sm fct-i"><use href="#i-pin"/></svg>স্থান ও সময়</div>
+      <div class="date-label">কখন লাগবে? *</div>
+      <div class="iw" style="margin-bottom:10px"><svg class="ic ico2"><use href="#i-cal"/></svg><input type="datetime-local" id="f-when"/></div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-hospital"/></svg><input type="text" id="f-hospital" placeholder="হাসপাতালের নাম *"/></div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-pin"/></svg><input type="text" id="f-location" placeholder="হাসপাতালের এলাকা/ঠিকানা *"/></div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-edit"/></svg><input type="text" id="f-details" placeholder="বিস্তারিত"/><span class="opt-label">(ঐচ্ছিক)</span></div>
+    </div>
+
+    <div class="step-nav">
+      <button class="step-back" onclick="goReqStep(1)">পেছনে</button>
+      <button class="step-next" onclick="goReqStep(3)">পরবর্তী ধাপ</button>
+    </div>
   </div>
 
-  <!-- যোগাযোগ -->
-  <div class="fcard">
-    <div class="fcard-title"><svg class="ic ic-sm fct-i"><use href="#i-phone"/></svg>যোগাযোগ</div>
-    <div class="iw"><svg class="ic ico2"><use href="#i-user"/></svg><input type="text" id="f-cname" placeholder="আপনার নাম *"/></div>
-    <div class="iw"><svg class="ic ico2"><use href="#i-phone"/></svg><input type="tel" id="f-cphone" placeholder="ফোন নম্বর *"/></div>
-  </div>
+  <!-- ── ধাপ ৩: যোগাযোগ ও সাবমিট ── -->
+  <div class="step" data-rstep="3">
+    <div class="step-title">যোগাযোগ</div>
+    <div class="step-sub">শেষ ধাপ — কীভাবে আপনাকে পাওয়া যাবে</div>
 
-  <button class="submit-btn" id="submit-btn" onclick="submitRequest()"><svg class="ic ic-sm"><use href="#i-alert"/></svg>অনুরোধ পাঠান</button>
+    <div class="fcard">
+      <div class="fcard-title"><svg class="ic ic-sm fct-i"><use href="#i-phone"/></svg>যোগাযোগ</div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-user"/></svg><input type="text" id="f-cname" placeholder="আপনার নাম *"/></div>
+      <div class="iw"><svg class="ic ico2"><use href="#i-phone"/></svg><input type="tel" id="f-cphone" placeholder="ফোন নম্বর *"/></div>
+    </div>
+
+    <div class="step-nav">
+      <button class="step-back" onclick="goReqStep(2)">পেছনে</button>
+    </div>
+    <button class="submit-btn" id="submit-btn" onclick="submitRequest()" style="margin-top:9px"><svg class="ic ic-sm"><use href="#i-alert"/></svg>অনুরোধ পাঠান</button>
+  </div>
 </div>
 
 <!-- ALL REQUESTS FEED -->
@@ -253,6 +306,42 @@ function bloodColor(b){
 // timeAgo / formatDateTime এখন app.js থেকে আসে
 function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2700); }
 function setLoad(v){ document.getElementById('loading').classList.toggle('show',v); }
+
+/* ── অনুরোধ ফর্ম — ধাপে ধাপে নেভিগেশন ── */
+const REQ_TOTAL_STEPS = 3;
+const reqBnDigits = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+
+function validateReqStep(n) {
+  if (n === 1) {
+    if (!document.getElementById('f-pname').value.trim()) { showToast('রোগীর নাম দিন'); return false; }
+    if (!document.getElementById('f-prob').value.trim())  { showToast('কী সমস্যা লিখুন'); return false; }
+    if (!document.getElementById('f-blood').value)        { showToast('রক্তের গ্রুপ বেছে নিন'); return false; }
+    const bags = document.getElementById('f-bags').value;
+    if (!bags || !(bags>=1 && bags<=20)) { showToast('কয় ব্যাগ লাগবে (১-২০) দিন'); return false; }
+  }
+  if (n === 2) {
+    if (!document.getElementById('f-when').value)                 { showToast('কখন লাগবে জানান'); return false; }
+    if (!document.getElementById('f-hospital').value.trim())      { showToast('হাসপাতালের নাম দিন'); return false; }
+    if (!document.getElementById('f-location').value.trim())      { showToast('হাসপাতালের এলাকা/ঠিকানা দিন'); return false; }
+  }
+  return true;
+}
+
+window.goReqStep = (to) => {
+  const from = parseInt(document.querySelector('#view-new .step.active').dataset.rstep, 10);
+  if (to > from && !validateReqStep(from)) return;
+
+  document.querySelectorAll('#view-new .step').forEach(el =>
+    el.classList.toggle('active', parseInt(el.dataset.rstep, 10) === to));
+
+  document.querySelectorAll('#req-step-dots .step-dot').forEach(dot => {
+    const d = parseInt(dot.dataset.d, 10);
+    dot.classList.toggle('done', d < to);
+    dot.classList.toggle('current', d === to);
+  });
+  document.getElementById('req-step-count').textContent = `${reqBnDigits(to)} / ${reqBnDigits(REQ_TOTAL_STEPS)}`;
+  document.getElementById('view-new').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
 
 </script>
 
@@ -312,6 +401,7 @@ window.submitRequest = async () => {
   const prob     = document.getElementById('f-prob').value.trim();
   const blood    = document.getElementById('f-blood').value;
   const bags     = document.getElementById('f-bags').value;
+  const hemoglobin = document.getElementById('f-hemoglobin').value.trim().slice(0, 30);
   const when     = document.getElementById('f-when').value;
   const hospital = document.getElementById('f-hospital').value.trim();
   const location = document.getElementById('f-location').value.trim();
@@ -333,12 +423,12 @@ window.submitRequest = async () => {
   try {
     await addDoc(collection(db,'bloodRequests'),{
       patientName:pname, problem:prob, blood,
-      bags:nBags, when, hospital, location,
+      bags:nBags, hemoglobin: hemoglobin || '', when, hospital, location,
       details, contactName:cname, contactPhone:normalizeBdPhone(cphone),
       uid:CU.uid, status:'active',
       createdAt:serverTimestamp()
     });
-    ['f-pname','f-prob','f-bags','f-when','f-hospital','f-location','f-details','f-cphone']
+    ['f-pname','f-prob','f-bags','f-hemoglobin','f-when','f-hospital','f-location','f-details','f-cphone']
       .forEach(id => document.getElementById(id).value='');
     document.getElementById('f-blood').value='';
     showToast(' অনুরোধ পাঠানো হয়েছে!');
@@ -395,6 +485,13 @@ window.loadPosts = () => {
               <div class="r2-when-v">${esc(r.location)}</div>
             </div>` : ''}
           </div>
+          ${r.hemoglobin ? `<div class="r2-when" style="border-top:none">
+            <svg class="ic" style="color:#8E8E8E"><use href="#i-stetho"/></svg>
+            <div style="flex:1;min-width:0">
+              <div class="r2-when-l">হিমোগ্লোবিন</div>
+              <div class="r2-when-v">${esc(r.hemoglobin)}</div>
+            </div>
+          </div>` : ''}
           ${r.details ? `<div class="r2-note">${esc(r.details)}</div>` : ''}
           <div class="r2-acts">
             <div class="r2-by">

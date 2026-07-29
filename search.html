@@ -25,7 +25,7 @@
 .bg-item.on{background:#c0392b;border-color:#c0392b;color:#fff}
 .loc-row{display:flex;align-items:center;gap:9px;background:#fafafa;border:0.5px solid #eee;border-radius:11px;padding:11px 12px;margin-bottom:10px;cursor:pointer}
 .loc-row-icon{font-size:15px;color:#c0392b;flex-shrink:0}
-.loc-row-txt{flex:1;font-size:12.5px;color:#444;font-family:'Hind Siliguri',sans-serif}
+.loc-row-txt{flex:1;font-size:14px;font-weight:600;color:#222;font-family:'Hind Siliguri',sans-serif}
 .loc-row-chev{color:#ccc;font-size:13px;flex-shrink:0;transition:transform .2s}
 .loc-row-chev.open{transform:rotate(180deg)}
 
@@ -46,14 +46,14 @@
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .area-head{display:flex;align-items:center;gap:10px;padding:15px 16px 12px;border-bottom:1px solid #f0f0f0;flex-shrink:0}
 .area-back{width:30px;height:30px;border-radius:50%;background:#f5f5f5;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;color:#666}
-.area-title{flex:1;font-size:15px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.area-title{flex:1;font-size:17px;font-weight:800;color:#111;font-family:'Hind Siliguri',sans-serif}
 .area-close{background:none;border:none;font-size:22px;color:#bbb;cursor:pointer;flex-shrink:0;line-height:1}
 .area-crumb{padding:9px 16px;font-size:11.5px;color:#999;font-family:'Hind Siliguri',sans-serif;border-bottom:1px solid #f5f5f5;flex-shrink:0}
 .area-crumb b{color:#c0392b}
 .area-list{overflow-y:auto;padding:6px 0 14px;flex:1}
 .area-item{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;border-bottom:1px solid #f6f6f6}
 .area-item:active{background:#faf0ef}
-.area-item-t{flex:1;font-size:14px;color:#333;font-family:'Hind Siliguri',sans-serif}
+.area-item-t{flex:1;font-size:14.5px;font-weight:600;color:#222;font-family:'Hind Siliguri',sans-serif}
 .area-item-chev{color:#ccc;font-size:15px}
 .area-item.all{color:#c0392b;font-weight:700}
 .area-item.all .area-item-t{color:#c0392b;font-weight:700}
@@ -335,6 +335,14 @@ document.getElementById('bg-grid').addEventListener('click', e => {
   sb.disabled = false;
   sb.classList.add('ready');
   sb.textContent = `${SELECTED_GROUP} রক্তদাতা খুঁজুন`;
+
+  // রক্তের গ্রুপ বাছার পরপরই এলাকা বাছার popup — ইউজারকে আলাদা করে
+  // "বদলান" খুঁজে বের করতে হবে না, পরের ধাপটা নিজে থেকেই এগিয়ে আসে।
+  // এলাকা আগে থেকে বাছা থাকলে (ইউজার শুধু গ্রুপ পাল্টাচ্ছে) আবার
+  // জোর করে খুলবে না — বিরক্তিকর হবে না।
+  if (!SEL.division && !SEL.district && !SEL.upazila) {
+    setTimeout(openLocModal, 200);
+  }
 });
 
 // ── এলাকা পিকার: বিভাগ → জেলা → উপজেলা (প্রতিটা ঐচ্ছিক) ──
@@ -381,7 +389,7 @@ function renderArea() {
   if (areaLevel === 'division') {
     title.textContent = 'বিভাগ বেছে নিন';
     // "সব বিভাগ" — কোনো ফিল্টার ছাড়া
-    items += `<div class="area-item all" data-pick="division" data-val=""><span class="area-item-t">সব বিভাগ (ফিল্টার নেই)</span></div>`;
+    items += `<div class="area-item all" data-pick="division" data-val=""><span class="area-item-t">সারা বাংলাদেশে খুঁজুন</span></div>`;
     DIVISIONS.forEach(d => {
       items += `<div class="area-item ${SEL.division===d?'selected':''}" data-pick="division" data-val="${esc(d)}">
         <span class="area-item-t">${esc(d)}</span>
@@ -498,16 +506,36 @@ window.searchDonors = async (override) => {
     // আলাদা collection, list করা যায় না)।
     const filters = [where('blood','==',blood), where('available','==',true)];
     // সবচেয়ে নির্দিষ্ট স্তর যেটা দেওয়া আছে সেটাই ব্যবহার করি
-    if (upa)       filters.push(where('upazila','==',upa));
-    else if (dist) filters.push(where('district','==',dist));
-    else if (div)  filters.push(where('division','==',div));
+    if (dist) filters.push(where('district','==',dist));
+    else if (div) filters.push(where('division','==',div));
 
-    const snap = await getDocs(query(collection(db,'donors'), ...filters, limit(30)));
     let donors = [];
-    snap.forEach(d => donors.push({id:d.id, ...d.data()}));
+    if (upa) {
+      // BUGFIX: উপজেলা দিয়ে খুঁজলে যাদের ডকুমেন্টে upazila field-ই নেই
+      // (উপজেলা ফিচার আসার আগে যারা register করেছেন, অথবা যারা ফর্মে
+      // ঐচ্ছিক এই ফিল্ডটা খালি রেখেছেন) তারা বাদ পড়ে যেতেন — যদিও তারা
+      // ঠিক ওই জেলাতেই আছেন। তাই এখন দুটো query একসাথে চালাই:
+      // ১) ঠিক এই উপজেলার (নিশ্চিত), ২) পুরো জেলার (fallback)।
+      // ফলাফল মিলিয়ে, উপজেলা-নিশ্চিত যাদের আগে দেখানো হয়।
+      const [exactSnap, districtSnap] = await Promise.all([
+        getDocs(query(collection(db,'donors'), ...filters, where('upazila','==',upa), limit(30))),
+        getDocs(query(collection(db,'donors'), ...filters, limit(30)))
+      ]);
+      const exact = [];
+      exactSnap.forEach(d => { if (d.id !== CU?.uid) exact.push({id:d.id, ...d.data(), _upaMatch:true}); });
+      const seen = new Set(exact.map(d => d.id));
+      const rest = [];
+      districtSnap.forEach(d => {
+        if (d.id !== CU?.uid && !seen.has(d.id)) rest.push({id:d.id, ...d.data(), _upaMatch:false});
+      });
+      donors = [...exact, ...rest];
+    } else {
+      const snap = await getDocs(query(collection(db,'donors'), ...filters, limit(30)));
+      snap.forEach(d => { if (d.id !== CU?.uid) donors.push({id:d.id, ...d.data()}); });
+    }
 
-    // rating বেশি যার আগে
-    donors.sort((a,b) => (b.rating||0) - (a.rating||0));
+    // rating বেশি যার আগে (কিন্তু উপজেলা-নিশ্চিতরা সবসময় প্রথমে)
+    donors.sort((a,b) => (b._upaMatch===a._upaMatch ? 0 : (b._upaMatch?1:-1)) || ((b.rating||0) - (a.rating||0)));
     stopLoadingMsgs();
     renderResults(donors, blood, div, dist, upa);
   } catch(e){
@@ -528,10 +556,11 @@ function renderResults(donors, blood, div, dist, upa) {
   if(!donors.length){
     const areaText = upa ? esc(upa) : (dist ? esc(dist) : (div ? esc(div) : ''));
     const hasAreaFilter = !!(div || dist || upa);
-    // এক ধাপ চওড়া করার সাজেশন: উপজেলা → জেলা → বিভাগ → সারা দেশ
+    // এক ধাপ চওড়া করার সাজেশন: (উপজেলা সার্চে জেলাও একসাথে চেক হয়ে
+    // গেছে, তাই খালি ফল মানে জেলাতেও কেউ নেই — সরাসরি বিভাগে যাই)
     let widerLabel = 'সারা দেশে খুঁজুন', widerSub = 'এলাকার সীমা তুলে দিন';
-    if (upa)       { widerLabel = dist + ' জেলায় খুঁজুন'; widerSub = 'উপজেলার সীমা তুলে দিন'; }
-    else if (dist) { widerLabel = div + ' বিভাগে খুঁজুন';  widerSub = 'জেলার সীমা তুলে দিন'; }
+    if (upa)        { widerLabel = div + ' বিভাগে খুঁজুন'; widerSub = dist + ' জেলায় কেউ পাওয়া যায়নি'; }
+    else if (dist)  { widerLabel = div + ' বিভাগে খুঁজুন'; widerSub = 'জেলার সীমা তুলে দিন'; }
 
     el.innerHTML = `
       <div class="ns-wrap">
@@ -570,10 +599,10 @@ function renderResults(donors, blood, div, dist, upa) {
 
     const nw = el.querySelector('[data-act="wider"]');
     if (nw) nw.addEventListener('click', () => {
-      // এক ধাপ চওড়া: উপজেলা থাকলে সেটা তুলি, নাহলে জেলা, নাহলে বিভাগ
-      if (upa)       { SEL.upazila = ''; searchDonors(); }
-      else if (dist) { SEL.district = ''; SEL.upazila = ''; searchDonors(); }
-      else           { SEL.division = ''; SEL.district = ''; SEL.upazila = ''; searchDonors(); }
+      // এক ধাপ চওড়া: উপজেলা→জেলা ইতিমধ্যে চেক হয়ে গেছে, তাই সরাসরি
+      // বিভাগে যাই। জেলা থেকে হলে বিভাগে, বিভাগ থেকে হলে সারা দেশে।
+      if (upa || dist) { SEL.district = ''; SEL.upazila = ''; searchDonors(); }
+      else             { SEL.division = ''; SEL.district = ''; SEL.upazila = ''; searchDonors(); }
       document.getElementById('loc-row-txt').textContent =
         SEL.upazila || SEL.district || SEL.division || 'সব বিভাগ';
     });
@@ -602,6 +631,9 @@ function renderResults(donors, blood, div, dist, upa) {
           <div class="dbadges">
             <span class="badge blood">${esc(d.blood)}</span>
             ${d.urgentReady?'<span class="badge urgent">⚡ জরুরি</span>':''}
+            ${upa ? (d._upaMatch
+              ? `<span class="badge" style="background:#EAF3DE;color:#3B6D11">📍 ${esc(upa)}</span>`
+              : `<span class="badge" style="background:#F4F4F4;color:#8E8E8E">${esc(dist)} জেলায়</span>`) : ''}
           </div>
           <div class="dloc">📌 ${esc([d.area,d.district,d.division].filter(Boolean).join(', '))}</div>
           <div style="font-size:11px;color:#aaa">${starsHtml(d.rating||0)} · ${esc(d.donations||0)} বার দান করেছেন</div>

@@ -36,6 +36,13 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .never-row{display:flex;align-items:center;gap:9px;margin-top:8px;cursor:pointer}
 .never-row input{width:17px;height:17px;accent-color:#c0392b;cursor:pointer}
 .never-row label{font-size:12px;color:#555;font-family:'Hind Siliguri',sans-serif;cursor:pointer}
+
+/* ── রক্ত দিয়েছেন কি না — Yes/No ── */
+.yn-label{font-size:12px;font-weight:700;color:#666;margin-bottom:8px;font-family:'Hind Siliguri',sans-serif;padding-left:2px}
+.yn-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.yn-btn{padding:13px 6px;border-radius:12px;border:1.5px solid #eee;background:#f8f8f8;color:#666;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.15s}
+.yn-btn:active{transform:scale(.97)}
+.yn-btn.on{border-color:#c0392b;background:#fdecea;color:#c0392b}
 .avail-row{display:flex;align-items:center;gap:12px}
 .avail-text{flex:1}
 .avail-t1{font-size:13px;font-weight:700;font-family:'Hind Siliguri',sans-serif}
@@ -186,7 +193,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
           </div>
         </div>
         <div class="iw">
-          <select id="r-upazila"><option value="">উপজেলা (ঐচ্ছিক)</option></select>
+          <select id="r-upazila"><option value="">উপজেলা *</option></select>
         </div>
         <div class="iw">
           <span class="ico">🏘️</span>
@@ -203,18 +210,19 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
     <!-- ── ধাপ ৩: বিস্তারিত ও সাবমিট ── -->
     <div class="step" data-step="3">
       <div class="step-title">বিস্তারিত তথ্য</div>
-      <div class="step-sub">শেষ ধাপ — এগুলো ঐচ্ছিক তবে সাহায্য করে</div>
+      <div class="step-sub">শেষ ধাপ — * চিহ্নিত অংশ পূরণ করতেই হবে</div>
 
       <div class="reg-section">
         <div class="reg-title">রক্তদানের ইতিহাস</div>
-        <div class="date-label">সর্বশেষ রক্তদানের তারিখ</div>
-        <div class="iw" id="date-row">
+        <div class="yn-label">আপনি কি আগে রক্ত দিয়েছেন? *</div>
+        <div class="yn-grid">
+          <button type="button" class="yn-btn" id="yn-yes" onclick="setDonatedBefore(true)">✅ হ্যাঁ, দিয়েছি</button>
+          <button type="button" class="yn-btn" id="yn-no" onclick="setDonatedBefore(false)">❌ না, দেইনি</button>
+        </div>
+        <input type="checkbox" id="never-check" style="display:none"/>
+        <div class="iw" id="date-row" style="display:none;margin-top:10px">
           <span class="ico">📅</span>
           <input type="date" id="r-lastdate"/>
-        </div>
-        <div class="never-row">
-          <input type="checkbox" id="never-check" onchange="toggleNever()"/>
-          <label for="never-check">এখনো রক্ত দেইনি</label>
         </div>
         <div class="iw" style="margin-top:10px">
           <span class="ico">🧪</span>
@@ -258,9 +266,14 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 <div class="toast" id="toast"></div>
 
 <script>
-window.toggleNever = () => {
-  const cb = document.getElementById('never-check');
-  document.getElementById('date-row').style.display = cb.checked ? 'none' : 'flex';
+window.setDonatedBefore = (donated) => {
+  document.getElementById('never-check').checked = !donated;
+  document.getElementById('date-row').style.display = donated ? 'flex' : 'none';
+  document.getElementById('yn-yes').classList.toggle('on', donated);
+  document.getElementById('yn-no').classList.toggle('on', !donated);
+  // মান বাছা হয়েছে, এটা track করে রাখি — সাবমিটের আগে বাধ্যতামূলক যাচাইয়ে লাগবে
+  document.getElementById('yn-yes').dataset.touched = 'true';
+  if (!donated) document.getElementById('r-lastdate').value = '';
 };
 function showToast(m) {
   const t = document.getElementById('toast');
@@ -286,12 +299,12 @@ window.fillDistricts = () => {
   s.innerHTML = '<option value="">জেলা *</option>';
   (DISTRICTS[d]||[]).forEach(x => s.innerHTML += `<option>${x}</option>`);
   // জেলা বদলালে উপজেলাও রিসেট
-  document.getElementById('r-upazila').innerHTML = '<option value="">উপজেলা (ঐচ্ছিক)</option>';
+  document.getElementById('r-upazila').innerHTML = '<option value="">উপজেলা *</option>';
 };
 window.fillUpazilas = () => {
   const d = document.getElementById('r-district').value;
   const s = document.getElementById('r-upazila');
-  s.innerHTML = '<option value="">উপজেলা (ঐচ্ছিক)</option>';
+  s.innerHTML = '<option value="">উপজেলা *</option>';
   (UPAZILAS[d]||[]).forEach(x => s.innerHTML += `<option>${x}</option>`);
 };
 
@@ -313,6 +326,7 @@ function validateStep(n) {
   if (n === 2) {
     if (!document.getElementById('r-division').value) { showErr('বিভাগ বেছে নিন'); return false; }
     if (!document.getElementById('r-district').value) { showErr('জেলা বেছে নিন'); return false; }
+    if (!document.getElementById('r-upazila').value) { showErr('উপজেলা বেছে নিন'); return false; }
   }
   return true;
 }
@@ -400,6 +414,11 @@ window.registerDonor = async () => {
   if(wa && !isValidBdPhone(wa)) { showErr('WhatsApp নম্বর সঠিক নয়'); return; }
   if(!division) { showErr('বিভাগ বেছে নিন'); return; }
   if(!district) { showErr('জেলা বেছে নিন'); return; }
+  if(!upazila)  { showErr('উপজেলা বেছে নিন'); return; }
+  if(!document.getElementById('yn-yes').dataset.touched) {
+    showErr('আপনি আগে রক্ত দিয়েছেন কিনা বেছে নিন'); return;
+  }
+  if(!never && !lastDate) { showErr('সর্বশেষ রক্তদানের তারিখ দিন'); return; }
 
   const normPhone = normalizeBdPhone(phone);
   const normWa    = wa ? normalizeBdPhone(wa) : '';
