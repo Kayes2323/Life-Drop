@@ -258,22 +258,51 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 <div class="toast" id="toast"></div>
 
 <script>
-const DISTRICTS = {
-  'ঢাকা':['ঢাকা','গাজীপুর','নারায়ণগঞ্জ','মানিকগঞ্জ','মুন্সীগঞ্জ','নরসিংদী','ফরিদপুর','গোপালগঞ্জ','মাদারীপুর','রাজবাড়ী','শরীয়তপুর','কিশোরগঞ্জ','টাঙ্গাইল'],
-  'চট্টগ্রাম':['চট্টগ্রাম','কক্সবাজার','কুমিল্লা','ফেনী','নোয়াখালী','লক্ষ্মীপুর','চাঁদপুর','ব্রাহ্মণবাড়িয়া','রাঙামাটি','খাগড়াছড়ি','বান্দরবান'],
-  'খুলনা':['খুলনা','বাগেরহাট','সাতক্ষীরা','যশোর','নড়াইল','মাগুরা','ঝিনাইদহ','কুষ্টিয়া','মেহেরপুর','চুয়াডাঙ্গা'],
-  'রাজশাহী':['রাজশাহী','নাটোর','নওগাঁ','চাঁপাইনবাবগঞ্জ','পাবনা','সিরাজগঞ্জ','বগুড়া','জয়পুরহাট'],
-  'রংপুর':['রংপুর','গাইবান্ধা','কুড়িগ্রাম','লালমনিরহাট','নীলফামারী','ঠাকুরগাঁও','পঞ্চগড়','দিনাজপুর'],
-  'সিলেট':['সিলেট','মৌলভীবাজার','হবিগঞ্জ','সুনামগঞ্জ'],
-  'বরিশাল':['বরিশাল','ভোলা','পটুয়াখালী','পিরোজপুর','ঝালকাঠি','বরগুনা'],
-  'ময়মনসিংহ':['ময়মনসিংহ','জামালপুর','শেরপুর','নেত্রকোণা']
+window.toggleNever = () => {
+  const cb = document.getElementById('never-check');
+  document.getElementById('date-row').style.display = cb.checked ? 'none' : 'flex';
 };
+function showToast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function setLoad(v) { document.getElementById('loading').classList.toggle('show', v); }
+</script>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { isValidBdPhone, normalizeBdPhone, DISTRICTS, UPAZILAS } from './app.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, setDoc, getDoc, updateDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// BUGFIX: fillDistricts/fillUpazilas আগে সাধারণ <script>-এ ছিল, কিন্তু
+// DISTRICTS/UPAZILAS শুধু এই module script-এ import করা — তাই সাধারণ
+// script থেকে সেগুলো দেখাই যেতো না (ReferenceError, নীরবে ভেঙে যেতো)।
+// এখন এখানেই রাখা হলো যেখানে import করা মান সত্যিই ব্যবহার করা যায়।
+window.fillDistricts = () => {
+  const d = document.getElementById('r-division').value;
+  const s = document.getElementById('r-district');
+  s.innerHTML = '<option value="">জেলা *</option>';
+  (DISTRICTS[d]||[]).forEach(x => s.innerHTML += `<option>${x}</option>`);
+  // জেলা বদলালে উপজেলাও রিসেট
+  document.getElementById('r-upazila').innerHTML = '<option value="">উপজেলা (ঐচ্ছিক)</option>';
+};
+window.fillUpazilas = () => {
+  const d = document.getElementById('r-district').value;
+  const s = document.getElementById('r-upazila');
+  s.innerHTML = '<option value="">উপজেলা (ঐচ্ছিক)</option>';
+  (UPAZILAS[d]||[]).forEach(x => s.innerHTML += `<option>${x}</option>`);
+};
+
 /* ── ধাপে ধাপে ফর্ম নেভিগেশন ── */
+// BUGFIX: এই ব্লকটাও আগে সাধারণ <script>-এ ছিল, কিন্তু validateStep()
+// isValidBdPhone (module import) ব্যবহার করে। ফলে "পরবর্তী ধাপ" চাপলে
+// ReferenceError হয়ে যেতো আর ধাপ এগোতোই না — form-এ কোনো পরিবর্তন
+// চোখেই পড়তো না। এখানে সরিয়ে আনা হলো।
 const TOTAL_STEPS = 3;
 const bnDigits = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
 
-// ধাপ ১ থেকে ২-এ যাওয়ার আগে, ২ থেকে ৩-এ যাওয়ার আগে — জরুরি ফিল্ড
-// পূরণ হয়েছে কিনা যাচাই করে, নাহলে খালি ফর্ম নিয়ে এগোনো যাবে
 function validateStep(n) {
   if (n === 1) {
     if (!document.getElementById('r-blood').value) { showErr('রক্তের গ্রুপ বেছে নিন'); return false; }
@@ -310,38 +339,6 @@ function hideErr() {
   const e = document.getElementById('err');
   if (e) e.style.display = 'none';
 }
-
-window.fillDistricts = () => {
-  const d = document.getElementById('r-division').value;
-  const s = document.getElementById('r-district');
-  s.innerHTML = '<option value="">জেলা *</option>';
-  (DISTRICTS[d]||[]).forEach(x => s.innerHTML += `<option>${x}</option>`);
-  // জেলা বদলালে উপজেলাও রিসেট
-  document.getElementById('r-upazila').innerHTML = '<option value="">উপজেলা (ঐচ্ছিক)</option>';
-};
-window.fillUpazilas = () => {
-  const d = document.getElementById('r-district').value;
-  const s = document.getElementById('r-upazila');
-  s.innerHTML = '<option value="">উপজেলা (ঐচ্ছিক)</option>';
-  (UPAZILAS[d]||[]).forEach(x => s.innerHTML += `<option>${x}</option>`);
-};
-window.toggleNever = () => {
-  const cb = document.getElementById('never-check');
-  document.getElementById('date-row').style.display = cb.checked ? 'none' : 'flex';
-};
-function showToast(m) {
-  const t = document.getElementById('toast');
-  t.textContent = m; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-function setLoad(v) { document.getElementById('loading').classList.toggle('show', v); }
-</script>
-
-<script type="module">
-import { auth, db } from './firebase-config.js';
-import { isValidBdPhone, normalizeBdPhone, DISTRICTS, UPAZILAS } from './app.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, setDoc, getDoc, updateDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const COORDS = {
   'ঢাকা':{lat:23.8103,lng:90.4125},'গাজীপুর':{lat:23.9999,lng:90.4203},
   'নারায়ণগঞ্জ':{lat:23.6238,lng:90.4997},'চট্টগ্রাম':{lat:22.3569,lng:91.7832},

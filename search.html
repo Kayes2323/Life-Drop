@@ -293,6 +293,36 @@
 // বিভাগ/জেলা তালিকা এখন app.js থেকে import করা (নিচের module script দেখুন),
 // আর লোকেশন বাছাই এখন মডাল-ভিত্তিক পিকার — নিচে openLocModal() দেখুন
 
+// ini() সরানো হয়েছে — app.js এর initials() এখন ব্যবহার হচ্ছে
+function starsHtml(r){let s='';for(let i=1;i<=5;i++)s+=`<span style="color:${i<=Math.round(r)?'#f39c12':'#ddd'};font-size:11px">★</span>`;return s;}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2700);}
+function setLoad(v){document.getElementById('loading').classList.toggle('show',v);}
+
+const _loadMsgs = [
+  'আপনার নিকটবর্তী সক্রিয় রক্তদাতা খোঁজা হচ্ছে',
+  'Sondhan ডেটাবেজ স্ক্যান করছে…',
+  'সক্রিয় দাতাদের তালিকা তৈরি হচ্ছে…',
+  'একটু অপেক্ষা করুন…'
+];
+let _loadTimer = null;
+function startLoadingMsgs(){
+  let i = 0;
+  _loadTimer = setInterval(() => {
+    i = (i+1) % _loadMsgs.length;
+    const el = document.getElementById('loading-sub');
+    if(el){ el.style.opacity='0'; setTimeout(()=>{ el.textContent=_loadMsgs[i]; el.style.opacity='1'; },200); }
+  }, 1100);
+}
+function stopLoadingMsgs(){ clearInterval(_loadTimer); }
+
+</script>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { esc, initials, waLink, telLink, isValidBdPhone, DIVISIONS, DISTRICTS, UPAZILAS } from './app.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 // ── রক্তের গ্রুপ গ্রিড — সিলেক্ট করলে হাইলাইট + সার্চ বাটন সক্রিয় ──
 let SELECTED_GROUP = null;
 document.getElementById('bg-grid').addEventListener('click', e => {
@@ -414,35 +444,7 @@ function finishArea() {
   closeArea();
 }
 
-// ini() সরানো হয়েছে — app.js এর initials() এখন ব্যবহার হচ্ছে
-function starsHtml(r){let s='';for(let i=1;i<=5;i++)s+=`<span style="color:${i<=Math.round(r)?'#f39c12':'#ddd'};font-size:11px">★</span>`;return s;}
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2700);}
-function setLoad(v){document.getElementById('loading').classList.toggle('show',v);}
 
-const _loadMsgs = [
-  'আপনার নিকটবর্তী সক্রিয় রক্তদাতা খোঁজা হচ্ছে',
-  'Sondhan ডেটাবেজ স্ক্যান করছে…',
-  'সক্রিয় দাতাদের তালিকা তৈরি হচ্ছে…',
-  'একটু অপেক্ষা করুন…'
-];
-let _loadTimer = null;
-function startLoadingMsgs(){
-  let i = 0;
-  _loadTimer = setInterval(() => {
-    i = (i+1) % _loadMsgs.length;
-    const el = document.getElementById('loading-sub');
-    if(el){ el.style.opacity='0'; setTimeout(()=>{ el.textContent=_loadMsgs[i]; el.style.opacity='1'; },200); }
-  }, 1100);
-}
-function stopLoadingMsgs(){ clearInterval(_loadTimer); }
-
-</script>
-
-<script type="module">
-import { auth, db } from './firebase-config.js';
-import { esc, initials, waLink, telLink, isValidBdPhone, DIVISIONS, DISTRICTS, UPAZILAS } from './app.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let CU = null;
 
