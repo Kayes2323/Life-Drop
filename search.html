@@ -321,7 +321,7 @@ function stopLoadingMsgs(){ clearInterval(_loadTimer); }
 import { auth, db } from './firebase-config.js';
 import { esc, initials, waLink, telLink, isValidBdPhone, DIVISIONS, DISTRICTS, UPAZILAS } from './app.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ── রক্তের গ্রুপ গ্রিড — সিলেক্ট করলে হাইলাইট + সার্চ বাটন সক্রিয় ──
 let SELECTED_GROUP = null;
@@ -653,10 +653,52 @@ function renderResults(donors, blood, div, dist, upa) {
 }
 
 // donorsPrivate থেকে একজন donor-এর phone/wa একবারই আনে, ক্যাশ করে রাখে
+// ── মাসিক সীমা: এক ইউজার মাসে সর্বোচ্চ কয়টা নম্বর দেখতে পারবে ──
+// দৈনিক সীমার বদলে মাসিক — নাহলে প্রতিদিন সীমা পর্যন্ত টেনে টেনে
+// মাসে অনেক নম্বরই জমানো যেতো। প্রতি ক্যালেন্ডার মাসে কাউন্টার রিসেট হয়।
+const REVEAL_MONTHLY_LIMIT = 30;
+const currentMonthKey = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+};
+
+// সীমা পার হয়ে গেলে false, নাহলে কাউন্টার ১ বাড়িয়ে true — সব একটা
+// transaction-এ (একসাথে পড়া+লেখা), তাই একই সময়ে দুইবার চাপলেও গণনা ঠিক থাকে।
+async function tryConsumeRevealQuota() {
+  if (!CU) return false;
+  const ref = doc(db, 'revealLimits', CU.uid);
+  const month = currentMonthKey();
+  try {
+    return await runTransaction(db, async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists()) {
+        tx.set(ref, { month, count: 1 });
+        return true;
+      }
+      const data = snap.data();
+      if (data.month !== month) {
+        tx.set(ref, { month, count: 1 });
+        return true;
+      }
+      if ((data.count || 0) >= REVEAL_MONTHLY_LIMIT) return false;
+      tx.update(ref, { count: data.count + 1 });
+      return true;
+    });
+  } catch (e) {
+    console.warn('reveal quota check failed:', e);
+    return true; // quota check ব্যর্থ হলেও genuine ইউজারকে আটকাই না
+  }
+}
+
 async function ensurePrivate(id) {
   const d = LAST_RESULTS.get(id);
   if(!d) return null;
   if(d._revealed) return d;
+  const ok = await tryConsumeRevealQuota();
+  if (!ok) {
+    showToast('এই মাসে নম্বর দেখার সীমা শেষ — আগামী মাসে আবার চেষ্টা করুন');
+    return null;
+  }
   try {
     const snap = await getDoc(doc(db,'donorsPrivate',id));
     if(snap.exists()) Object.assign(d, snap.data());
