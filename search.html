@@ -28,9 +28,37 @@
 .loc-row-txt{flex:1;font-size:12.5px;color:#444;font-family:'Hind Siliguri',sans-serif}
 .loc-row-chev{color:#ccc;font-size:13px;flex-shrink:0;transition:transform .2s}
 .loc-row-chev.open{transform:rotate(180deg)}
-.loc-panel{display:none;background:#fafafa;border-radius:11px;padding:11px;margin:-4px 0 10px;gap:8px}
-.loc-panel.open{display:flex}
-.loc-panel select{flex:1;padding:9px 8px;border-radius:9px;border:1px solid #e5e5e5;background:#fff;font-size:12px;font-family:'Hind Siliguri',sans-serif;color:#333;outline:none}
+
+/* ── লোকেশন পিকার মডাল (এক ট্যাপেই বাছাই — native select-এর ঝামেলা নেই) ── */
+.lp-crumb{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:0 2px 12px;font-size:12px;color:#aaa;font-family:'Hind Siliguri',sans-serif}
+.lp-crumb b{color:#c0392b;cursor:pointer;font-weight:700}
+.lp-crumb span{color:#ddd}
+.lp-list{max-height:52vh;overflow-y:auto}
+.lp-item{display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid #f4f4f4;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-size:13.5px;color:#333}
+.lp-item:last-child{border-bottom:none}
+.lp-item:active{background:#fafafa}
+.lp-item.all{color:#c0392b;font-weight:700}
+.lp-item .chev{color:#ddd;font-size:15px;flex-shrink:0}
+/* ── এলাকা পিকার মডাল ── */
+.area-modal{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;display:none;align-items:flex-end}
+.area-modal.open{display:flex}
+.area-sheet{background:#fff;width:100%;max-width:480px;margin:0 auto;border-radius:20px 20px 0 0;max-height:82vh;display:flex;flex-direction:column;animation:sheetUp .25s ease}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.area-head{display:flex;align-items:center;gap:10px;padding:15px 16px 12px;border-bottom:1px solid #f0f0f0;flex-shrink:0}
+.area-back{width:30px;height:30px;border-radius:50%;background:#f5f5f5;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;color:#666}
+.area-title{flex:1;font-size:15px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.area-close{background:none;border:none;font-size:22px;color:#bbb;cursor:pointer;flex-shrink:0;line-height:1}
+.area-crumb{padding:9px 16px;font-size:11.5px;color:#999;font-family:'Hind Siliguri',sans-serif;border-bottom:1px solid #f5f5f5;flex-shrink:0}
+.area-crumb b{color:#c0392b}
+.area-list{overflow-y:auto;padding:6px 0 14px;flex:1}
+.area-item{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;border-bottom:1px solid #f6f6f6}
+.area-item:active{background:#faf0ef}
+.area-item-t{flex:1;font-size:14px;color:#333;font-family:'Hind Siliguri',sans-serif}
+.area-item-chev{color:#ccc;font-size:15px}
+.area-item.all{color:#c0392b;font-weight:700}
+.area-item.all .area-item-t{color:#c0392b;font-weight:700}
+.area-item.selected{background:#fdecea}
+.area-pick-all{margin:10px 16px 4px;padding:13px;background:#c0392b;color:#fff;border:none;border-radius:12px;font-size:13.5px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;width:calc(100% - 32px)}
 .search-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;background:#eee;color:#bbb;transition:.15s}
 .search-btn.ready{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;box-shadow:0 5px 16px rgba(192,57,43,.3)}
 .results-list{flex:1;overflow-y:auto;padding:11px}
@@ -173,20 +201,11 @@
         <button class="bg-item" data-g="O-">O-</button>
       </div>
 
-      <div class="loc-row" id="loc-row">
+      <div class="loc-row" id="loc-row" onclick="openLocModal()">
         <span class="loc-row-icon">📍</span>
         <span class="loc-row-txt" id="loc-row-txt">সব বিভাগ</span>
         <span style="font-size:11.5px;color:#c0392b;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-right:2px">বদলান</span>
-        <span class="loc-row-chev" id="loc-chev">▾</span>
-      </div>
-      <div class="loc-panel" id="loc-panel">
-        <select id="div-filter" onchange="fillDist()">
-          <option value="">সব বিভাগ</option>
-          <option>ঢাকা</option><option>চট্টগ্রাম</option><option>খুলনা</option>
-          <option>রাজশাহী</option><option>রংপুর</option><option>সিলেট</option>
-          <option>বরিশাল</option><option>ময়মনসিংহ</option>
-        </select>
-        <select id="dist-filter"><option value="">সব জেলা</option></select>
+        <span class="loc-row-chev">›</span>
       </div>
 
       <button class="search-btn" id="search-btn" disabled onclick="searchDonors()">খুঁজুন</button>
@@ -197,6 +216,19 @@
     <div class="hint-box">
       <div style="font-size:40px">🩸</div>
       <p>উপরে রক্তের গ্রুপ বেছে নিয়ে খুঁজুন শুরু করুন</p>
+    </div>
+  </div>
+
+  <!-- ── এলাকা পিকার মডাল (বিভাগ → জেলা → উপজেলা, প্রতিটা ঐচ্ছিক) ── -->
+  <div class="area-modal" id="area-modal">
+    <div class="area-sheet">
+      <div class="area-head">
+        <button class="area-back" id="area-back" onclick="areaBack()" style="display:none">‹</button>
+        <span class="area-title" id="area-title">বিভাগ বেছে নিন</span>
+        <button class="area-close" onclick="closeArea()">×</button>
+      </div>
+      <div class="area-crumb" id="area-crumb">সব বিভাগ থেকে খোঁজা হবে</div>
+      <div class="area-list" id="area-list"></div>
     </div>
   </div>
 
@@ -216,6 +248,19 @@
       <button class="modal-close" onclick="document.getElementById('dp-modal').classList.remove('open')">×</button>
     </div>
     <div class="modal-body" id="dp-body"></div>
+  </div>
+</div>
+
+<!-- লোকেশন পিকার মডাল — বিভাগ → জেলা → উপজেলা, প্রতি ধাপে এক ট্যাপ -->
+<div class="modal-bg" id="lp-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-header"><h3 id="lp-title">বিভাগ বেছে নিন</h3>
+      <button class="modal-close" onclick="document.getElementById('lp-modal').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="lp-crumb" id="lp-crumb"></div>
+      <div class="lp-list" id="lp-list"></div>
+    </div>
   </div>
 </div>
 
@@ -245,23 +290,8 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const DISTRICTS={
-  'ঢাকা':['ঢাকা','গাজীপুর','নারায়ণগঞ্জ','মানিকগঞ্জ','মুন্সীগঞ্জ','নরসিংদী','ফরিদপুর','গোপালগঞ্জ','মাদারীপুর','রাজবাড়ী','শরীয়তপুর','কিশোরগঞ্জ','টাঙ্গাইল'],
-  'চট্টগ্রাম':['চট্টগ্রাম','কক্সবাজার','কুমিল্লা','ফেনী','নোয়াখালী','লক্ষ্মীপুর','চাঁদপুর','ব্রাহ্মণবাড়িয়া','রাঙামাটি','খাগড়াছড়ি','বান্দরবান'],
-  'খুলনা':['খুলনা','বাগেরহাট','সাতক্ষীরা','যশোর','নড়াইল','মাগুরা','ঝিনাইদহ','কুষ্টিয়া','মেহেরপুর','চুয়াডাঙ্গা'],
-  'রাজশাহী':['রাজশাহী','নাটোর','নওগাঁ','চাঁপাইনবাবগঞ্জ','পাবনা','সিরাজগঞ্জ','বগুড়া','জয়পুরহাট'],
-  'রংপুর':['রংপুর','গাইবান্ধা','কুড়িগ্রাম','লালমনিরহাট','নীলফামারী','ঠাকুরগাঁও','পঞ্চগড়','দিনাজপুর'],
-  'সিলেট':['সিলেট','মৌলভীবাজার','হবিগঞ্জ','সুনামগঞ্জ'],
-  'বরিশাল':['বরিশাল','ভোলা','পটুয়াখালী','পিরোজপুর','ঝালকাঠি','বরগুনা'],
-  'ময়মনসিংহ':['ময়মনসিংহ','জামালপুর','শেরপুর','নেত্রকোণা']
-};
-window.fillDist=()=>{
-  const d=document.getElementById('div-filter').value;
-  const s=document.getElementById('dist-filter');
-  s.innerHTML='<option value="">সব জেলা</option>';
-  (DISTRICTS[d]||[]).forEach(x=>s.innerHTML+=`<option>${x}</option>`);
-  updateLocText();
-};
+// বিভাগ/জেলা তালিকা এখন app.js থেকে import করা (নিচের module script দেখুন),
+// আর লোকেশন বাছাই এখন মডাল-ভিত্তিক পিকার — নিচে openLocModal() দেখুন
 
 // ── রক্তের গ্রুপ গ্রিড — সিলেক্ট করলে হাইলাইট + সার্চ বাটন সক্রিয় ──
 let SELECTED_GROUP = null;
@@ -277,17 +307,111 @@ document.getElementById('bg-grid').addEventListener('click', e => {
   sb.textContent = `${SELECTED_GROUP} রক্তদাতা খুঁজুন`;
 });
 
-// ── এলাকা প্যানেল খোলা/বন্ধ ──
-document.getElementById('loc-row').addEventListener('click', () => {
-  document.getElementById('loc-panel').classList.toggle('open');
-  document.getElementById('loc-chev').classList.toggle('open');
+// ── এলাকা পিকার: বিভাগ → জেলা → উপজেলা (প্রতিটা ঐচ্ছিক) ──
+// নির্বাচিত মান রাখি; খালি মানে "সব"
+let SEL = { division: '', district: '', upazila: '' };
+let areaLevel = 'division';   // এখন কোন স্তর দেখাচ্ছি
+
+window.openLocModal = () => {
+  areaLevel = 'division';
+  renderArea();
+  document.getElementById('area-modal').classList.add('open');
+};
+window.closeArea = () => document.getElementById('area-modal').classList.remove('open');
+
+// ব্যাকগ্রাউন্ডে ট্যাপ করলে বন্ধ
+document.getElementById('area-modal').addEventListener('click', e => {
+  if (e.target.id === 'area-modal') closeArea();
 });
-document.getElementById('dist-filter').addEventListener('change', updateLocText);
-function updateLocText() {
-  const div = document.getElementById('div-filter').value;
-  const dist = document.getElementById('dist-filter').value;
-  document.getElementById('loc-row-txt').textContent =
-    dist ? dist : (div ? div : 'সব বিভাগ');
+
+window.areaBack = () => {
+  if (areaLevel === 'upazila') areaLevel = 'district';
+  else if (areaLevel === 'district') areaLevel = 'division';
+  renderArea();
+};
+
+function renderArea() {
+  const list = document.getElementById('area-list');
+  const title = document.getElementById('area-title');
+  const crumb = document.getElementById('area-crumb');
+  const back = document.getElementById('area-back');
+  back.style.display = areaLevel === 'division' ? 'none' : 'flex';
+
+  // ব্রেডক্রাম্ব — এ পর্যন্ত কী বাছা হয়েছে
+  const parts = [];
+  if (SEL.division) parts.push(SEL.division);
+  if (SEL.district) parts.push(SEL.district);
+  if (SEL.upazila)  parts.push(SEL.upazila);
+  crumb.innerHTML = parts.length
+    ? 'নির্বাচিত: <b>' + parts.map(esc).join(' › ') + '</b>'
+    : 'সব বিভাগ থেকে খোঁজা হবে';
+
+  let items = '';
+
+  if (areaLevel === 'division') {
+    title.textContent = 'বিভাগ বেছে নিন';
+    // "সব বিভাগ" — কোনো ফিল্টার ছাড়া
+    items += `<div class="area-item all" data-pick="division" data-val=""><span class="area-item-t">সব বিভাগ (ফিল্টার নেই)</span></div>`;
+    DIVISIONS.forEach(d => {
+      items += `<div class="area-item ${SEL.division===d?'selected':''}" data-pick="division" data-val="${esc(d)}">
+        <span class="area-item-t">${esc(d)}</span>
+        <span class="area-item-chev">›</span></div>`;
+    });
+  }
+  else if (areaLevel === 'district') {
+    title.textContent = SEL.division + ' — জেলা';
+    // এই বিভাগের সব — জেলা ফিল্টার ছাড়া, শুধু বিভাগ
+    items += `<button class="area-pick-all" data-pick="district" data-val="">পুরো ${esc(SEL.division)} বিভাগে খুঁজুন</button>`;
+    (DISTRICTS[SEL.division] || []).forEach(d => {
+      items += `<div class="area-item ${SEL.district===d?'selected':''}" data-pick="district" data-val="${esc(d)}">
+        <span class="area-item-t">${esc(d)}</span>
+        <span class="area-item-chev">›</span></div>`;
+    });
+  }
+  else { // upazila
+    title.textContent = SEL.district + ' — উপজেলা';
+    const ups = UPAZILAS[SEL.district] || [];
+    items += `<button class="area-pick-all" data-pick="upazila" data-val="">পুরো ${esc(SEL.district)} জেলায় খুঁজুন</button>`;
+    if (!ups.length) {
+      items += `<div style="padding:20px;text-align:center;color:#bbb;font-size:12px">এই জেলার উপজেলা তালিকা নেই</div>`;
+    }
+    ups.forEach(u => {
+      items += `<div class="area-item ${SEL.upazila===u?'selected':''}" data-pick="upazila" data-val="${esc(u)}">
+        <span class="area-item-t">${esc(u)}</span></div>`;
+    });
+  }
+
+  list.innerHTML = items;
+}
+
+// তালিকায় ক্লিক
+document.getElementById('area-list').addEventListener('click', e => {
+  const el = e.target.closest('[data-pick]');
+  if (!el) return;
+  const level = el.dataset.pick;
+  const val = el.dataset.val;
+
+  if (level === 'division') {
+    SEL.division = val; SEL.district = ''; SEL.upazila = '';
+    if (!val) { finishArea(); return; }         // "সব বিভাগ" → সরাসরি শেষ
+    areaLevel = 'district'; renderArea();
+  }
+  else if (level === 'district') {
+    SEL.district = val; SEL.upazila = '';
+    if (!val) { finishArea(); return; }         // "পুরো বিভাগ" → শেষ
+    areaLevel = 'upazila'; renderArea();
+  }
+  else { // upazila
+    SEL.upazila = val;
+    finishArea();                               // উপজেলা বাছলে (বা "পুরো জেলা") শেষ
+  }
+});
+
+// বাছাই শেষ — লেবেল আপডেট করে মডাল বন্ধ
+function finishArea() {
+  const label = SEL.upazila || SEL.district || SEL.division || 'সব বিভাগ';
+  document.getElementById('loc-row-txt').textContent = label;
+  closeArea();
 }
 
 // ini() সরানো হয়েছে — app.js এর initials() এখন ব্যবহার হচ্ছে
@@ -316,7 +440,7 @@ function stopLoadingMsgs(){ clearInterval(_loadTimer); }
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { esc, initials, waLink, telLink, isValidBdPhone } from './app.js';
+import { esc, initials, waLink, telLink, isValidBdPhone, DIVISIONS, DISTRICTS, UPAZILAS } from './app.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -332,10 +456,12 @@ onAuthStateChanged(auth, user => {
 });
 
 // SEARCH — donors collection, JS filter
-window.searchDonors = async (overrideDiv, overrideDist) => {
+window.searchDonors = async (override) => {
   const blood = SELECTED_GROUP;
-  const div   = overrideDiv  !== undefined ? overrideDiv  : document.getElementById('div-filter').value;
-  const dist  = overrideDist !== undefined ? overrideDist : document.getElementById('dist-filter').value;
+  // override দিলে সেটা (nationwide পুনঃসার্চের জন্য), নাহলে SEL থেকে
+  const div  = override ? (override.division || '') : SEL.division;
+  const dist = override ? (override.district || '') : SEL.district;
+  const upa  = override ? (override.upazila  || '') : SEL.upazila;
   if(!blood){ showToast('রক্তের গ্রুপ বেছে নিন'); return; }
 
   // Nice loading UI
@@ -369,7 +495,9 @@ window.searchDonors = async (overrideDiv, overrideDist) => {
     // সহ — শুধু প্রাসঙ্গিক ডেটা আসে, আর phone/wa আসেই না (donorsPrivate
     // আলাদা collection, list করা যায় না)।
     const filters = [where('blood','==',blood), where('available','==',true)];
-    if (dist)      filters.push(where('district','==',dist));
+    // সবচেয়ে নির্দিষ্ট স্তর যেটা দেওয়া আছে সেটাই ব্যবহার করি
+    if (upa)       filters.push(where('upazila','==',upa));
+    else if (dist) filters.push(where('district','==',dist));
     else if (div)  filters.push(where('division','==',div));
 
     const snap = await getDocs(query(collection(db,'donors'), ...filters, limit(30)));
@@ -379,7 +507,7 @@ window.searchDonors = async (overrideDiv, overrideDist) => {
     // rating বেশি যার আগে
     donors.sort((a,b) => (b.rating||0) - (a.rating||0));
     stopLoadingMsgs();
-    renderResults(donors, blood, div, dist);
+    renderResults(donors, blood, div, dist, upa);
   } catch(e){
     stopLoadingMsgs();
     console.warn('search error (Firestore composite index লাগতে পারে):', e);
@@ -391,13 +519,18 @@ window.searchDonors = async (overrideDiv, overrideDist) => {
 // পড়তে হয় না (একটা কম read, আর দ্রুত)
 let LAST_RESULTS = new Map();
 
-function renderResults(donors, blood, div, dist) {
+function renderResults(donors, blood, div, dist, upa) {
   const el = document.getElementById('results-list');
   LAST_RESULTS = new Map(donors.map(d => [d.id, d]));
 
   if(!donors.length){
-    const areaText = dist ? esc(dist) : (div ? esc(div) : '');
-    const hasAreaFilter = !!(div || dist);
+    const areaText = upa ? esc(upa) : (dist ? esc(dist) : (div ? esc(div) : ''));
+    const hasAreaFilter = !!(div || dist || upa);
+    // এক ধাপ চওড়া করার সাজেশন: উপজেলা → জেলা → বিভাগ → সারা দেশ
+    let widerLabel = 'সারা দেশে খুঁজুন', widerSub = 'এলাকার সীমা তুলে দিন';
+    if (upa)       { widerLabel = dist + ' জেলায় খুঁজুন'; widerSub = 'উপজেলার সীমা তুলে দিন'; }
+    else if (dist) { widerLabel = div + ' বিভাগে খুঁজুন';  widerSub = 'জেলার সীমা তুলে দিন'; }
+
     el.innerHTML = `
       <div class="ns-wrap">
         <div class="ns-icon">🔍</div>
@@ -405,11 +538,11 @@ function renderResults(donors, blood, div, dist) {
         <div class="ns-sub">হাল ছাড়বেন না — নিচের যেকোনো উপায়ে চেষ্টা করুন</div>
 
         ${hasAreaFilter ? `
-        <div class="ns-action" data-act="nationwide">
+        <div class="ns-action" data-act="wider">
           <div class="ns-ico" style="background:#E6F1FB">📍</div>
           <div class="ns-txt">
-            <div class="ns-txt-t">সারা দেশে খুঁজুন</div>
-            <div class="ns-txt-s">এলাকার সীমা তুলে দিন</div>
+            <div class="ns-txt-t">${esc(widerLabel)}</div>
+            <div class="ns-txt-s">${esc(widerSub)}</div>
           </div>
           <span class="ns-chev">›</span>
         </div>` : ''}
@@ -433,12 +566,14 @@ function renderResults(donors, blood, div, dist) {
         </a>
       </div>`;
 
-    const nw = el.querySelector('[data-act="nationwide"]');
+    const nw = el.querySelector('[data-act="wider"]');
     if (nw) nw.addEventListener('click', () => {
-      document.getElementById('div-filter').value = '';
-      document.getElementById('dist-filter').value = '';
-      updateLocText();
-      searchDonors('', '');
+      // এক ধাপ চওড়া: উপজেলা থাকলে সেটা তুলি, নাহলে জেলা, নাহলে বিভাগ
+      if (upa)       { SEL.upazila = ''; searchDonors(); }
+      else if (dist) { SEL.district = ''; SEL.upazila = ''; searchDonors(); }
+      else           { SEL.division = ''; SEL.district = ''; SEL.upazila = ''; searchDonors(); }
+      document.getElementById('loc-row-txt').textContent =
+        SEL.upazila || SEL.district || SEL.division || 'সব বিভাগ';
     });
     return;
   }

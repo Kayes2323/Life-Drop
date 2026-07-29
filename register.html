@@ -182,8 +182,11 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
             </select>
           </div>
           <div class="iw">
-            <select id="r-district"><option value="">জেলা *</option></select>
+            <select id="r-district" onchange="fillUpazilas()"><option value="">জেলা *</option></select>
           </div>
+        </div>
+        <div class="iw">
+          <select id="r-upazila"><option value="">উপজেলা (ঐচ্ছিক)</option></select>
         </div>
         <div class="iw">
           <span class="ico">🏘️</span>
@@ -313,6 +316,14 @@ window.fillDistricts = () => {
   const s = document.getElementById('r-district');
   s.innerHTML = '<option value="">জেলা *</option>';
   (DISTRICTS[d]||[]).forEach(x => s.innerHTML += `<option>${x}</option>`);
+  // জেলা বদলালে উপজেলাও রিসেট
+  document.getElementById('r-upazila').innerHTML = '<option value="">উপজেলা (ঐচ্ছিক)</option>';
+};
+window.fillUpazilas = () => {
+  const d = document.getElementById('r-district').value;
+  const s = document.getElementById('r-upazila');
+  s.innerHTML = '<option value="">উপজেলা (ঐচ্ছিক)</option>';
+  (UPAZILAS[d]||[]).forEach(x => s.innerHTML += `<option>${x}</option>`);
 };
 window.toggleNever = () => {
   const cb = document.getElementById('never-check');
@@ -328,7 +339,7 @@ function setLoad(v) { document.getElementById('loading').classList.toggle('show'
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { isValidBdPhone, normalizeBdPhone } from './app.js';
+import { isValidBdPhone, normalizeBdPhone, DISTRICTS, UPAZILAS } from './app.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, setDoc, getDoc, updateDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const COORDS = {
@@ -378,6 +389,7 @@ window.registerDonor = async () => {
   const phone    = document.getElementById('r-phone').value.trim();
   const division = document.getElementById('r-division').value;
   const district = document.getElementById('r-district').value;
+  const upazila  = document.getElementById('r-upazila').value;
   const area     = document.getElementById('r-area').value.trim();
   const wa       = document.getElementById('r-wa').value.trim();
   const never    = document.getElementById('never-check').checked;
@@ -409,7 +421,7 @@ window.registerDonor = async () => {
       name         : CU.displayName || '',
       email        : CU.email || '',
       photo        : CU.photoURL || '',
-      blood, division, district, area,
+      blood, division, district, upazila, area,
       lat          : coords.lat + (Math.random()-.5)*.04,
       lng          : coords.lng + (Math.random()-.5)*.04,
       lastDonation : lastDate || null,
@@ -457,7 +469,7 @@ window.registerDonor = async () => {
         uid: CU.uid, name: CU.displayName||'',
         email: CU.email||'', photo: CU.photoURL||'',
         isDonor:true, available:true, blood,
-        division, district, donations:0, rating:0, raters:0,
+        division, district, upazila, donations:0, rating:0, raters:0,
         createdAt: serverTimestamp()
       });
     });
