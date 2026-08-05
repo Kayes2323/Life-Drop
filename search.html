@@ -28,6 +28,8 @@
 .loc-row-txt{flex:1;font-size:14px;font-weight:600;color:#222;font-family:'Hind Siliguri',sans-serif}
 .loc-row-chev{color:#ccc;font-size:13px;flex-shrink:0;transition:transform .2s}
 .loc-row-chev.open{transform:rotate(180deg)}
+.reset-link{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:#999;font-size:12px;font-weight:600;font-family:'Hind Siliguri',sans-serif;cursor:pointer;padding:2px 2px 10px;margin-top:-2px}
+.reset-link:active{color:#c0392b}
 
 /* ── লোকেশন পিকার মডাল (এক ট্যাপেই বাছাই — native select-এর ঝামেলা নেই) ── */
 .lp-crumb{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:0 2px 12px;font-size:12px;color:#aaa;font-family:'Hind Siliguri',sans-serif}
@@ -48,8 +50,20 @@
 .area-back{width:30px;height:30px;border-radius:50%;background:#f5f5f5;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;color:#666}
 .area-title{flex:1;font-size:17px;font-weight:800;color:#111;font-family:'Hind Siliguri',sans-serif}
 .area-close{background:none;border:none;font-size:22px;color:#bbb;cursor:pointer;flex-shrink:0;line-height:1}
-.area-crumb{padding:9px 16px;font-size:11.5px;color:#999;font-family:'Hind Siliguri',sans-serif;border-bottom:1px solid #f5f5f5;flex-shrink:0}
-.area-crumb b{color:#c0392b}
+.area-steps{display:flex;align-items:center;padding:13px 14px;border-bottom:1px solid #f0f0f0;flex-shrink:0;gap:4px}
+.astep{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.astep-num{width:24px;height:24px;border-radius:50%;background:#eee;color:#999;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;flex-shrink:0;transition:.2s}
+.astep-txt{min-width:0}
+.astep-name{font-size:11px;font-weight:700;color:#bbb;font-family:'Hind Siliguri',sans-serif;line-height:1.2;transition:.2s}
+.astep-val{font-size:9.5px;color:#c0392b;font-family:'Hind Siliguri',sans-serif;line-height:1.2;margin-top:1px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px}
+.astep-line{flex:1;height:2px;background:#eee;border-radius:2px;min-width:8px}
+/* বর্তমান ধাপ — লাল, বড় করে বোঝানো */
+.astep.current .astep-num{background:#c0392b;color:#fff}
+.astep.current .astep-name{color:#c0392b}
+/* সম্পন্ন ধাপ — টিক চিহ্ন, সবুজাভ */
+.astep.done .astep-num{background:#2e7d32;color:#fff}
+.astep.done .astep-name{color:#555}
+.area-hint{padding:11px 14px;font-size:11.5px;color:#8a6d3b;background:#fdf8ee;font-family:'Hind Siliguri',sans-serif;line-height:1.55;border-bottom:1px solid #f5f0e5}
 .area-list{overflow-y:auto;padding:6px 0 14px;flex:1}
 .area-item{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;border-bottom:1px solid #f6f6f6}
 .area-item:active{background:#faf0ef}
@@ -59,6 +73,7 @@
 .area-item.all .area-item-t{color:#c0392b;font-weight:700}
 .area-item.selected{background:#fdecea}
 .area-pick-all{margin:10px 16px 4px;padding:13px;background:#c0392b;color:#fff;border:none;border-radius:12px;font-size:13.5px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;width:calc(100% - 32px)}
+.area-clear{margin:6px 16px 4px;padding:11px;background:#fff;color:#888;border:1px solid #e5e5e5;border-radius:12px;font-size:12.5px;font-weight:600;font-family:'Hind Siliguri',sans-serif;cursor:pointer;width:calc(100% - 32px)}
 .search-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;background:#eee;color:#bbb;transition:.15s}
 .search-btn.ready{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;box-shadow:0 5px 16px rgba(192,57,43,.3)}
 .results-list{flex:1;overflow-y:auto;padding:11px}
@@ -124,6 +139,8 @@
 .iw:focus-within{border-color:#c0392b;background:#fff}
 .iw input,.iw select{flex:1;border:none;background:transparent;padding:12px 0;font-size:14px;outline:none;font-family:'Hind Siliguri',sans-serif}
 .iico{font-size:15px;margin-right:10px;opacity:.6}
+.iico2{color:#8E8E8E;margin-right:10px;flex-shrink:0}
+.info-ico2{color:#8E8E8E;flex-shrink:0;width:20px}
 .req-area{width:100%;padding:11px;border:1.5px solid #eee;border-radius:12px;font-size:13px;resize:none;height:75px;font-family:'Hind Siliguri',sans-serif;outline:none;margin-bottom:11px}
 .req-area:focus{border-color:#c0392b}
 .submit-btn{width:100%;padding:13px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
@@ -169,9 +186,44 @@
   100%{width:0%;margin-left:100%}
 }
 
+/* ── আইকন ── */
+.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;display:block}
+.ic-sm{width:15px;height:15px}
+.ic-lg{width:21px;height:21px}
+.ic-tile{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 </style>
 </head>
 <body>
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol>
+  <symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5 0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z"/></symbol>
+  <symbol id="i-droplet-f" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5 0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 12 12 3l9 9v9h-6v-6H9v6H3v-9z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 3h4l2 5-2.5 1.5a12 12 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L3 21l2-6.2A8 8 0 1 1 21 12z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 21l8.8-8.3a5 5 0 0 0 0-7.1z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="m2 7 10 6 10-6"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-hospital" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M12 9v6M9 12h6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+  <symbol id="i-nav" viewBox="0 0 24 24"><path d="M3 11 22 2l-9 19-2-8-8-2z"/></symbol>
+  <symbol id="i-stetho" viewBox="0 0 24 24"><path d="M5 3v5a4 4 0 0 0 8 0V3"/><path d="M9 12v3a5 5 0 0 0 10 0v-2"/><circle cx="19" cy="10" r="2"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M8 3h8v3a4 4 0 0 1-1 2.6V19a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V8.6A4 4 0 0 1 8 6V3z"/></symbol>
+  <symbol id="i-shield-lock" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/><rect x="9.5" y="10.5" width="5" height="4" rx="1"/><path d="M10.5 10.5V9a1.5 1.5 0 0 1 3 0v1.5"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 12h5l2 3h4l2-3h5"/><path d="M5 5h14l2 7v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6l2-7z"/></symbol>
+</svg>
+
 <div class="app">
 
   <div class="header">
@@ -187,7 +239,7 @@
 
   <div class="search-top">
     <div class="search-top-title">রক্তদাতা খুঁজুন</div>
-    <div class="search-top-sub">গ্রুপ বেছে নিন, তারপর খুঁজুন</div>
+    <div class="search-top-sub">১. রক্তের গ্রুপ বেছে নিন → ২. এলাকা বেছে নিন → খুঁজুন</div>
     <div class="search-card">
       <div class="bg-label">রক্তের গ্রুপ বেছে নিন</div>
       <div class="bg-grid" id="bg-grid">
@@ -202,11 +254,15 @@
       </div>
 
       <div class="loc-row" id="loc-row" onclick="openLocModal()">
-        <span class="loc-row-icon">📍</span>
-        <span class="loc-row-txt" id="loc-row-txt">সব বিভাগ</span>
+        <svg class="ic" style="color:#c0392b"><use href="#i-pin"/></svg>
+        <span class="loc-row-txt" id="loc-row-txt">এলাকা বেছে নিন</span>
         <span style="font-size:11.5px;color:#c0392b;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-right:2px">বদলান</span>
         <span class="loc-row-chev">›</span>
       </div>
+
+      <button class="reset-link" id="reset-link" onclick="resetFilters()" style="display:none">
+        <svg class="ic" style="width:13px;height:13px"><use href="#i-alert"/></svg>সব ফিল্টার মুছুন
+      </button>
 
       <button class="search-btn" id="search-btn" disabled onclick="searchDonors()">খুঁজুন</button>
     </div>
@@ -214,7 +270,7 @@
 
   <div class="results-list" id="results-list">
     <div class="hint-box">
-      <div style="font-size:40px">🩸</div>
+      <svg class="ic" style="width:38px;height:38px;color:#f0b8b0"><use href="#i-droplet"/></svg>
       <p>উপরে রক্তের গ্রুপ বেছে নিয়ে খুঁজুন শুরু করুন</p>
     </div>
   </div>
@@ -227,7 +283,25 @@
         <span class="area-title" id="area-title">বিভাগ বেছে নিন</span>
         <button class="area-close" onclick="closeArea()">×</button>
       </div>
-      <div class="area-crumb" id="area-crumb">সব বিভাগ থেকে খোঁজা হবে</div>
+
+      <!-- সবসময় দৃশ্যমান ধাপ-নির্দেশক: এখন কোথায় আছি, এরপর কী -->
+      <div class="area-steps" id="area-steps">
+        <div class="astep" data-s="division">
+          <div class="astep-num">১</div>
+          <div class="astep-txt"><div class="astep-name">বিভাগ</div><div class="astep-val" id="astep-val-division"></div></div>
+        </div>
+        <div class="astep-line"></div>
+        <div class="astep" data-s="district">
+          <div class="astep-num">২</div>
+          <div class="astep-txt"><div class="astep-name">জেলা</div><div class="astep-val" id="astep-val-district"></div></div>
+        </div>
+        <div class="astep-line"></div>
+        <div class="astep" data-s="upazila">
+          <div class="astep-num">৩</div>
+          <div class="astep-txt"><div class="astep-name">উপজেলা</div><div class="astep-val" id="astep-val-upazila">ঐচ্ছিক</div></div>
+        </div>
+      </div>
+
       <div class="area-list" id="area-list"></div>
     </div>
   </div>
@@ -273,15 +347,15 @@
     <div class="modal-body">
       <input type="hidden" id="req-donor-id"/>
       <div class="form-group"><label>আপনার নাম *</label>
-        <div class="iw"><span class="iico">👤</span><input type="text" id="req-name" placeholder="আপনার নাম"/></div>
+        <div class="iw"><svg class="ic ic-sm iico2"><use href="#i-user"/></svg><input type="text" id="req-name" placeholder="আপনার নাম"/></div>
       </div>
       <div class="form-group"><label>আপনার ফোন *</label>
-        <div class="iw"><span class="iico">📞</span><input type="tel" id="req-phone" placeholder="01XXXXXXXXX"/></div>
+        <div class="iw"><svg class="ic ic-sm iico2"><use href="#i-phone"/></svg><input type="tel" id="req-phone" placeholder="01XXXXXXXXX"/></div>
       </div>
       <div class="form-group"><label>হাসপাতাল ও বিবরণ *</label>
         <textarea class="req-area" id="req-msg" placeholder="কোন হাসপাতাল, কখন লাগবে, রোগীর অবস্থা..."></textarea>
       </div>
-      <button class="submit-btn" id="req-btn" onclick="submitReq()">🩸 অনুরোধ পাঠান</button>
+      <button class="submit-btn" id="req-btn" onclick="submitReq()"><svg class="ic ic-sm" style="vertical-align:-2px;margin-right:5px"><use href="#i-droplet-f"/></svg>অনুরোধ পাঠান</button>
     </div>
   </div>
 </div>
@@ -371,25 +445,18 @@ window.areaBack = () => {
 function renderArea() {
   const list = document.getElementById('area-list');
   const title = document.getElementById('area-title');
-  const crumb = document.getElementById('area-crumb');
   const back = document.getElementById('area-back');
   back.style.display = areaLevel === 'division' ? 'none' : 'flex';
 
-  // ব্রেডক্রাম্ব — এ পর্যন্ত কী বাছা হয়েছে
-  const parts = [];
-  if (SEL.division) parts.push(SEL.division);
-  if (SEL.district) parts.push(SEL.district);
-  if (SEL.upazila)  parts.push(SEL.upazila);
-  crumb.innerHTML = parts.length
-    ? 'নির্বাচিত: <b>' + parts.map(esc).join(' › ') + '</b>'
-    : 'সব বিভাগ থেকে খোঁজা হবে';
+  // ── ধাপ-নির্দেশক হালনাগাদ ──
+  // প্রতিটা ধাপ: সম্পন্ন (done + টিক ও নির্বাচিত মান) / বর্তমান (current) / বাকি
+  updateSteps();
 
   let items = '';
 
   if (areaLevel === 'division') {
-    title.textContent = 'বিভাগ বেছে নিন';
-    // "সব বিভাগ" — কোনো ফিল্টার ছাড়া
-    items += `<div class="area-item all" data-pick="division" data-val=""><span class="area-item-t">সারা বাংলাদেশে খুঁজুন</span></div>`;
+    title.textContent = 'ধাপ ১: বিভাগ বেছে নিন';
+    items += `<div class="area-hint">আপনার বিভাগ বেছে নিন।</div>`;
     DIVISIONS.forEach(d => {
       items += `<div class="area-item ${SEL.division===d?'selected':''}" data-pick="division" data-val="${esc(d)}">
         <span class="area-item-t">${esc(d)}</span>
@@ -397,8 +464,8 @@ function renderArea() {
     });
   }
   else if (areaLevel === 'district') {
-    title.textContent = SEL.division + ' — জেলা';
-    // এই বিভাগের সব — জেলা ফিল্টার ছাড়া, শুধু বিভাগ
+    title.textContent = 'ধাপ ২: জেলা বেছে নিন';
+    items += `<div class="area-hint">${esc(SEL.division)} বিভাগের জেলা বেছে নিন। পুরো বিভাগে খুঁজতে চাইলে নিচের লাল বাটন।</div>`;
     items += `<button class="area-pick-all" data-pick="district" data-val="">পুরো ${esc(SEL.division)} বিভাগে খুঁজুন</button>`;
     (DISTRICTS[SEL.division] || []).forEach(d => {
       items += `<div class="area-item ${SEL.district===d?'selected':''}" data-pick="district" data-val="${esc(d)}">
@@ -407,9 +474,14 @@ function renderArea() {
     });
   }
   else { // upazila
-    title.textContent = SEL.district + ' — উপজেলা';
+    title.textContent = 'ধাপ ৩: উপজেলা (ঐচ্ছিক)';
     const ups = UPAZILAS[SEL.district] || [];
+    items += `<div class="area-hint">এই ধাপ ঐচ্ছিক। সরাসরি "পুরো ${esc(SEL.district)} জেলায় খুঁজুন" চাপলেও চলবে।</div>`;
     items += `<button class="area-pick-all" data-pick="upazila" data-val="">পুরো ${esc(SEL.district)} জেলায় খুঁজুন</button>`;
+    // উপজেলা আগে বাছা থাকলে — বাতিল করার সরাসরি সুযোগ
+    if (SEL.upazila) {
+      items += `<button class="area-clear" data-pick="upazila" data-val="">✕ "${esc(SEL.upazila)}" নির্বাচন বাতিল করুন</button>`;
+    }
     if (!ups.length) {
       items += `<div style="padding:20px;text-align:center;color:#bbb;font-size:12px">এই জেলার উপজেলা তালিকা নেই</div>`;
     }
@@ -420,6 +492,25 @@ function renderArea() {
   }
 
   list.innerHTML = items;
+}
+
+// ধাপ-নির্দেশকের প্রতিটা ধাপের অবস্থা (done/current/বাকি) ও নির্বাচিত মান বসায়
+function updateSteps() {
+  const order = ['division', 'district', 'upazila'];
+  const curIdx = order.indexOf(areaLevel);
+  order.forEach((step, i) => {
+    const el = document.querySelector(`.astep[data-s="${step}"]`);
+    if (!el) return;
+    el.classList.toggle('current', i === curIdx);
+    el.classList.toggle('done', i < curIdx);
+    const num = el.querySelector('.astep-num');
+    // সম্পন্ন ধাপে সংখ্যার বদলে টিক
+    num.textContent = i < curIdx ? '✓' : ['১','২','৩'][i];
+  });
+  // নির্বাচিত মান দেখাই
+  document.getElementById('astep-val-division').textContent = SEL.division || '';
+  document.getElementById('astep-val-district').textContent = SEL.district || '';
+  document.getElementById('astep-val-upazila').textContent  = SEL.upazila || (areaLevel === 'upazila' ? 'ঐচ্ছিক' : '');
 }
 
 // তালিকায় ক্লিক
@@ -440,6 +531,12 @@ document.getElementById('area-list').addEventListener('click', e => {
     areaLevel = 'upazila'; renderArea();
   }
   else { // upazila
+    // "বাতিল করুন" বাটন (data-clear) — মডাল বন্ধ না করে তালিকায় থাকি
+    if (el.classList.contains('area-clear')) {
+      SEL.upazila = '';
+      renderArea();
+      return;
+    }
     SEL.upazila = val;
     finishArea();                               // উপজেলা বাছলে (বা "পুরো জেলা") শেষ
   }
@@ -449,8 +546,24 @@ document.getElementById('area-list').addEventListener('click', e => {
 function finishArea() {
   const label = SEL.upazila || SEL.district || SEL.division || 'সব বিভাগ';
   document.getElementById('loc-row-txt').textContent = label;
+  refreshResetLink();
   closeArea();
 }
+
+// এলাকা নির্বাচন করা থাকলেই "সব ফিল্টার মুছুন" লিংক দেখাই
+function refreshResetLink() {
+  const any = SEL.division || SEL.district || SEL.upazila;
+  document.getElementById('reset-link').style.display = any ? 'inline-flex' : 'none';
+}
+
+// এক ক্লিকে সব এলাকা-ফিল্টার মুছে "সারা বাংলাদেশ" অবস্থায় ফেরা
+window.resetFilters = () => {
+  SEL = { division: '', district: '', upazila: '' };
+  areaLevel = 'division';
+  document.getElementById('loc-row-txt').textContent = 'সব বিভাগ';
+  refreshResetLink();
+  showToast('ফিল্টার মুছে ফেলা হয়েছে');
+};
 
 
 
@@ -564,13 +677,13 @@ function renderResults(donors, blood, div, dist, upa) {
 
     el.innerHTML = `
       <div class="ns-wrap">
-        <div class="ns-icon">🔍</div>
+        <div class="ns-icon"><svg class="ic ic-lg" style="color:#c0392b"><use href="#i-search"/></svg></div>
         <div class="ns-title">${areaText ? areaText+'য়' : 'এই মুহূর্তে'} ${esc(blood)} রক্তদাতা পাওয়া যায়নি</div>
         <div class="ns-sub">হাল ছাড়বেন না — নিচের যেকোনো উপায়ে চেষ্টা করুন</div>
 
         ${hasAreaFilter ? `
         <div class="ns-action" data-act="wider">
-          <div class="ns-ico" style="background:#E6F1FB">📍</div>
+          <div class="ns-ico" style="background:#E6F1FB"><svg class="ic ic-lg" style="color:#185FA5"><use href="#i-pin"/></svg></div>
           <div class="ns-txt">
             <div class="ns-txt-t">${esc(widerLabel)}</div>
             <div class="ns-txt-s">${esc(widerSub)}</div>
@@ -579,7 +692,7 @@ function renderResults(donors, blood, div, dist, upa) {
         </div>` : ''}
 
         <a class="ns-action" href="request.html">
-          <div class="ns-ico" style="background:#FAEEDA">🆘</div>
+          <div class="ns-ico" style="background:#FAEEDA"><svg class="ic ic-lg" style="color:#854F0B"><use href="#i-alert"/></svg></div>
           <div class="ns-txt">
             <div class="ns-txt-t">জরুরি অনুরোধ পোস্ট করুন</div>
             <div class="ns-txt-s">সব রক্তদাতা দেখতে পাবেন</div>
@@ -588,7 +701,7 @@ function renderResults(donors, blood, div, dist, upa) {
         </a>
 
         <a class="ns-action accent" href="bloodbank.html">
-          <div class="ns-ico" style="background:#fdecea">🩸</div>
+          <div class="ns-ico" style="background:#fdecea"><svg class="ic ic-lg" style="color:#c0392b"><use href="#i-bag"/></svg></div>
           <div class="ns-txt">
             <div class="ns-txt-t">কাছের ব্লাড ব্যাংকে যোগাযোগ</div>
             <div class="ns-txt-s">স্বেচ্ছাসেবী সংগঠনের সাহায্য নিন</div>
@@ -630,23 +743,23 @@ function renderResults(donors, blood, div, dist, upa) {
           <div class="dname">${esc(d.name)}</div>
           <div class="dbadges">
             <span class="badge blood">${esc(d.blood)}</span>
-            ${d.urgentReady?'<span class="badge urgent">⚡ জরুরি</span>':''}
+            ${d.urgentReady?'<span class="badge urgent"><svg class="ic" style="width:11px;height:11px;vertical-align:-1px;margin-right:2px"><use href="#i-alert"/></svg>জরুরি</span>':''}
             ${upa ? (d._upaMatch
-              ? `<span class="badge" style="background:#EAF3DE;color:#3B6D11">📍 ${esc(upa)}</span>`
+              ? `<span class="badge" style="background:#EAF3DE;color:#3B6D11"><svg class="ic" style="width:10px;height:10px;vertical-align:-1px;margin-right:2px"><use href="#i-pin"/></svg>${esc(upa)}</span>`
               : `<span class="badge" style="background:#F4F4F4;color:#8E8E8E">${esc(dist)} জেলায়</span>`) : ''}
           </div>
-          <div class="dloc">📌 ${esc([d.area,d.district,d.division].filter(Boolean).join(', '))}</div>
+          <div class="dloc"><svg class="ic" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px"><use href="#i-pin"/></svg>${esc([d.area,d.district,d.division].filter(Boolean).join(', '))}</div>
           <div style="font-size:11px;color:#aaa">${starsHtml(d.rating||0)} · ${esc(d.donations||0)} বার দান করেছেন</div>
         </div>
       </div>
       <div class="phone-row">
-        <button class="reveal-btn" data-act="reveal" data-id="${esc(d.id)}" style="border:none;background:#fdecea;color:#c0392b;font-weight:700;font-size:12px;padding:8px 14px;border-radius:10px;cursor:pointer;font-family:'Hind Siliguri',sans-serif">🔒 নম্বর দেখুন</button>
+        <button class="reveal-btn" data-act="reveal" data-id="${esc(d.id)}" style="border:none;background:#fdecea;color:#c0392b;font-weight:700;font-size:12px;padding:8px 14px;border-radius:10px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:inline-flex;align-items:center;gap:5px"><svg class="ic ic-sm"><use href="#i-shield-lock"/></svg>নম্বর দেখুন</button>
       </div>
       <div class="dactions">
-        <button class="abtn call" data-act="call" data-id="${esc(d.id)}">📞 Call</button>
-        <button class="abtn wa" data-act="wa" data-id="${esc(d.id)}">💬 WA</button>
-        <button class="abtn view" data-act="view" data-id="${esc(d.id)}">👤 Profile</button>
-        <button class="abtn req" data-act="req" data-id="${esc(d.id)}">🩸 অনুরোধ</button>
+        <button class="abtn call" data-act="call" data-id="${esc(d.id)}"><svg class="ic ic-sm"><use href="#i-phone"/></svg>Call</button>
+        <button class="abtn wa" data-act="wa" data-id="${esc(d.id)}"><svg class="ic ic-sm"><use href="#i-chat"/></svg>WA</button>
+        <button class="abtn view" data-act="view" data-id="${esc(d.id)}"><svg class="ic ic-sm"><use href="#i-user"/></svg>Profile</button>
+        <button class="abtn req" data-act="req" data-id="${esc(d.id)}"><svg class="ic ic-sm"><use href="#i-droplet-f"/></svg>অনুরোধ</button>
       </div>
     </div>`;
   }).join('');
@@ -719,10 +832,10 @@ document.getElementById('results-list').addEventListener('click', async e => {
   if (act === 'reveal') {
     btn.textContent = 'লোড হচ্ছে...'; btn.disabled = true;
     const d = await ensurePrivate(btn.dataset.id);
-    if(!d){ btn.disabled=false; btn.textContent='🔒 নম্বর দেখুন'; return; }
+    if(!d){ btn.disabled=false; btn.innerHTML='<svg class="ic ic-sm"><use href="#i-shield-lock"/></svg>নম্বর দেখুন'; return; }
     btn.closest('.phone-row').innerHTML =
-      `<span>📞 ${esc(d.phone||'—')}</span>
-       <button class="phone-copy" data-act="copy" data-phone="${esc(d.phone||'')}">📋</button>`;
+      `<span><svg class="ic ic-sm" style="vertical-align:-2px;margin-right:4px"><use href="#i-phone"/></svg>${esc(d.phone||'—')}</span>
+       <button class="phone-copy" data-act="copy" data-phone="${esc(d.phone||'')}"><svg class="ic ic-sm"><use href="#i-copy"/></svg></button>`;
   } else if (act === 'copy') {
     navigator.clipboard?.writeText(btn.dataset.phone)
       .then(() => showToast('নম্বর কপি হয়েছে!'))
@@ -759,15 +872,15 @@ window.viewProfile = (id) => {
       <div style="font-size:17px;font-weight:800;font-family:'Inter',sans-serif">${esc(d.name)}</div>
       <span style="display:inline-block;background:#c0392b;color:#fff;font-size:12px;font-weight:700;padding:3px 14px;border-radius:20px;margin:6px 0">${esc(d.blood)}</span>
     </div>
-    <div class="info-row"><span class="info-ico">📌</span><span class="info-label">অবস্থান</span><span class="info-val">${esc([d.area,d.district,d.division].filter(Boolean).join(', '))}</span></div>
-    <div class="info-row" id="dp-phone-row"><span class="info-ico">📞</span><span class="info-label">ফোন</span><span class="info-val"><button data-act="reveal" data-id="${esc(d.id)}" style="border:none;background:#fdecea;color:#c0392b;font-weight:700;font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif">🔒 দেখুন</button></span></div>
-    <div class="info-row"><span class="info-ico">🩸</span><span class="info-label">মোট দান</span><span class="info-val">${esc(d.donations||0)} বার</span></div>
-    <div class="info-row"><span class="info-ico">📅</span><span class="info-label">শেষ দান</span><span class="info-val">${esc(d.lastDonation||(d.neverDonated?'এখনো দেননি':'—'))}</span></div>
+    <div class="info-row"><svg class="ic info-ico2"><use href="#i-pin"/></svg><span class="info-label">অবস্থান</span><span class="info-val">${esc([d.area,d.district,d.division].filter(Boolean).join(', '))}</span></div>
+    <div class="info-row" id="dp-phone-row"><svg class="ic info-ico2"><use href="#i-phone"/></svg><span class="info-label">ফোন</span><span class="info-val"><button data-act="reveal" data-id="${esc(d.id)}" style="border:none;background:#fdecea;color:#c0392b;font-weight:700;font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:inline-flex;align-items:center;gap:4px"><svg class="ic ic-sm"><use href="#i-shield-lock"/></svg>দেখুন</button></span></div>
+    <div class="info-row"><svg class="ic info-ico2"><use href="#i-droplet"/></svg><span class="info-label">মোট দান</span><span class="info-val">${esc(d.donations||0)} বার</span></div>
+    <div class="info-row"><svg class="ic info-ico2"><use href="#i-cal"/></svg><span class="info-label">শেষ দান</span><span class="info-val">${esc(d.lastDonation||(d.neverDonated?'এখনো দেননি':'—'))}</span></div>
     <div class="info-row"><span class="info-ico">⭐</span><span class="info-label">Rating</span><span class="info-val">${starsHtml(d.rating||0)} ${d.raters?'('+esc(d.raters)+' জন)':''}</span></div>
     <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="abtn call" data-act="call" data-id="${esc(d.id)}" style="flex:1;padding:12px">📞 Call</button>
-      <button class="abtn wa" data-act="wa" data-id="${esc(d.id)}" style="flex:1;padding:12px">💬 WhatsApp</button>
-      <button class="abtn req" data-act="req" data-id="${esc(d.id)}" style="flex:1;padding:12px">🩸 অনুরোধ</button>
+      <button class="abtn call" data-act="call" data-id="${esc(d.id)}" style="flex:1;padding:12px"><svg class="ic ic-sm"><use href="#i-phone"/></svg>Call</button>
+      <button class="abtn wa" data-act="wa" data-id="${esc(d.id)}" style="flex:1;padding:12px"><svg class="ic ic-sm"><use href="#i-chat"/></svg>WhatsApp</button>
+      <button class="abtn req" data-act="req" data-id="${esc(d.id)}" style="flex:1;padding:12px"><svg class="ic ic-sm"><use href="#i-droplet-f"/></svg>অনুরোধ</button>
     </div>`;
   document.getElementById('dp-modal').classList.add('open');
 };
@@ -821,9 +934,9 @@ window.submitReq = async () => {
     });
     document.getElementById('req-modal').classList.remove('open');
     document.getElementById('req-msg').value='';
-    showToast('✅ অনুরোধ পাঠানো হয়েছে!');
+    showToast('অনুরোধ পাঠানো হয়েছে');
   } catch(e){ showToast('অনুরোধ পাঠানো যায়নি'); console.warn(e); }
-  finally{ btn.textContent='🩸 অনুরোধ পাঠান'; btn.disabled=false; }
+  finally{ btn.innerHTML='<svg class="ic ic-sm" style="vertical-align:-2px;margin-right:5px"><use href="#i-droplet-f"/></svg>অনুরোধ পাঠান'; btn.disabled=false; }
 };
 </script>
 <div class="install-banner" id="install-banner">
@@ -831,7 +944,7 @@ window.submitReq = async () => {
     <div class="install-modal-icon"><img src="icon-192.png" alt="Sondhan"/></div>
     <div class="install-modal-title">Sondhan ইনস্টল করুন</div>
     <div class="install-modal-sub">ভালো অভিজ্ঞতার জন্য অ্যাপটি ডাউনলোড করুন</div>
-    <button class="install-modal-btn" onclick="installApp()">📲 ইনস্টল করুন</button>
+    <button class="install-modal-btn" onclick="installApp()"><svg class="ic ic-sm" style="vertical-align:-2px;margin-right:5px"><use href="#i-download"/></svg>ইনস্টল করুন</button>
     <div class="install-modal-later" onclick="dismissInstall()">পরে করবো</div>
   </div>
 </div>

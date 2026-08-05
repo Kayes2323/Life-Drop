@@ -7,7 +7,7 @@
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন,
 // নাহলে ইউজাররা পুরনো ক্যাশ করা ফাইল দেখতে থাকবে।
-const CACHE_VERSION = 'sondhan-v17';
+const CACHE_VERSION = 'sondhan-v23';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -32,6 +32,22 @@ const APP_SHELL = [
   './icon-512.png'
 ];
 
+// BUGFIX (৫ সেকেন্ডের লগইন-ফ্ল্যাশ): Firebase SDK (auth/firestore/app)
+// gstatic.com থেকে আমদানি হয়, আর নিচের fetch handler cross-origin
+// রিকোয়েস্ট এড়িয়ে যায় (ভালো কারণেই — fonts/অন্য cross-origin
+// রিসোর্সে আগে সমস্যা হয়েছিল)। ফলে প্রতিবার পেজ লোডে Firebase SDK
+// নতুন করে নেটওয়ার্ক থেকে নামতো — ধীর নেটওয়ার্কে onAuthStateChanged
+// চালুই হতে কয়েক সেকেন্ড লেগে যেতো, তাই লগইন অবস্থা "উধাও" হয়ে
+// কিছুক্ষণ পর ফিরে আসতো বলে মনে হতো। এই ৩টা URL সুনির্দিষ্টভাবে,
+// শুধু এগুলোই cache করছি (fonts/অন্য কিছু ছোঁয়া হচ্ছে না) —
+// এগুলো Firebase নিজেই CORS-enabled রাখে (ESM import সমর্থনের জন্য),
+// তাই আগের cross-origin ক্যাশিং বাগের ঝুঁকি এখানে নেই।
+const FIREBASE_SDK_URLS = [
+  'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js',
+  'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js',
+  'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js'
+];
+
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_VERSION).then(cache =>
@@ -41,7 +57,7 @@ self.addEventListener('install', event => {
       // cache হয় — একটা fail করলে বাকিগুলো ঠিকই cache থেকে যায়,
       // আর কোনটা fail করলো তা console-এ স্পষ্ট দেখা যায়।
       Promise.allSettled(
-        APP_SHELL.map(url =>
+        [...APP_SHELL, ...FIREBASE_SDK_URLS].map(url =>
           cache.add(url).catch(err => {
             console.warn('[SW] cache করা যায়নি:', url, err.message);
             return null;
@@ -64,6 +80,27 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const req = event.request;
+
+  // Firebase SDK (auth/firestore/app) — সুনির্দিষ্ট এই ৩টা URL-ই
+  // cache-first, ব্যাকগ্রাউন্ডে আপডেট করে রাখে। এর ফলে onAuthStateChanged
+  // চালু হতে নেটওয়ার্কের অপেক্ষা করতে হয় না, লগইন অবস্থা সাথে সাথে বোঝা যায়।
+  if (req.method === 'GET' && FIREBASE_SDK_URLS.includes(req.url)) {
+    event.respondWith(
+      caches.match(req).then(cached => {
+        const network = fetch(req)
+          .then(res => {
+            if (res && res.ok) {
+              const copy = res.clone();
+              caches.open(CACHE_VERSION).then(c => c.put(req, copy));
+            }
+            return res;
+          })
+          .catch(() => cached);
+        return cached || network;
+      })
+    );
+    return;
+  }
 
   // শুধু GET, এবং শুধু নিজেদের origin — Firebase/Google Fonts/gstatic
   // request-এ হাত দেওয়া হয় না, ওগুলো সরাসরি নেটওয়ার্কে যাক

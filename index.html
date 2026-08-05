@@ -42,6 +42,14 @@
 </style>
 </head>
 <body>
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol>
+  <symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5 0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M8 3h8v3a4 4 0 0 1-1 2.6V19a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V8.6A4 4 0 0 1 8 6V3z"/></symbol>
+</svg>
+
 <div id="loading-screen" class="loading-screen">
   <div class="sondhan-logo sondhan-logo--splash">
     <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
@@ -94,30 +102,30 @@
     <!-- QUICK ACTIONS -->
     <div class="section" style="padding:12px 12px 0">
       <div class="sec-title">দ্রুত একশন</div>
-      <div class="action-grid">
-        <button class="ac red" onclick="goGuarded('search.html')">
-          <div class="ac-bg">🔍</div>
-          <div class="ac-icon">🔍</div>
-          <div class="ac-label">রক্তদাতা খুঁজুন</div>
+      <div class="qa-grid">
+        <button class="qa" onclick="goGuarded('search.html')">
+          <div class="qa-tile red"><svg class="qa-ic"><use href="#i-search"/></svg></div>
+          <div class="qa-label">রক্তদাতা খুঁজুন</div>
+          <div class="qa-sub">কাছের ডোনার</div>
         </button>
-        <button class="ac orange" onclick="goGuarded('request.html')">
-          <div class="ac-bg">🆘</div>
-          <div class="ac-icon">🆘</div>
-          <div class="ac-label">জরুরি অনুরোধ</div>
+        <button class="qa" onclick="goGuarded('request.html')">
+          <div class="qa-tile amber"><svg class="qa-ic"><use href="#i-alert"/></svg></div>
+          <div class="qa-label">জরুরি অনুরোধ</div>
+          <div class="qa-sub">এখনই রক্ত দরকার?</div>
         </button>
-        <button class="ac teal" onclick="goGuarded('ambulance.html')">
-          <div class="ac-bg">🚑</div>
-          <div class="ac-icon">🚑</div>
-          <div class="ac-label">অ্যাম্বুলেন্স খুঁজুন</div>
+        <button class="qa" onclick="window.location.href='bloodbank.html'">
+          <div class="qa-tile green"><svg class="qa-ic"><use href="#i-bag"/></svg></div>
+          <div class="qa-label">ব্লাড ব্যাংক</div>
+          <div class="qa-sub">তালিকা দেখুন</div>
         </button>
-        <button class="ac green" onclick="goGuarded('register.html')">
-          <div class="ac-bg">🩸</div>
-          <div class="ac-icon">🩸</div>
-          <div class="ac-label">Donor হোন</div>
+        <button class="qa" onclick="goGuarded('register.html')">
+          <div class="qa-tile violet"><svg class="qa-ic"><use href="#i-droplet"/></svg></div>
+          <div class="qa-label">Donor হোন</div>
+          <div class="qa-sub">নিবন্ধন করুন</div>
         </button>
-        <button class="ac blue full" onclick="window.location.href='about.html'">
-          <div class="ac-icon">ℹ️</div>
-          <div class="ac-label">আমাদের সম্পর্কে জানুন</div>
+        <button class="qa qa-full" onclick="window.location.href='about.html'">
+          <div class="qa-tile blue"><svg class="qa-ic"><use href="#i-info"/></svg></div>
+          <div class="qa-label">আমাদের সম্পর্কে জানুন</div>
         </button>
       </div>
     </div>
@@ -165,8 +173,7 @@
     <!-- FOOTER -->
     <div class="app-footer">
       <div class="footer-social">
-        <a href="https://www.facebook.com/" target="_blank" rel="noopener" class="footer-soc" aria-label="Facebook">f</a>
-        <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="footer-soc" aria-label="Instagram">◎</a>
+        <a href="https://www.facebook.com/share/19A7JwXeL8/" target="_blank" rel="noopener" class="footer-soc" aria-label="Facebook">f</a>
       </div>
       <a href="about.html" class="footer-link">আমাদের সম্পর্কে</a>
       <div class="footer-copy">মানবতার সন্ধানে</div>
