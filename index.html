@@ -85,28 +85,99 @@
 
     <!-- SLIDER -->
     <div class="banner">
-      <div class="slider-wrap">
-        <div class="slide active" id="slide-0">
-          <div class="slide-tag"><svg class="ic ic-sm" style="vertical-align:-2px;margin-right:4px"><use href="#i-book"/></svg>কুরআনের বাণী</div>
-          <h2>যে একজনের প্রাণ বাঁচালো, সে যেন পুরো মানবজাতিকে বাঁচালো</h2>
-          <div class="ref">— সূরা আল-মায়েদা: ৩২</div>
-        </div>
-        <div class="slide" id="slide-1">
-          <div class="slide-tag">আমাদের আহ্বান</div>
-          <h2>ডোনার রেজিস্ট্রেশন ফর্ম পূরণ করে মানবতার কল্যাণে যুক্ত হোন।</h2>
-          <div class="ref">— Sondhan</div>
-        </div>
-        <div class="slide" id="slide-2">
-          <div class="slide-tag"><svg class="ic ic-sm" style="vertical-align:-2px;margin-right:4px"><use href="#i-megaphone"/></svg>Notice</div>
-          <h2>Sondhan বর্তমানে উন্নয়ন ও পরীক্ষামূলক কার্যক্রমের মধ্যে রয়েছে। খুব শীঘ্রই পূর্ণাঙ্গ সেবা চালু হবে ইনশাআল্লাহ।</h2>
-          <div class="ref">— Sondhan Team</div>
+      <div class="hero">
+        <div class="hero-track" id="hero-track">
+
+          <!-- স্লাইড ০: কুরআনের বাণী (উক্তি, কোনো CTA নেই — আগের মতোই) -->
+          <div class="hslide quran">
+            <div class="fshape f1"></div>
+            <div class="fshape f2"></div>
+            <div class="htag"><svg class="ic ic-sm" style="vertical-align:-2px;margin-right:4px"><use href="#i-book"/></svg>কুরআনের বাণী</div>
+            <div class="hquote">যে একজনের প্রাণ বাঁচালো, সে যেন পুরো মানবজাতিকে বাঁচালো</div>
+            <div class="href">— সূরা আল-মায়েদা: ৩২</div>
+          </div>
+
+          <!-- স্লাইড ১: Become a Blood Donor -->
+          <div class="hslide donor">
+            <div class="fshape f1"></div>
+            <div class="fshape f2"></div>
+            <div class="hillust">
+              <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.2">
+                <circle cx="10" cy="7" r="3.4"/>
+                <path d="M4 20c0-3.3 2.9-6 6.5-6"/>
+                <path d="M16 12.5s-2.3 2.5-2.3 4a2.3 2.3 0 0 0 4.6 0c0-1.5-2.3-4-2.3-4z" fill="rgba(255,255,255,.35)" stroke="none"/>
+              </svg>
+            </div>
+            <div class="htag">সহজ নিবন্ধন</div>
+            <div class="htitle">রক্তদাতা হয়ে উঠুন</div>
+            <div class="hsub">এক ব্যাগ রক্ত বাঁচাতে পারে একটা জীবন</div>
+            <button class="hcta" onclick="goGuarded('register.html')">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              ডোনার হিসেবে নিবন্ধন
+            </button>
+          </div>
+
+          <!-- স্লাইড ২: Blood Bank -->
+          <div class="hslide bank">
+            <div class="fshape f1"></div>
+            <div class="fshape f3"></div>
+            <div class="hillust">
+              <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.2">
+                <path d="M10 3h4v1.6h-4z"/>
+                <path d="M12 4.6v2"/>
+                <path d="M7 7.2h10v10.3a5 5 0 0 1-10 0V7.2z"/>
+                <path d="M7 12.5h10v5a5 5 0 0 1-10 0v-5z" fill="rgba(255,255,255,.3)" stroke="none"/>
+              </svg>
+            </div>
+            <div class="htag">বিশ্বস্ত তালিকা</div>
+            <div class="htitle">ব্লাড ব্যাংক খুঁজুন</div>
+            <div class="hsub">কাছাকাছি স্বেচ্ছাসেবী রক্তভাণ্ডার</div>
+            <button class="hcta" onclick="window.location.href='bloodbank.html'">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              ব্লাড ব্যাংক দেখুন
+            </button>
+          </div>
+
+          <!-- স্লাইড ৩: Tutorial -->
+          <div class="hslide tutorial">
+            <div class="fshape f1"></div>
+            <div class="fshape f2"></div>
+            <div class="hillust">
+              <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.3">
+                <rect x="2.5" y="5" width="19" height="14" rx="3"/>
+                <path d="M10 9.3v5.4l4.5-2.7z" fill="rgba(255,255,255,.4)" stroke="none"/>
+              </svg>
+            </div>
+            <div class="htag">নতুন ব্যবহারকারী?</div>
+            <div class="htitle">কীভাবে ব্যবহার করবেন</div>
+            <div class="hsub">অল্প সময়ে পুরো অ্যাপ শিখে নিন</div>
+            <button class="hcta" onclick="openVideo()">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg>
+              Watch Tutorial
+            </button>
+          </div>
+
+          <!-- স্লাইড ৪: Facebook -->
+          <div class="hslide fb">
+            <div class="fshape f1"></div>
+            <div class="fshape f3"></div>
+            <div class="hillust">
+              <svg viewBox="0 0 24 24" fill="rgba(255,255,255,.35)" stroke="none">
+                <path d="M17 3H7a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h5v-7H9.5v-2.7H12V9.4c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v2h2.8l-.4 2.7h-2.4V21H17a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4z"/>
+              </svg>
+            </div>
+            <div class="htag">কমিউনিটি</div>
+            <div class="htitle">ফেসবুকে যুক্ত হোন</div>
+            <div class="hsub">আপডেট ও গল্প সবার আগে পান</div>
+            <button class="hcta" onclick="window.open('https://www.facebook.com/share/19A7JwXeL8/','_blank','noopener')">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" stroke="none"><path d="M17 3H7a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h5v-7H9.5v-2.7H12V9.4c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v2h2.8l-.4 2.7h-2.4V21H17a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4z"/></svg>
+              Follow Now
+            </button>
+          </div>
+
         </div>
       </div>
-      <div class="slider-dots">
-        <div class="sdot active"></div>
-        <div class="sdot"></div>
-        <div class="sdot"></div>
-      </div>
+      <div class="hero-dots" id="hero-dots"></div>
     </div>
 
     <!-- QUICK ACTIONS -->
@@ -226,17 +297,152 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- TUTORIAL ভিডিও মডাল -->
+<div class="vmodal" id="vmodal">
+  <div class="vmodal-top">
+    <button class="vmodal-close" onclick="closeVideo()">×</button>
+  </div>
+  <div class="vmodal-body">
+    <video id="tut-video" playsinline></video>
+    <div class="vmodal-fallback" id="vfallback">
+      <h3>টিউটোরিয়াল ভিডিও শীঘ্রই আসছে</h3>
+      <p>এখানে ভিডিও যোগ করা হয়নি বলে এই বার্তা দেখাচ্ছে — আসল ভিডিও বা YouTube লিংক যোগ করলে সরাসরি এখানেই চলবে।</p>
+      <a href="#" id="vfallback-link" target="_blank" rel="noopener">▶ YouTube-এ দেখুন</a>
+    </div>
+  </div>
+  <div class="vmodal-controls" id="vcontrols" style="display:none">
+    <input type="range" class="vseek" id="vseek" value="0" min="0" max="100" step="0.1">
+    <div class="vctrl-row">
+      <button class="vctrl-btn play" id="vplay" onclick="toggleVideoPlay()">
+        <svg id="vplay-ic" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff" stroke="none"/></svg>
+      </button>
+      <span class="vtime" id="vtime">0:00 / 0:00</span>
+      <div class="vctrl-spacer"></div>
+      <button class="vctrl-btn" onclick="toggleFullscreen()">
+        <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ── SLIDER (runs immediately, no Firebase needed) ─────────────
-let cur = 0;
-function goSlide(n) {
-  document.getElementById('slide-'+cur).classList.remove('active');
-  document.querySelectorAll('.sdot')[cur].classList.remove('active');
-  cur = (n + 3) % 3;
-  document.getElementById('slide-'+cur).classList.add('active');
-  document.querySelectorAll('.sdot')[cur].classList.add('active');
+// ── HERO SLIDER (swipe + auto-slide + dots) ────────────────────
+const heroTrack = document.getElementById('hero-track');
+const heroSlides = heroTrack.children;
+const HN = heroSlides.length;
+let hcur = 0;
+let heroAutoTimer = null;
+const HERO_AUTO_MS = 3000; // ব্যবহারকারীর নির্দেশ অনুযায়ী ৩ সেকেন্ড
+
+const heroDotsWrap = document.getElementById('hero-dots');
+for (let i = 0; i < HN; i++) {
+  const d = document.createElement('div');
+  d.className = 'hdot' + (i === 0 ? ' on' : '');
+  d.addEventListener('click', () => heroGoTo(i));
+  heroDotsWrap.appendChild(d);
 }
-setInterval(() => goSlide(cur + 1), 4000);
+function heroUpdateDots() {
+  [...heroDotsWrap.children].forEach((d, i) => d.classList.toggle('on', i === hcur));
+}
+function heroGoTo(i, animate = true) {
+  hcur = (i + HN) % HN;
+  heroTrack.classList.toggle('no-anim', !animate);
+  heroTrack.style.transform = `translateX(-${hcur * 100}%)`;
+  heroUpdateDots();
+}
+function heroNext() { heroGoTo(hcur + 1); }
+function heroStartAuto() { heroStopAuto(); heroAutoTimer = setInterval(heroNext, HERO_AUTO_MS); }
+function heroStopAuto() { if (heroAutoTimer) clearInterval(heroAutoTimer); }
+heroStartAuto();
+
+// swipe (touch + মাউস)
+let hStartX = 0, hDeltaX = 0, hDragging = false;
+function heroDragStart(x) { hDragging = true; hStartX = x; hDeltaX = 0; heroStopAuto(); heroTrack.classList.add('no-anim'); }
+function heroDragMove(x) {
+  if (!hDragging) return;
+  hDeltaX = x - hStartX;
+  const pct = (-hcur * 100) + (hDeltaX / heroTrack.parentElement.offsetWidth * 100);
+  heroTrack.style.transform = `translateX(${pct}%)`;
+}
+function heroDragEnd() {
+  if (!hDragging) return;
+  hDragging = false;
+  heroTrack.classList.remove('no-anim');
+  const threshold = heroTrack.parentElement.offsetWidth * 0.18;
+  if (hDeltaX > threshold) heroGoTo(hcur - 1);
+  else if (hDeltaX < -threshold) heroGoTo(hcur + 1);
+  else heroGoTo(hcur);
+  heroStartAuto(); // ম্যানুয়াল swipe এর পর টাইমার রিসেট, আবার শুরু থেকে অটো-চলা
+}
+const heroWrap = heroTrack.parentElement;
+heroWrap.addEventListener('touchstart', e => heroDragStart(e.touches[0].clientX), {passive:true});
+heroWrap.addEventListener('touchmove', e => heroDragMove(e.touches[0].clientX), {passive:true});
+heroWrap.addEventListener('touchend', heroDragEnd);
+heroWrap.addEventListener('mousedown', e => { heroDragStart(e.clientX); e.preventDefault(); });
+window.addEventListener('mousemove', e => heroDragMove(e.clientX));
+window.addEventListener('mouseup', heroDragEnd);
+
+// ── TUTORIAL ভিডিও মডাল ──
+const vmodal   = document.getElementById('vmodal');
+const tutVideo = document.getElementById('tut-video');
+const vfallback = document.getElementById('vfallback');
+const vcontrols = document.getElementById('vcontrols');
+const vseek     = document.getElementById('vseek');
+const vtimeEl   = document.getElementById('vtime');
+const vplayIc   = document.getElementById('vplay-ic');
+
+// ⚠️ এখানে আসল ভিডিও/YouTube লিংক বসবে — এখন ফাঁকা রাখা হয়েছে, তাই সবসময় fallback দেখাবে
+const TUTORIAL_VIDEO_SRC = '';
+const TUTORIAL_YOUTUBE_URL = '#';
+
+window.openVideo = () => {
+  vmodal.classList.add('open');
+  heroStopAuto();
+  if (!TUTORIAL_VIDEO_SRC) { showVideoFallback(); return; }
+  tutVideo.src = TUTORIAL_VIDEO_SRC;
+  tutVideo.style.display = 'block';
+  vfallback.classList.remove('show');
+  vcontrols.style.display = 'block';
+  tutVideo.play().catch(showVideoFallback);
+};
+function showVideoFallback() {
+  tutVideo.style.display = 'none';
+  vcontrols.style.display = 'none';
+  vfallback.classList.add('show');
+  document.getElementById('vfallback-link').href = TUTORIAL_YOUTUBE_URL;
+}
+tutVideo.addEventListener('error', showVideoFallback);
+
+window.closeVideo = () => {
+  vmodal.classList.remove('open');
+  tutVideo.pause();
+  heroStartAuto();
+};
+window.toggleVideoPlay = () => {
+  if (tutVideo.paused) {
+    tutVideo.play();
+    vplayIc.innerHTML = '<rect x="6" y="5" width="4" height="14" fill="#fff"/><rect x="14" y="5" width="4" height="14" fill="#fff"/>';
+  } else {
+    tutVideo.pause();
+    vplayIc.innerHTML = '<path d="M8 5v14l11-7z" fill="#fff"/>';
+  }
+};
+tutVideo.addEventListener('timeupdate', () => {
+  if (!tutVideo.duration) return;
+  vseek.value = (tutVideo.currentTime / tutVideo.duration) * 100;
+  vtimeEl.textContent = fmtTime(tutVideo.currentTime) + ' / ' + fmtTime(tutVideo.duration);
+});
+vseek.addEventListener('input', () => {
+  if (tutVideo.duration) tutVideo.currentTime = (vseek.value / 100) * tutVideo.duration;
+});
+function fmtTime(s) {
+  s = Math.floor(s || 0);
+  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}
+window.toggleFullscreen = () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else vmodal.requestFullscreen?.();
+};
 
 // ── AUTH GUARD (non-blocking) ─────────────────────────────────
 // _authReady becomes true once Firebase responds (or times out)
