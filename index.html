@@ -39,6 +39,11 @@
 .footer-soc{width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid #eee;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#c0392b;text-decoration:none}
 .footer-link{display:inline-block;font-size:12.5px;color:#888;text-decoration:none;font-family:'Hind Siliguri',sans-serif;border-bottom:1px solid #ddd;padding-bottom:2px}
 .footer-copy{font-size:10.5px;color:#c9c9c9;font-family:'Hind Siliguri',sans-serif;margin-top:12px}
+/* ── আইকন ── */
+.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;display:block}
+.ic-sm{width:15px;height:15px}
+.ic-lg{width:21px;height:21px}
+.ic-tile{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -48,6 +53,11 @@
   <symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5 0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".6" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-bag" viewBox="0 0 24 24"><path d="M8 3h8v3a4 4 0 0 1-1 2.6V19a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V8.6A4 4 0 0 1 8 6V3z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15zM4 17.5A2.5 2.5 0 0 1 6.5 15H20"/></symbol>
+  <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M3 11v2a2 2 0 0 0 2 2h1l1 5h2l-1-5h2l8 4V6l-8 4H6a2 2 0 0 0-3 1z"/></symbol>
+  <symbol id="i-shield-lock" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/><rect x="9.5" y="10.5" width="5" height="4" rx="1"/><path d="M10.5 10.5V9a1.5 1.5 0 0 1 3 0v1.5"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13m0 0 5-5m-5 5-5-5"/><path d="M4 19h16"/></symbol>
 </svg>
 
 <div id="loading-screen" class="loading-screen">
@@ -77,7 +87,7 @@
     <div class="banner">
       <div class="slider-wrap">
         <div class="slide active" id="slide-0">
-          <div class="slide-tag">📖 কুরআনের বাণী</div>
+          <div class="slide-tag"><svg class="ic ic-sm" style="vertical-align:-2px;margin-right:4px"><use href="#i-book"/></svg>কুরআনের বাণী</div>
           <h2>যে একজনের প্রাণ বাঁচালো, সে যেন পুরো মানবজাতিকে বাঁচালো</h2>
           <div class="ref">— সূরা আল-মায়েদা: ৩২</div>
         </div>
@@ -87,7 +97,7 @@
           <div class="ref">— Sondhan</div>
         </div>
         <div class="slide" id="slide-2">
-          <div class="slide-tag">📢 Notice </div>
+          <div class="slide-tag"><svg class="ic ic-sm" style="vertical-align:-2px;margin-right:4px"><use href="#i-megaphone"/></svg>Notice</div>
           <h2>Sondhan বর্তমানে উন্নয়ন ও পরীক্ষামূলক কার্যক্রমের মধ্যে রয়েছে। খুব শীঘ্রই পূর্ণাঙ্গ সেবা চালু হবে ইনশাআল্লাহ।</h2>
           <div class="ref">— Sondhan Team</div>
         </div>
@@ -102,30 +112,42 @@
     <!-- QUICK ACTIONS -->
     <div class="section" style="padding:12px 12px 0">
       <div class="sec-title">দ্রুত একশন</div>
-      <div class="qa-grid">
-        <button class="qa" onclick="goGuarded('search.html')">
-          <div class="qa-tile red"><svg class="qa-ic"><use href="#i-search"/></svg></div>
-          <div class="qa-label">রক্তদাতা খুঁজুন</div>
-          <div class="qa-sub">কাছের ডোনার</div>
+      <div class="action-grid">
+        <button class="ac red" onclick="goGuarded('search.html')">
+          <div class="ac-bg"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg></div>
+          <div class="ac-ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg></div>
+          <div class="ac-label">রক্তদাতা খুঁজুন</div>
+          <div class="ac-sub">সবচেয়ে কাছের ডোনার খুঁজুন</div>
         </button>
-        <button class="qa" onclick="goGuarded('request.html')">
-          <div class="qa-tile amber"><svg class="qa-ic"><use href="#i-alert"/></svg></div>
-          <div class="qa-label">জরুরি অনুরোধ</div>
-          <div class="qa-sub">এখনই রক্ত দরকার?</div>
+        <button class="ac orange" onclick="goGuarded('request.html')">
+          <div class="ac-bg"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div>
+          <div class="ac-ico"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div>
+          <div class="ac-label">জরুরি অনুরোধ</div>
+          <div class="ac-sub">এখনই রক্ত দরকার?</div>
         </button>
-        <button class="qa" onclick="window.location.href='bloodbank.html'">
-          <div class="qa-tile green"><svg class="qa-ic"><use href="#i-bag"/></svg></div>
-          <div class="qa-label">ব্লাড ব্যাংক</div>
-          <div class="qa-sub">তালিকা দেখুন</div>
+        <button class="ac purple" onclick="window.location.href='bloodbank.html'">
+          <div class="ac-bg"><svg viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5 0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z"/><path d="M15.5 15.5v3.5M13.75 17.25h3.5" stroke-width="1.2"/></svg></div>
+          <div class="ac-ico">
+            <svg viewBox="0 0 24 24">
+              <path d="M10 2.2h4v1.3h-4z"/>
+              <path d="M12 3.5v2"/>
+              <path d="M7.5 5.8h9v9.2a4.5 4.5 0 0 1-9 0V5.8z"/>
+              <path d="M7.5 10.5h9v4.5a4.5 4.5 0 0 1-9 0v-4.5z" fill="#fff" stroke="none" opacity=".55"/>
+            </svg>
+            <div class="plus-badge"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+          <div class="ac-label">ব্লাড ব্যাংক</div>
+          <div class="ac-sub">কাছাকাছি ব্লাড ব্যাংক খুঁজুন</div>
         </button>
-        <button class="qa" onclick="goGuarded('register.html')">
-          <div class="qa-tile violet"><svg class="qa-ic"><use href="#i-droplet"/></svg></div>
-          <div class="qa-label">Donor হোন</div>
-          <div class="qa-sub">নিবন্ধন করুন</div>
+        <button class="ac green" onclick="goGuarded('register.html')">
+          <div class="ac-bg"><svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.2"/><path d="M4 19c0-3 2.7-5 6-5"/><path d="M17 14v6M14 17h6"/></svg></div>
+          <div class="ac-ico"><svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.2"/><path d="M4 19c0-3 2.7-5 6-5"/><path d="M17 14v6M14 17h6"/></svg></div>
+          <div class="ac-label">Donor হোন</div>
+          <div class="ac-sub">নিবন্ধন করুন</div>
         </button>
-        <button class="qa qa-full" onclick="window.location.href='about.html'">
-          <div class="qa-tile blue"><svg class="qa-ic"><use href="#i-info"/></svg></div>
-          <div class="qa-label">আমাদের সম্পর্কে জানুন</div>
+        <button class="ac blue full" onclick="window.location.href='about.html'">
+          <div class="ac-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".6" fill="#fff" stroke="none"/></svg></div>
+          <div class="ac-label">আমাদের সম্পর্কে জানুন</div>
         </button>
       </div>
     </div>
@@ -144,11 +166,11 @@
     <div class="section" style="padding:0 12px">
       <div class="sec-title">কেন রক্ত দেবেন?</div>
       <div class="why-card">
-        <div class="why-ico" style="background:#fdecea">❤️</div>
+        <div class="why-ico" style="background:#fdecea"><svg class="ic ic-lg" style="color:#c0392b"><use href="#i-heart"/></svg></div>
         <div><h4>জীবন বাঁচায়</h4><p>আপনার দেওয়া এক ব্যাগ রক্ত একজন মানুষের জীবন বাঁচাতে গুরুত্বপূর্ণ ভূমিকা রাখতে পারে।</p></div>
       </div>
       <div class="why-card">
-        <div class="why-ico" style="background:#d5f5e3">🛡️</div>
+        <div class="why-ico" style="background:#d5f5e3"><svg class="ic ic-lg" style="color:#1e8449"><use href="#i-shield"/></svg></div>
         <div><h4>স্বাস্থ্য উপকারিতা</h4><p>হৃদরোগ ও ক্যান্সারের ঝুঁকি কমায়</p></div>
       </div>
     </div>
@@ -194,7 +216,7 @@
 <!-- LOGIN REQUIRED OVERLAY -->
 <div class="lr-overlay" id="lr-overlay">
   <div class="lr-card">
-    <div class="lr-icon">🔒</div>
+    <div class="lr-icon"><svg class="ic" style="width:30px;height:30px;color:#c0392b"><use href="#i-shield-lock"/></svg></div>
     <h3>লগইন প্রয়োজন</h3>
     <p>এই সেবা ব্যবহার করতে লগইন করুন</p>
     <a href="#" id="lr-btn" class="lr-btn">লগইন করুন</a>
@@ -345,7 +367,7 @@ if(db) {
     <div class="install-modal-icon"><img src="icon-192.png" alt="Sondhan"/></div>
     <div class="install-modal-title">Sondhan ইনস্টল করুন</div>
     <div class="install-modal-sub">ভালো অভিজ্ঞতার জন্য অ্যাপটি ডাউনলোড করুন</div>
-    <button class="install-modal-btn" onclick="installApp()">📲 ইনস্টল করুন</button>
+    <button class="install-modal-btn" onclick="installApp()"><svg class="ic ic-sm" style="vertical-align:-2px;margin-right:5px"><use href="#i-download"/></svg>ইনস্টল করুন</button>
     <div class="install-modal-later" onclick="dismissInstall()">পরে করবো</div>
   </div>
 </div>
