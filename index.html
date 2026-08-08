@@ -82,6 +82,8 @@
   <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 13h6M9 17h6"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 3h4l2 5-2.5 1.5a12 12 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></symbol>
   <symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-7.5-10A4.5 4.5 0 0 1 12 7.3a4.5 4.5 0 0 1 7.5 3.2c0 5.4-7.5 10-7.5 10z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3.5 6 8.5 6.5L20.5 6"/></symbol>
 </svg>
 
 <div id="loading-screen" class="loading-screen">
@@ -247,16 +249,6 @@
       </div>
     </div>
 
-    <!-- STATS -->
-    <div class="section" style="padding:0 20px">
-      <div class="sec-title">আমাদের পরিসংখ্যান</div>
-      <div class="stats-row">
-        <div class="stat"><div class="stat-n" id="stat-donors">—</div><div class="stat-l">সক্রিয় Donor</div></div>
-        <div class="stat"><div class="stat-n" id="stat-requests">—</div><div class="stat-l">রক্তের অনুরোধ</div></div>
-        <div class="stat"><div class="stat-n">৬৪</div><div class="stat-l">জেলায় সেবা</div></div>
-      </div>
-    </div>
-
     <!-- WHY -->
     <div class="section" style="padding:0 20px">
       <div class="sec-title">কেন রক্ত দেবেন?</div>
@@ -291,7 +283,7 @@
     <div class="app-footer">
 
       <!-- CALL TO ACTION -->
-      <a href="register.html" class="footer-cta" onclick="event.preventDefault();goGuarded('register.html')">
+      <a href="https://www.facebook.com/share/19A7JwXeL8/" target="_blank" rel="noopener" class="footer-cta">
         <svg class="ic ic-sm"><use href="#i-droplet"/></svg>
         Save Lives Together
         <svg class="ic ic-sm" style="margin-left:2px"><use href="#i-arrow-r"/></svg>
@@ -306,6 +298,7 @@
         <a href="https://www.facebook.com/share/19A7JwXeL8/" target="_blank" rel="noopener" class="footer-soc" aria-label="Facebook"><svg class="ic"><use href="#i-fb"/></svg></a>
         <a href="https://www.instagram.com/sondhan.org26?igsh=YnRlNHdzeDlxd2Rr" target="_blank" rel="noopener" class="footer-soc" aria-label="Instagram"><svg class="ic"><use href="#i-instagram"/></svg></a>
         <a href="https://youtube.com/@sondhan.org2?si=k1R0FEcIsVxhc_Wc" target="_blank" rel="noopener" class="footer-soc" aria-label="YouTube"><svg class="ic"><use href="#i-youtube"/></svg></a>
+        <a href="mailto:sondhan.org26@gmail.com" class="footer-soc" aria-label="Gmail"><svg class="ic"><use href="#i-mail"/></svg></a>
       </div>
 
       <!-- QUICK LINKS -->
@@ -559,10 +552,9 @@ if (document.readyState !== 'loading') hideSplash();
 
 <!-- Firebase loads AFTER page is visible — non-blocking -->
 <script type="module">
-import { auth, db } from './firebase-config.js';
+import { auth } from './firebase-config.js';
 import { esc } from './app.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 if(auth) {
   // Timeout: if Firebase takes > 5s, give up waiting
@@ -593,39 +585,6 @@ if(auth) {
 
     window._onAuthResolved?.();   // অপেক্ষায় থাকা ক্লিক থাকলে সেটা চালাও
   });
-}
-
-// ── STATS ────────────────────────────────────────────────────
-// BUGFIX ১: আগে 'stat-donations' খোঁজা হতো, কিন্তু index.html-এ
-//   সেই element নেই → TypeError, স্ক্রিপ্ট ওখানেই থেমে যেতো।
-// BUGFIX ২: 'stat-requests' কখনো ভরাট হতো না → চিরকাল "—" দেখাতো।
-function setStat(id, val) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = val;
-}
-
-function toBn(n) {
-  return String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
-}
-
-if(db) {
-  // সক্রিয় donor সংখ্যা
-  try {
-    onSnapshot(
-      query(collection(db,'donors'), where('available','==',true)),
-      snap => setStat('stat-donors', toBn(snap.size)),
-      ()   => setStat('stat-donors', '—')
-    );
-  } catch(e) { setStat('stat-donors', '—'); }
-
-  // রক্তের অনুরোধ সংখ্যা
-  try {
-    onSnapshot(
-      query(collection(db,'bloodRequests'), where('status','==','active')),
-      snap => setStat('stat-requests', toBn(snap.size)),
-      ()   => setStat('stat-requests', '—')
-    );
-  } catch(e) { setStat('stat-requests', '—'); }
 }
 </script>
 <div class="install-banner" id="install-banner">
