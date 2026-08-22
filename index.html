@@ -62,6 +62,22 @@
 .ic-sm{width:15px;height:15px}
 .ic-lg{width:21px;height:21px}
 .ic-tile{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ══ DONOR PROMPT (মাঝ-স্ক্রিন popup) ══ */
+.dp-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0);align-items:center;justify-content:center;transition:background .3s;z-index:900;padding:20px}
+.dp-overlay.show{display:flex;background:rgba(0,0,0,.45)}
+.dp-card{background:#fff;width:100%;max-width:340px;border-radius:24px;padding:30px 24px 26px;text-align:center;transform:scale(.85);opacity:0;transition:transform .35s cubic-bezier(.16,1,.3,1),opacity .3s;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;overflow:hidden}
+.dp-overlay.show .dp-card{transform:scale(1);opacity:1}
+.dp-bg1{position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:#eaf3de}
+.dp-bg2{position:absolute;bottom:-50px;left:-30px;width:110px;height:110px;border-radius:50%;background:#eaf3de;opacity:.6}
+.dp-close{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;background:#f2f2f2;border:none;color:#999;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3}
+.dp-close:active{background:#e8e8e8}
+.dp-icon{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#27ae60,#2ecc71);display:flex;align-items:center;justify-content:center;margin:4px auto 18px;position:relative;z-index:1;box-shadow:0 10px 24px rgba(39,174,96,.3)}
+.dp-icon svg{width:38px;height:38px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dp-title{font-size:14px;font-weight:600;color:#888;font-family:'Hind Siliguri',sans-serif;line-height:1.4;position:relative;z-index:1;margin-bottom:16px}
+.dp-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:linear-gradient(135deg,#c0392b,#ff5b47);color:#fff;padding:19px;border-radius:18px;font-size:17px;font-weight:800;font-family:'Hind Siliguri',sans-serif;border:none;cursor:pointer;box-shadow:0 14px 30px rgba(192,57,43,.42),0 0 0 3px rgba(192,57,43,.12);position:relative;z-index:1;margin-bottom:10px;letter-spacing:.2px}
+.dp-cta:active{transform:scale(.98)}
+.dp-later{background:none;border:none;color:#bbb;font-size:12px;font-family:'Hind Siliguri',sans-serif;cursor:pointer;position:relative;z-index:1}
 </style>
 </head>
 <body>
@@ -84,6 +100,7 @@
   <symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
   <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-7.5-10A4.5 4.5 0 0 1 12 7.3a4.5 4.5 0 0 1 7.5 3.2c0 5.4-7.5 10-7.5 10z"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3.5 6 8.5 6.5L20.5 6"/></symbol>
+  <symbol id="i-person-plus" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.2"/><path d="M4 19c0-3 2.7-5 6-5"/><path d="M17 14v6M14 17h6"/></symbol>
 </svg>
 
 <div id="loading-screen" class="loading-screen">
@@ -254,7 +271,7 @@
       <div class="sec-title">কেন রক্ত দেবেন?</div>
       <div class="why-card">
         <div class="why-ico" style="background:#fdecea"><svg class="ic ic-lg" style="color:#c0392b"><use href="#i-heart"/></svg></div>
-        <div><h4>জীবন বাঁচায়</h4><p>আপনার দেওয়া এক ব্যাগ রক্ত একজন মানুষের জীবন বাঁচাতে গুরুত্বপূর্ণ ভূমিকা রাখতে পারে।</p></div>
+        <div><h4>জীবন বাঁচায়</h4><p>আপনার দেওয়া এক ব্যাগ রক্ত একজন মানুষের জীবন বাঁচাতে গুরুত্বপূর্ণ ভূমিকা রাখতে পারে।</p></div>
       </div>
       <div class="why-card">
         <div class="why-ico" style="background:#d5f5e3"><svg class="ic ic-lg" style="color:#1e8449"><use href="#i-shield"/></svg></div>
@@ -271,7 +288,7 @@
         <div class="prep-item"><div class="prep-dot"></div><p>রক্তদানের পূর্বে হালকা খাবার গ্রহণ করুন</p></div>
         <div class="prep-item"><div class="prep-dot"></div><p>সর্বোচ্চ <b>~৪৫০ মি.লি.</b> রক্ত দেওয়া নিরাপদ</p></div>
         <div class="prep-item"><div class="prep-dot"></div><p>রক্ত দেওয়ার পর কিছুক্ষণ বিশ্রাম নিন</p></div>
-        <div class="prep-item"><div class="prep-dot"></div><p>সুস্থ শরীর ও সুস্থ মন নিয়ে রক্তদান করুন</p></div>
+        <div class="prep-item"><div class="prep-dot"></div><p>সুস্থ শরীর ও সুস্থ মন নিয়ে রক্তদান করুন</p></div>
         <div class="prep-item"><div class="prep-dot"></div><p>রোগীর জন্য প্রার্থনা করুন</p></div>
         <div class="prep-item"><div class="prep-dot" style="background:#c0392b"></div>
           <p><b>কোনো বিনিময় ছাড়া মানবতার সেবায় রক্ত দেওয়াই সর্বোত্তম</b></p>
@@ -349,6 +366,24 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- DONOR PROMPT (মাঝ-স্ক্রিন popup, install-banner-এর মতো একবার, cooldown সহ) -->
+<div class="dp-overlay" id="dp-overlay">
+  <div class="dp-card">
+    <div class="dp-bg1"></div>
+    <div class="dp-bg2"></div>
+    <button class="dp-close" onclick="dismissDonorPrompt()">×</button>
+    <div class="dp-icon">
+      <svg viewBox="0 0 24 24"><use href="#i-person-plus"/></svg>
+    </div>
+    <div class="dp-title">মানবতার সেবায় যুক্ত হতে</div>
+    <button class="dp-cta" onclick="dpGoRegister()">
+      ডোনার ফর্ম পূরণ করুন
+      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"><use href="#i-arrow-r"/></svg>
+    </button>
+    <button class="dp-later" onclick="dismissDonorPrompt()">পরে করবো</button>
+  </div>
+</div>
 
 <!-- TUTORIAL ভিডিও মডাল -->
 <div class="vmodal" id="vmodal">
@@ -548,13 +583,51 @@ function hideSplash() {
 document.addEventListener('DOMContentLoaded', hideSplash);
 setTimeout(hideSplash, 2500);          // সর্বোচ্চ ২.৫ সেকেন্ড, তারপর জোর করে সরাও
 if (document.readyState !== 'loading') hideSplash();
+
+// ── DONOR PROMPT (মাঝ-স্ক্রিন popup) ─────────────────────────
+// install-banner-এর ঠিক ১০ সেকেন্ড পরে দেখানো হয় (মোট ~২০ সেকেন্ড
+// পেজ লোডের পর থেকে) — install-banner আসলে দেখা যাক বা না যাক
+// (beforeinstallprompt সব ব্রাউজারে আসে না), এই টাইমার independent
+// ভাবে চলে, তাই দুটো popup কখনো একসাথে আসবে না।
+(function(){
+  const DP_KEY = 'sondhan-donor-prompt-dismissed-at';
+  const DP_COOLDOWN = 7 * 24 * 60 * 60 * 1000; // ৭ দিন
+
+  function dpRecentlyDismissed(){
+    const t = localStorage.getItem(DP_KEY);
+    return t && (Date.now() - parseInt(t, 10)) < DP_COOLDOWN;
+  }
+  function dpAlreadyShownThisSession(){
+    return sessionStorage.getItem('sondhan-donor-prompt-shown') === '1';
+  }
+
+  window.dismissDonorPrompt = function(){
+    document.getElementById('dp-overlay').classList.remove('show');
+    localStorage.setItem(DP_KEY, Date.now().toString());
+  };
+  window.dpGoRegister = function(){
+    document.getElementById('dp-overlay').classList.remove('show');
+    goGuarded('register.html');
+  };
+
+  window._maybeShowDonorPrompt = function(){
+    if (dpRecentlyDismissed() || dpAlreadyShownThisSession()) return;
+    // ইতিমধ্যে Donor হলে দেখাবো না (auth-resolved স্ক্রিপ্টে সেট হয়)
+    if (window._userIsDonor) return;
+    sessionStorage.setItem('sondhan-donor-prompt-shown', '1');
+    document.getElementById('dp-overlay').classList.add('show');
+  };
+
+  setTimeout(window._maybeShowDonorPrompt, 20000); // মোট ~২০ সেকেন্ড
+})();
 </script>
 
 <!-- Firebase loads AFTER page is visible — non-blocking -->
 <script type="module">
-import { auth } from './firebase-config.js';
+import { auth, db } from './firebase-config.js';
 import { esc } from './app.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 if(auth) {
   // Timeout: if Firebase takes > 5s, give up waiting
@@ -582,6 +655,13 @@ if(auth) {
         </a>`;
     }
     // লগইন না থাকলে HTML-এর default "লগইন করুন" বাটনই থেকে যায়
+
+    // ইতিমধ্যে Donor কিনা চেক করি — হলে donor-prompt আর দেখাবো না
+    if (user && db) {
+      getDoc(doc(db, 'donors', user.uid))
+        .then(snap => { window._userIsDonor = snap.exists(); })
+        .catch(() => {});
+    }
 
     window._onAuthResolved?.();   // অপেক্ষায় থাকা ক্লিক থাকলে সেটা চালাও
   });
