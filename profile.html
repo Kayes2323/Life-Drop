@@ -578,13 +578,13 @@ window.openEdit = () => {
 window.closeEdit = () => document.getElementById('edit-modal').classList.remove('open');
 
 window.saveEdit = async () => {
-  const name      = document.getElementById('e-name').value.trim();
+  const name      = document.getElementById('e-name').value.trim().slice(0, 100);
   const phone     = document.getElementById('e-phone').value.trim();
   const wa        = document.getElementById('e-wa').value.trim();
   const blood     = document.getElementById('e-blood').value;
   const donations = parseInt(document.getElementById('e-donations').value)||0;
   const last      = document.getElementById('e-last').value;
-  const area      = document.getElementById('e-area').value.trim();
+  const area      = document.getElementById('e-area').value.trim().slice(0, 100);
   if(!name||!phone){ toast('নাম ও ফোন দিন'); return; }
   if(!isValidBdPhone(phone)){ toast('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)'); return; }
   if(wa && !isValidBdPhone(wa)){ toast('WhatsApp নম্বর সঠিক নয়'); return; }
@@ -594,8 +594,14 @@ window.saveEdit = async () => {
   setLoad(true);
   try {
     // BUGFIX: ফোন/WhatsApp এখন donorsPrivate-এ (public donors ডকে নেই)
-    // — search-এ তালিকা টানলে নম্বর আর client-এ আসে না।
-    await updateDoc(doc(db,'donors',CU.uid),{name,blood,donations,lastDonation:last||null,area});
+    // — search-এ তালিকা টানলে নম্বর আর client-এ আসে না। hasPhone/hasWa
+    // ফ্ল্যাগ পাবলিক ডকে অবশ্যই আপডেট করতে হবে — নাহলে search.html
+    // ধরেই নেয় ফ্ল্যাগ "unknown" (legacy fallback), আর edit করা নম্বর
+    // থাকা সত্ত্বেও ভুল ধরে নেয় কোন কন্ট্যাক্ট মেথড আছে/নেই।
+    await updateDoc(doc(db,'donors',CU.uid),{
+      name, blood, donations, lastDonation:last||null, area,
+      hasPhone: !!normPhone, hasWa: !!normWa
+    });
     await setDoc(doc(db,'donorsPrivate',CU.uid),{phone:normPhone,wa:normWa},{merge:true});
     try{ await updateDoc(doc(db,'users',CU.uid),{name,blood}); }catch(e){}
     Object.assign(DD,{name,phone:normPhone,wa:normWa,blood,donations,lastDonation:last||null,area});

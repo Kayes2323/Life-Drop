@@ -136,10 +136,13 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { normalizeBdPhone } from './app.js';
+import { normalizeBdPhone, safeRedirect } from './app.js';
 import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const redir = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
+// নিরাপত্তা: ?redirect= থেকে আসা মান বাইরের ডোমেইনে হতে পারে (open redirect /
+// ফিশিং ঝুঁকি) — তাই সরাসরি ব্যবহার না করে safeRedirect() দিয়ে যাচাই করা হয়,
+// শুধু এই সাইটের নিজস্ব .html পেজেই রিডাইরেক্ট করার অনুমতি দেয়।
+const redir = safeRedirect(new URLSearchParams(window.location.search).get('redirect'));
 
 let confirmationResult = null;
 let recaptchaVerifier  = null;

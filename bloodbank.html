@@ -437,7 +437,7 @@ function render(items) {
         </span>
         <div class="b2-btns">
           ${hasCoords ? `<a class="b2-btn" target="_blank" rel="noopener"
-             href="https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}"
+             href="https://www.google.com/maps/dir/?api=1&destination=${esc(b.lat)},${esc(b.lng)}"
              data-stop aria-label="দিকনির্দেশ"><svg class="ic ic-sm"><use href="#i-nav"/></svg></a>` : ''}
           <a class="b2-btn call" href="${esc(telLink(b.phone || ''))}" data-stop>
             <svg class="ic ic-sm"><use href="#i-phone"/></svg>কল
@@ -533,7 +533,7 @@ function openDetail(id) {
       <a class="d-btn call" href="${esc(telLink(b.phone || ''))}"><svg class="ic ic-sm"><use href="#i-phone"/></svg>কল করুন</a>
       ${hasCoords
         ? `<a class="d-btn dir" target="_blank" rel="noopener"
-             href="https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}"><svg class="ic ic-sm"><use href="#i-nav"/></svg>দিকনির্দেশ</a>`
+             href="https://www.google.com/maps/dir/?api=1&destination=${esc(b.lat)},${esc(b.lng)}"><svg class="ic ic-sm"><use href="#i-nav"/></svg>দিকনির্দেশ</a>`
         : ''}
     </div>`;
   document.getElementById('d-modal').classList.add('open');

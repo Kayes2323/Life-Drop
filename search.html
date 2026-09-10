@@ -509,7 +509,7 @@ function stopLoadingMsgs(){ clearInterval(_loadTimer); }
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { esc, initials, waLink, telLink, isValidBdPhone, DIVISIONS, DISTRICTS, UPAZILAS } from './app.js';
+import { esc, initials, waLink, telLink, isValidBdPhone, isValidFacebookUrl, DIVISIONS, DISTRICTS, UPAZILAS } from './app.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -1222,40 +1222,54 @@ function renderResults(donors, blood, div, dist, upa, scopeUsed) {
 }
 
 // donorsPrivate থেকে একজন donor-এর phone/wa একবারই আনে, ক্যাশ করে রাখে
-// ── মাসিক সীমা: এক ইউজার মাসে সর্বোচ্চ কয়টা নম্বর দেখতে পারবে ──
-// দৈনিক সীমার বদলে মাসিক — নাহলে প্রতিদিন সীমা পর্যন্ত টেনে টেনে
-// মাসে অনেক নম্বরই জমানো যেতো। প্রতি ক্যালেন্ডার মাসে কাউন্টার রিসেট হয়।
-const REVEAL_MONTHLY_LIMIT = 30;
-const currentMonthKey = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-};
+// ── ৩০ দিনের রোলিং সীমা: এক ইউজার সর্বোচ্চ কয়জন ভিন্ন ডোনারের নম্বর
+//    দেখতে পারবেন ──
+// নিরাপত্তা (গুরুত্বপূর্ণ): শুধু client-এ কাউন্ট রাখলে যে কেউ Firestore
+// সরাসরি call করে (এই UI/quota এড়িয়ে) donorsPrivate/{id} পড়ে ফেলতে
+// পারতো — সীমাটা তখন নিছক decoration হয়ে যেতো। তাই এখন প্রতিটা "reveal"-এর
+// জন্য একটা আলাদা reveals/{uid}_{donorId} রেকর্ড তৈরি হয় (একই transaction-এ
+// যেটা কাউন্টার বাড়ায়), আর donorsPrivate.get-এর Firestore rule নিজেই
+// চেক করে সেই রেকর্ড আছে কিনা — অর্থাৎ আসল সীমা server-side rules-এ, শুধু
+// client কোডে না। (মিলিত firestore.rules ফাইল দেখুন — donorsPrivate,
+// revealLimits, reveals — এই তিনটা একসাথে কাজ করে।)
+const REVEAL_WINDOW_DAYS = 30;
+const REVEAL_LIMIT = 30;
 
-// সীমা পার হয়ে গেলে false, নাহলে কাউন্টার ১ বাড়িয়ে true — সব একটা
-// transaction-এ (একসাথে পড়া+লেখা), তাই একই সময়ে দুইবার চাপলেও গণনা ঠিক থাকে।
-async function tryConsumeRevealQuota() {
+// একটা নির্দিষ্ট donor-এর জন্য quota consume করে (আগে কখনো reveal করা
+// থাকলে নতুন করে খরচ হয় না) — সব একটা transaction-এ, তাই রেসকন্ডিশন-মুক্ত।
+async function tryConsumeRevealQuota(donorId) {
   if (!CU) return false;
-  const ref = doc(db, 'revealLimits', CU.uid);
-  const month = currentMonthKey();
+  const limitRef  = doc(db, 'revealLimits', CU.uid);
+  const revealRef = doc(db, 'reveals', CU.uid + '_' + donorId);
   try {
     return await runTransaction(db, async (tx) => {
-      const snap = await tx.get(ref);
-      if (!snap.exists()) {
-        tx.set(ref, { month, count: 1 });
-        return true;
+      const revealSnap = await tx.get(revealRef);
+      if (revealSnap.exists()) return true; // আগেই দেখা হয়েছে — নতুন খরচ নেই
+
+      const limitSnap = await tx.get(limitRef);
+      const now = Date.now();
+      if (!limitSnap.exists()) {
+        tx.set(limitRef, { count: 1, windowStart: serverTimestamp() });
+      } else {
+        const data = limitSnap.data();
+        const windowStartMs = data.windowStart?.toDate ? data.windowStart.toDate().getTime() : 0;
+        const windowExpired = (now - windowStartMs) > REVEAL_WINDOW_DAYS * 86400000;
+        if (windowExpired) {
+          tx.set(limitRef, { count: 1, windowStart: serverTimestamp() });
+        } else {
+          if ((data.count || 0) >= REVEAL_LIMIT) return false;
+          tx.update(limitRef, { count: data.count + 1 });
+        }
       }
-      const data = snap.data();
-      if (data.month !== month) {
-        tx.set(ref, { month, count: 1 });
-        return true;
-      }
-      if ((data.count || 0) >= REVEAL_MONTHLY_LIMIT) return false;
-      tx.update(ref, { count: data.count + 1 });
+      tx.set(revealRef, { uid: CU.uid, donorId, revealedAt: serverTimestamp() });
       return true;
     });
   } catch (e) {
     console.warn('reveal quota check failed:', e);
-    return true; // quota check ব্যর্থ হলেও genuine ইউজারকে আটকাই না
+    // transaction ব্যর্থ হলে reveals রেকর্ডও তৈরি হয়নি — পরের donorsPrivate
+    // read rules নিজেই আটকে দেবে, তাই এখানে fail-open থাকা নিরাপদ
+    // (genuine ইউজারকে সাময়িক নেটওয়ার্ক সমস্যায় আটকানো হয় না)।
+    return true;
   }
 }
 
@@ -1264,9 +1278,9 @@ async function ensurePrivate(id) {
   const d = LAST_RESULTS.get(id);
   if(!d) return null;
   if(d._revealed) return d;
-  const ok = await tryConsumeRevealQuota();
+  const ok = await tryConsumeRevealQuota(id);
   if (!ok) {
-    showToast('এই মাসে নম্বর দেখার সীমা শেষ — আগামী মাসে আবার চেষ্টা করুন');
+    showToast('এই মাসে নম্বর দেখার সীমা শেষ — কিছুদিন পর আবার চেষ্টা করুন');
     return null;
   }
   try {
@@ -1297,6 +1311,10 @@ document.getElementById('results-list').addEventListener('click', async e => {
   } else if (act === 'fb') {
     const d = await ensurePrivate(btn.dataset.id);
     if(!d || !d.facebook){ showToast('এই ডোনারের Facebook লিংক নেই'); return; }
+    // নিরাপত্তা: লেখার সময় donor.html regex দিয়ে যাচাই করলেও, rules সেটা
+    // enforce না করলে সরাসরি API দিয়ে javascript:/data: এর মতো malicious
+    // URI লেখা সম্ভব — তাই খোলার আগে আবার একই নিয়মে যাচাই করা হয়।
+    if(!isValidFacebookUrl(d.facebook)){ showToast('লিংকটি অবৈধ মনে হচ্ছে'); return; }
     window.open(d.facebook, '_blank', 'noopener');
   } else if (act === 'view') {
     window.viewProfile(btn.dataset.id);
@@ -1382,6 +1400,10 @@ document.getElementById('dp-body').addEventListener('click', async e => {
   } else if (act === 'fb') {
     const d = await ensurePrivate(btn.dataset.id);
     if(!d || !d.facebook){ showToast('এই ডোনারের Facebook লিংক নেই'); return; }
+    // নিরাপত্তা: লেখার সময় donor.html regex দিয়ে যাচাই করলেও, rules সেটা
+    // enforce না করলে সরাসরি API দিয়ে javascript:/data: এর মতো malicious
+    // URI লেখা সম্ভব — তাই খোলার আগে আবার একই নিয়মে যাচাই করা হয়।
+    if(!isValidFacebookUrl(d.facebook)){ showToast('লিংকটি অবৈধ মনে হচ্ছে'); return; }
     window.open(d.facebook, '_blank', 'noopener');
   } else if (act === 'req') {
     const d = LAST_RESULTS.get(btn.dataset.id);

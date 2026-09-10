@@ -349,7 +349,7 @@ window.goReqStep = (to) => {
 import { auth, db } from './firebase-config.js';
 import { esc, timeAgo, formatWhen, isPast, toBn, telLink, isValidBdPhone, normalizeBdPhone } from './app.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp, doc, getDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 let CU = null;
 let AUTH_READY = false;
 let LAST_POSTS = new Map();   // share-এর জন্য, নাম onclick-এ বসাতে হয় না
@@ -394,19 +394,25 @@ onAuthStateChanged(auth, user => {
   }
 });
 
+// নিরাপত্তা: স্প্যাম/ফ্লাডিং ঠেকাতে একজন ইউজার কমপক্ষে এই সময় (সেকেন্ড) পার
+// না হলে দ্বিতীয় অনুরোধ পাঠাতে পারবেন না — Firestore rules-এও (users/{uid}.
+// lastRequestAt এর সাথে) হুবহু এই সীমা enforce করা থাকে, তাই এটা শুধু UX-এর
+// জন্য দ্রুত/বন্ধুত্বপূর্ণ বার্তা — আসল সুরক্ষা rules-এ।
+const REQUEST_COOLDOWN_SEC = 60;
+
 window.submitRequest = async () => {
   if(!AUTH_READY){ showToast('একটু অপেক্ষা করুন...'); return; }
   if(!CU){ window.location.href='login.html?redirect=request.html'; return; }
-  const pname    = document.getElementById('f-pname').value.trim();
-  const prob     = document.getElementById('f-prob').value.trim();
+  const pname    = document.getElementById('f-pname').value.trim().slice(0, 60);
+  const prob     = document.getElementById('f-prob').value.trim().slice(0, 200);
   const blood    = document.getElementById('f-blood').value;
   const bags     = document.getElementById('f-bags').value;
   const hemoglobin = document.getElementById('f-hemoglobin').value.trim().slice(0, 30);
   const when     = document.getElementById('f-when').value;
-  const hospital = document.getElementById('f-hospital').value.trim();
-  const location = document.getElementById('f-location').value.trim();
+  const hospital = document.getElementById('f-hospital').value.trim().slice(0, 120);
+  const location = document.getElementById('f-location').value.trim().slice(0, 120);
   const details  = document.getElementById('f-details').value.trim();
-  const cname    = document.getElementById('f-cname').value.trim();
+  const cname    = document.getElementById('f-cname').value.trim().slice(0, 60);
   const cphone   = document.getElementById('f-cphone').value.trim();
 
   if(!pname||!prob||!blood||!bags||!when||!hospital||!location||!cname||!cphone){
@@ -421,13 +427,32 @@ window.submitRequest = async () => {
   const btn = document.getElementById('submit-btn');
   btn.textContent='পাঠানো হচ্ছে...'; btn.disabled=true;
   try {
-    await addDoc(collection(db,'bloodRequests'),{
+    // দ্রুত, বন্ধুত্বপূর্ণ কুলডাউন বার্তা (আসল সীমা rules-এ) — অকারণে
+    // সার্ভারে গিয়ে reject হওয়ার বদলে আগেই জানিয়ে দেয়
+    const userRef = doc(db,'users',CU.uid);
+    const userSnap = await getDoc(userRef);
+    const lastAt = userSnap.exists() ? userSnap.data().lastRequestAt : null;
+    if (lastAt) {
+      const elapsedSec = (Date.now() - lastAt.toDate().getTime()) / 1000;
+      if (elapsedSec < REQUEST_COOLDOWN_SEC) {
+        showToast(`একটু অপেক্ষা করুন — ${Math.ceil(REQUEST_COOLDOWN_SEC - elapsedSec)} সেকেন্ড পর আবার চেষ্টা করুন`);
+        btn.innerHTML='<svg class=\'ic ic-sm\'><use href=\'#i-alert\'/></svg>অনুরোধ পাঠান'; btn.disabled=false;
+        return;
+      }
+    }
+    // অনুরোধ তৈরি + lastRequestAt আপডেট — একই batch-এ (rules একসাথে দুটোই
+    // যাচাই করতে পারে, আর একটা ব্যর্থ হলে আরেকটাও হয় না)
+    const batch = writeBatch(db);
+    const reqRef = doc(collection(db,'bloodRequests'));
+    batch.set(reqRef, {
       patientName:pname, problem:prob, blood,
       bags:nBags, hemoglobin: hemoglobin || '', when, hospital, location,
       details, contactName:cname, contactPhone:normalizeBdPhone(cphone),
       uid:CU.uid, status:'active',
       createdAt:serverTimestamp()
     });
+    batch.set(userRef, { lastRequestAt: serverTimestamp() }, { merge: true });
+    await batch.commit();
     ['f-pname','f-prob','f-bags','f-hemoglobin','f-when','f-hospital','f-location','f-details','f-cphone']
       .forEach(id => document.getElementById(id).value='');
     document.getElementById('f-blood').value='';
@@ -441,7 +466,11 @@ window.loadPosts = () => {
   const el = document.getElementById('posts-list');
   el.innerHTML=`<div style="text-align:center;padding:30px 20px"><div class="spinner" style="margin:0 auto 12px"></div><p style="font-size:13px;color:#aaa;font-family:'Hind Siliguri',sans-serif">লোড হচ্ছে...</p></div>`;
   try {
-    const q = query(collection(db,'bloodRequests'), orderBy('createdAt','desc'));
+    // নিরাপত্তা/পারফরম্যান্স: আগে পুরো bloodRequests collection (সীমাহীন,
+    // চিরকালের সব অনুরোধ, লগইন ছাড়াই) realtime শোনা হতো — কোনো limit ছিল
+    // না, তাই collection বড় হওয়ার সাথে সাথে প্রতিটা visitor-এর ডাউনলোড আর
+    // খরচ বাড়তেই থাকতো। donors সার্চের মতোই এখানে সাম্প্রতিক ৫০টায় সীমাবদ্ধ করা হলো।
+    const q = query(collection(db,'bloodRequests'), orderBy('createdAt','desc'), limit(50));
     onSnapshot(q, snap => {
       if(snap.empty){
         el.innerHTML=`<div class="r2-empty">

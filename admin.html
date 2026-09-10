@@ -120,9 +120,9 @@ window.switchTab = (tab) => {
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { esc, initials, timeAgo, isSuperAdmin } from './app.js';
+import { esc, initials, timeAgo, isSuperAdmin, normalizeBdPhone } from './app.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, getDocs, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, getDocs, getCountFromServer, query, where, orderBy, limit, doc, getDoc, setDoc, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 // ⚠️ এই চেকটা Firestore rules-এর isAdmin() এর সাথে হুবহু মিলতে হবে।
 // rules বর্তমানে শুধু ইমেইল দেখে — তাই এখানেও শুধু ইমেইল।
 // (আগে এখানে users ডকের isAdmin:true-ও দেখা হতো, ফলে ভুয়া অ্যাডমিনের
@@ -149,7 +149,7 @@ window.loadFeedback = async () => {
   const el = document.getElementById('main-content');
   el.innerHTML=`<div style="text-align:center;padding:30px"><div class="spinner"></div></div>`;
   try {
-    const snap = await getDocs(query(collection(db,'feedback'), orderBy('createdAt','desc')));
+    const snap = await getDocs(query(collection(db,'feedback'), orderBy('createdAt','desc'), limit(100)));
     if(snap.empty){
       el.innerHTML=`<div class="empty">এখনো কোনো feedback নেই।</div>`; return;
     }
@@ -186,21 +186,26 @@ window.loadStats = async () => {
   const el = document.getElementById('main-content');
   el.innerHTML=`<div style="text-align:center;padding:30px"><div class="spinner"></div></div>`;
   try {
-    const [donorsSnap, usersSnap, reqSnap, fbSnap] = await Promise.all([
-      getDocs(collection(db,'donors')),
-      getDocs(collection(db,'users')),
-      getDocs(collection(db,'bloodRequests')),
-      getDocs(collection(db,'feedback'))
+    // পারফরম্যান্স/নিরাপত্তা: শুধু সংখ্যা দেখানোর জন্য আগে ৪টা পুরো collection
+    // (প্রতিটা donor/user/request/feedback-এর সব field সহ) ডাউনলোড হতো —
+    // ডেটা বাড়ার সাথে সাথে প্রতিবার Statistics ট্যাব খুললেই খরচ/সময় বাড়তো।
+    // getCountFromServer() শুধু গণনা করে, ডকুমেন্টের ভেতরের কোনো তথ্য
+    // (email, phone ইত্যাদি) client-এ আনে না।
+    const [donorsCount, activeCount, usersCount, reqCount, fbCount] = await Promise.all([
+      getCountFromServer(collection(db,'donors')),
+      getCountFromServer(query(collection(db,'donors'), where('available','==',true))),
+      getCountFromServer(collection(db,'users')),
+      getCountFromServer(collection(db,'bloodRequests')),
+      getCountFromServer(collection(db,'feedback'))
     ]);
-    const activeDonors = donorsSnap.docs.filter(d=>d.data().available).length;
     el.innerHTML=`
       <div class="stat-grid">
-        <div class="stat-card red"><div class="num">${donorsSnap.size}</div><div class="lbl">মোট Donor</div></div>
-        <div class="stat-card green"><div class="num">${activeDonors}</div><div class="lbl">সক্রিয় Donor</div></div>
-        <div class="stat-card blue"><div class="num">${usersSnap.size}</div><div class="lbl">মোট User</div></div>
-        <div class="stat-card orange"><div class="num">${reqSnap.size}</div><div class="lbl">রক্তের অনুরোধ</div></div>
+        <div class="stat-card red"><div class="num">${donorsCount.data().count}</div><div class="lbl">মোট Donor</div></div>
+        <div class="stat-card green"><div class="num">${activeCount.data().count}</div><div class="lbl">সক্রিয় Donor</div></div>
+        <div class="stat-card blue"><div class="num">${usersCount.data().count}</div><div class="lbl">মোট User</div></div>
+        <div class="stat-card orange"><div class="num">${reqCount.data().count}</div><div class="lbl">রক্তের অনুরোধ</div></div>
       </div>
-      <div class="stat-card" style="margin-top:0"><div class="num" style="color:#8e44ad">${fbSnap.size}</div><div class="lbl">মোট Feedback</div></div>`;
+      <div class="stat-card" style="margin-top:0"><div class="num" style="color:#8e44ad">${fbCount.data().count}</div><div class="lbl">মোট Feedback</div></div>`;
   } catch(e){
     el.innerHTML=`<div class="empty" style="color:#c0392b">লোড করতে সমস্যা হয়েছে।</div>`;
   }
@@ -211,8 +216,23 @@ window.loadDonors = async () => {
   const el = document.getElementById('main-content');
   el.innerHTML=`<div style="text-align:center;padding:30px"><div class="spinner"></div></div>`;
   try {
-    const snap = await getDocs(query(collection(db,'donors'), orderBy('createdAt','desc')));
+    // পারফরম্যান্স: আগে পুরো collection (সীমাহীন) ডাউনলোড হতো — এখন সাম্প্রতিক
+    // ১০০টায় সীমাবদ্ধ। এই ট্যাব শুধু admin browsing/spot-check-এর জন্য, পুরো
+    // ডেটাবেসের রিপোর্ট/এক্সপোর্টের জন্য না।
+    const snap = await getDocs(query(collection(db,'donors'), orderBy('createdAt','desc'), limit(100)));
     if(snap.empty){ el.innerHTML=`<div class="empty">কোনো donor নেই।</div>`; return; }
+
+    // পুরনো (register.html যুগের) donor ডকে email/phone সরাসরি public
+    // collection-এ থেকে গেছে — কতগুলোতে এখনো আছে তা migration বাটনের
+    // ওপরে count আকারে দেখানো হয়, যাতে admin বুঝতে পারেন কাজ বাকি আছে কিনা।
+    const legacyCount = snap.docs.filter(d => d.data().email || d.data().phone).length;
+    const migrationBanner = legacyCount > 0 ? `
+      <div style="background:#fff8e1;border:1.5px solid #ffe082;border-radius:14px;padding:14px;margin-bottom:4px">
+        <div style="font-size:13px;font-weight:700;color:#8d6e00;font-family:'Hind Siliguri',sans-serif;margin-bottom:4px">⚠️ ${esc(legacyCount)}টি পুরনো donor ডকে email/phone এখনো পাবলিকভাবে খোলা আছে</div>
+        <div style="font-size:11px;color:#a1870f;font-family:'Hind Siliguri',sans-serif;line-height:1.6;margin-bottom:10px">এই বাটনে চাপলে সেগুলোর ফোন/ইমেইল donorsPrivate-এ সরিয়ে পাবলিক ডক থেকে মুছে ফেলা হবে (একবারই করা লাগবে, ইতিমধ্যে ঠিক থাকা ডকগুলো ছোঁয়া হবে না)।</div>
+        <button onclick="runPrivacyMigration()" style="width:100%;padding:11px;background:#c0392b;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif">এখনই ঠিক করুন (Migrate)</button>
+      </div>` : '';
+
     // phone/wa এখন donorsPrivate-এ — admin হিসেবে প্রতিটার জন্য আলাদা read
     const rows = await Promise.all(snap.docs.map(async d => {
       const r = d.data();
@@ -227,15 +247,57 @@ window.loadDonors = async () => {
         <div class="d-info">
           <div class="d-name">${esc(r.name)} <span style="font-size:11px;color:#c0392b;font-weight:700">${esc(r.blood)}</span></div>
           <div class="d-sub">📌 ${esc([r.area,r.district,r.division].filter(Boolean).join(', '))}</div>
-          <div class="d-sub">📞 ${esc(phone)}</div>
+          <div class="d-sub">📞 ${esc(phone)}${(r.email||r.phone) ? ' <span style="color:#c0392b;font-weight:700">· পাবলিক ডকে PII আছে</span>' : ''}</div>
         </div>
         <span class="d-badge ${r.available?'active':'inactive'}">${r.available?'সক্রিয়':'অপ্রস্তুত'}</span>
       </div>`;
     }));
-    el.innerHTML = rows.join('');
+    el.innerHTML = migrationBanner + rows.join('');
   } catch(e){
     el.innerHTML=`<div class="empty" style="color:#c0392b">লোড করতে সমস্যা হয়েছে।</div>`;
   }
+};
+
+// ── প্রাইভেসি মাইগ্রেশন (একবারের জন্য) ──────────────────────────
+// পুরনো register.html ফ্লো email/phone সরাসরি পাবলিক 'donors' ডকে লিখে
+// ফেলতো। donor.html/profile.html-এর বর্তমান ডিজাইনে phone/wa/facebook
+// শুধু 'donorsPrivate'-এ থাকে আর পাবলিক ডকে শুধু hasPhone/hasWa/hasFacebook
+// (true/false) ফ্ল্যাগ থাকে। এই ফাংশন পুরনো ডেটা নতুন প্যাটার্নে সরিয়ে
+// আনে — donorsPrivate-এ ইতিমধ্যে থাকা মান কখনো ওভাররাইট করে না, শুধু
+// পাবলিক ডক থেকে email/phone/uid ফিল্ড মুছে ফেলে ও ফ্ল্যাগ ঠিক করে।
+window.runPrivacyMigration = async () => {
+  if (!confirm('পুরনো donor ডেটা থেকে email/phone সরিয়ে গোপন কালেকশনে নেওয়া হবে। এগিয়ে যাবেন?')) return;
+  const el = document.getElementById('main-content');
+  el.innerHTML = `<div style="text-align:center;padding:30px"><div class="spinner"></div><p style="margin-top:14px;color:#aaa;font-size:12px;font-family:'Hind Siliguri',sans-serif">মাইগ্রেশন চলছে — বন্ধ করবেন না...</p></div>`;
+  let migrated = 0, skipped = 0, failed = 0;
+  try {
+    const snap = await getDocs(collection(db,'donors'));
+    for (const d of snap.docs) {
+      const r = d.data();
+      if (!r.email && !r.phone) { skipped++; continue; }
+      try {
+        const privRef = doc(db,'donorsPrivate', d.id);
+        const privSnap = await getDoc(privRef);
+        const existing = privSnap.exists() ? privSnap.data() : {};
+        const phone = existing.phone || normalizeBdPhone(r.phone || '') || '';
+        const wa = existing.wa || '';
+        const facebook = existing.facebook || '';
+        const privUpdate = {};
+        if (phone && !existing.phone) privUpdate.phone = phone;
+        if (Object.keys(privUpdate).length) await setDoc(privRef, privUpdate, { merge: true });
+        await updateDoc(doc(db,'donors', d.id), {
+          hasPhone: !!phone, hasWa: !!wa, hasFacebook: !!facebook,
+          email: deleteField(), phone: deleteField()
+        });
+        migrated++;
+      } catch (e) { failed++; console.warn('migration failed for', d.id, e); }
+    }
+    showToast(`মাইগ্রেশন শেষ — ঠিক হয়েছে: ${migrated}, বাদ (আগে থেকেই ঠিক): ${skipped}, ব্যর্থ: ${failed}`);
+  } catch (e) {
+    showToast('মাইগ্রেশন শুরু করা যায়নি');
+    console.warn(e);
+  }
+  loadDonors();
 };
 </script>
 <div class="install-banner" id="install-banner">

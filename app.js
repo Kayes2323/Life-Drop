@@ -278,6 +278,21 @@ export function fillUpazilaSelect(selectEl, district, placeholder = 'উপজ�
   });
 }
 
+/* ── নিরাপত্তা: ওপেন-রিডাইরেক্ট প্রতিরোধ ─────────────────────
+   ?redirect= এর মতো query param থেকে আসা মান কখনো সরাসরি
+   window.location-এ বসানো উচিত না — বাইরের ডোমেইনে (ফিশিং সাইটে)
+   পাঠানোর ঝুঁকি থাকে। শুধু এই সাইটের নিজস্ব .html পেজে (একই
+   ডিরেক্টরি, প্রোটোকল/ডোমেইন/স্ল্যাশ ছাড়া) রিডাইরেক্ট মঞ্জুর করি। */
+export function safeRedirect(raw, fallback = 'index.html') {
+  const v = String(raw || '').trim();
+  return /^[a-zA-Z0-9_-]+\.html(\?[^\s]*)?$/.test(v) ? v : fallback;
+}
+
+/* ── Facebook প্রোফাইল/পেজ লিংক যাচাই (লেখা ও পড়া দুই জায়গায় একই নিয়ম) ── */
+export function isValidFacebookUrl(v) {
+  return /^https?:\/\/(www\.|m\.|web\.)?(facebook\.com|fb\.com|fb\.me)\//i.test(String(v || '').trim());
+}
+
 /* ── অ্যাডমিন চেক (rules-এর সাথে হুবহু মিলতে হবে) ───────── */
 export const SUPER_ADMIN_EMAIL = 'aakayes99@gmail.com';
 export function isSuperAdmin(user) {

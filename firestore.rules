@@ -1,0 +1,224 @@
+rules_version = '2';
+
+// ══════════════════════════════════════════════════════════════════
+// Sondhan (life-drop-d4784) — Firestore Security Rules
+//
+// এই ফাইলটা রিপোতে শুধু রেফারেন্স/হ্যান্ড-অফ হিসেবে রাখা হয়েছে —
+// আসল rules শুধু Firebase Console (Firestore Database → Rules) থেকেই
+// deploy করা যায়, তাই এই কোড এখানে না থাকলেও অ্যাপ কাজ করবে। এটা
+// প্রয়োগ করতে হলে Firebase Console → Firestore Database → Rules ট্যাবে
+// পুরো কন্টেন্ট পেস্ট করে Publish করতে হবে।
+//
+// ⚠️ প্রয়োগ করার আগে: বর্তমান Console-এর rules আলাদা কোথাও কপি করে
+// রাখুন (ব্যাকআপ), কারণ এই ফাইলটা সম্পূর্ণ প্রতিস্থাপন করে, merge করে না।
+//
+// এই rules-এর পেছনের নকশা (app.js/search.html/donor.html/request.html-এর
+// বাস্তব কোডের সাথে হুবহু মিলিয়ে):
+//  • donors        — পাবলিক প্রোফাইল (নাম/এলাকা/ব্লাড গ্রুপ ইত্যাদি),
+//                     phone/email/wa/facebook এখানে কখনো থাকবে না।
+//  • donorsPrivate — phone/wa/facebook। মালিক বা অ্যাডমিন সবসময় পড়তে
+//                     পারেন; অন্য কেউ শুধু বৈধ "reveal" থাকলে (নিচে দেখুন)।
+//  • revealLimits  — একজন ইউজার প্রতি ৩০ দিনে সর্বোচ্চ কয়জন ডোনারের
+//                     নম্বর "reveal" করতে পারবেন তার কাউন্টার।
+//  • reveals       — প্রতিটা সফল reveal-এর একটা রেকর্ড (uid+donorId) —
+//                     donorsPrivate.get-কে ঠিক কোন donor reveal করা
+//                     হয়েছে তার সাথে যাচাই করার জন্য।
+//  • phoneIndex    — ফোন নম্বর → uid (ডুপ্লিকেট রেজিস্ট্রেশন ঠেকাতে)।
+//  • users         — প্রতিটা ইউজারের নিজস্ব প্রোফাইল/মেটাডেটা।
+//  • bloodRequests — জরুরি রক্তের অনুরোধ (পাবলিকভাবে পঠনযোগ্য — এটাই
+//                     ফিচারের উদ্দেশ্য, কিন্তু create-এ rate-limit +
+//                     ownership + validation বাধ্যতামূলক)।
+//  • feedback      — ইউজার মতামত (create যে কেউ করতে পারে, read শুধু admin)।
+//  • bloodBanks / ambulances — অ্যাডমিন-কিউরেটেড পাবলিক ডিরেক্টরি।
+// ══════════════════════════════════════════════════════════════════
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── অ্যাডমিন ──────────────────────────────────────────────────
+    // app.js-এর SUPER_ADMIN_EMAIL-এর সাথে হুবহু মিলতে হবে (client-side
+    // UI gate আর server-side rule একই শর্ত না হলে "isSuperAdmin() true
+    // কিন্তু rules সব read/write আটকে দিচ্ছে" জাতীয় বিভ্রান্তি হয়)।
+    // ভবিষ্যতে একাধিক অ্যাডমিন দরকার হলে Firebase custom claims-এ যাওয়া
+    // ভালো — এখন পর্যন্ত single hardcoded email-ই app.js-এর সাথে সঙ্গতিপূর্ণ।
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email.lower() == 'aakayes99@gmail.com';
+    }
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    // ── donors: পাবলিক প্রোফাইল ──────────────────────────────────
+    match /donors/{donorId} {
+      allow get: if true;
+      // list: লগইন ছাড়াই সার্চ করা যায় (প্রোডাক্ট-এর ইচ্ছাকৃত সিদ্ধান্ত),
+      // কিন্তু প্রতিবারে সর্বোচ্চ ৩০টা ডকুমেন্ট — নাহলে পুরো collection
+      // একসাথে scrape/download করা সম্ভব হতো। অ্যাডমিন প্যানেলের
+      // মাইগ্রেশন/লিস্ট টুলের জন্য অ্যাডমিনের এই সীমা নেই।
+      allow list: if isAdmin() || request.query.limit <= 30;
+
+      allow create: if isOwner(donorId)
+        && request.resource.data.uid == donorId
+        && !('email' in request.resource.data)
+        && !('phone' in request.resource.data)
+        && !('wa' in request.resource.data)
+        && !('facebook' in request.resource.data)
+        && request.resource.data.name is string && request.resource.data.name.size() <= 100
+        && request.resource.data.blood in ['A+','A-','B+','B-','AB+','AB-','O+','O-'];
+
+      // নিরাপত্তা (মূল ফিক্স): সাধারণ owner কখনো email/phone/wa/facebook
+      // ছুঁতে (যোগ/বদল/মোছা) পারবেন না — এই ৪টা ফিল্ড পাবলিক donors ডকে
+      // থাকার কথাই না। কিন্তু পুরনো (register.html যুগের) কিছু ডকে এই
+      // ফিল্ডগুলো আগে থেকেই বসে আছে — affectedKeys() দিয়ে শুধু "এই
+      // আপডেটে কোন কোন কী বদলাচ্ছে" চেক করা হয়, তাই legacy ডকের
+      // অসম্পর্কিত ফিল্ড (যেমন available টগল) আপডেট করা আটকায় না।
+      // অ্যাডমিনের এই সীমা নেই — মাইগ্রেশন টুল ঠিক এই ফিল্ডগুলোই মুছে
+      // ফেলার জন্য বানানো, তাই admin-কে ছাড় দেওয়া জরুরি।
+      allow update: if (
+          (isOwner(donorId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['email','phone','wa','facebook']))
+          || isAdmin()
+        )
+        && (!('name' in request.resource.data) || (request.resource.data.name is string && request.resource.data.name.size() <= 100));
+
+      allow delete: if isOwner(donorId) || isAdmin();
+    }
+
+    // ── donorsPrivate: phone/wa/facebook — গোপন ──────────────────
+    match /donorsPrivate/{donorId} {
+      // list কখনোই না — এটা করলে সবার নম্বর একসাথে scrape করা যেতো।
+      allow list: if false;
+
+      // get: মালিক নিজে, অ্যাডমিন, অথবা এই donor-এর জন্য বৈধভাবে quota
+      // consume করে "reveal" তৈরি করা থাকলে (নিচের reveals কালেকশন দেখুন)।
+      // এটাই আসল সুরক্ষা — শুধু "লগইন করা থাকলেই" যথেষ্ট না, প্রতিটা
+      // donor-এর জন্য আলাদা করে বৈধ reveal লাগবে, তাই স্ক্রিপ্ট দিয়ে
+      // সবার নম্বর একসাথে টেনে নেওয়া (scraping) আর সম্ভব না।
+      allow get: if isOwner(donorId) || isAdmin()
+        || (isSignedIn() && exists(/databases/$(database)/documents/reveals/$(request.auth.uid + '_' + donorId)));
+
+      allow write: if isOwner(donorId) || isAdmin();
+    }
+
+    // ── revealLimits: প্রতি ইউজারের ৩০-দিনের রোলিং কাউন্টার ───────
+    match /revealLimits/{uid} {
+      allow get: if isOwner(uid) || isAdmin();
+      allow list: if false;
+
+      allow create: if isOwner(uid)
+        && request.resource.data.count == 1
+        && request.resource.data.windowStart == request.time;
+
+      // হয় window মেয়াদোত্তীর্ণ হয়ে নতুন করে শুরু (count=1, নতুন windowStart),
+      // নয়তো window চলমান থাকলে ঠিক ১ করে বাড়বে আর সীমার নিচে থাকতে হবে —
+      // এই দুটো ছাড়া অন্য কোনো লেখা (যেমন সরাসরি count কমিয়ে/শূন্য করে
+      // সীমা "রিসেট" করার চেষ্টা) rules প্রত্যাখ্যান করে।
+      allow update: if isOwner(uid) && (
+        (request.time > resource.data.windowStart + duration.value(30, 'd')
+          && request.resource.data.count == 1
+          && request.resource.data.windowStart == request.time)
+        ||
+        (request.time <= resource.data.windowStart + duration.value(30, 'd')
+          && resource.data.count < 30
+          && request.resource.data.count == resource.data.count + 1
+          && request.resource.data.windowStart == resource.data.windowStart)
+      );
+      allow delete: if false;
+    }
+
+    // ── reveals: প্রতিটা সফল "নম্বর দেখা"-র প্রমাণ ────────────────
+    match /reveals/{revealId} {
+      allow get, list: if false; // সরাসরি পড়ার দরকার নেই, শুধু exists() দিয়ে চেক হয়
+      allow create: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.donorId is string
+        && revealId == request.auth.uid + '_' + request.resource.data.donorId;
+      allow update, delete: if false; // একবার তৈরি হলে চিরস্থায়ী রেকর্ড, বদলানোর দরকার নেই
+    }
+
+    // ── phoneIndex: ফোন → uid (শুধু ডুপ্লিকেট-চেকের জন্য, কখনো read হয় না) ──
+    match /phoneIndex/{phone} {
+      allow get, list: if isAdmin();
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // ── users: প্রতিটা ইউজারের নিজস্ব প্রোফাইল ────────────────────
+    match /users/{uid} {
+      allow get: if isOwner(uid) || isAdmin();
+      // list কখনোই না — এখানে email থাকে, পুরো ইউজার-তালিকা কারো জন্য
+      // পাবলিক হওয়া চলবে না (admin.html শুধু getCountFromServer ব্যবহার
+      // করে, ডকুমেন্টের কনটেন্ট আনে না — তাই count-এর জন্য list লাগে না)।
+      allow list: if false;
+      allow create: if isOwner(uid);
+      // lastRequestAt শুধু request.html-এর rate-limit ব্যাচ-রাইটে বসে,
+      // owner নিজেই লেখে — এখানে আলাদা কিছু লাগে না, owner-write যথেষ্ট।
+      allow update: if isOwner(uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── bloodRequests: জরুরি রক্তের অনুরোধ (পাবলিক ফিড) ───────────
+    match /bloodRequests/{reqId} {
+      allow get: if true;
+      // পুরো ইতিহাস না, একবারে সর্বোচ্চ ৫০টা (request.html-এর সাথে মিলিয়ে)
+      allow list: if isAdmin() || request.query.limit <= 50;
+
+      allow create: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'active'
+        && request.resource.data.patientName is string && request.resource.data.patientName.size() <= 60
+        && request.resource.data.problem is string && request.resource.data.problem.size() <= 200
+        && request.resource.data.blood in ['A+','A-','B+','B-','AB+','AB-','O+','O-']
+        && request.resource.data.bags is int && request.resource.data.bags >= 1 && request.resource.data.bags <= 20
+        && request.resource.data.hospital is string && request.resource.data.hospital.size() <= 120
+        && request.resource.data.location is string && request.resource.data.location.size() <= 120
+        && request.resource.data.contactName is string && request.resource.data.contactName.size() <= 60
+        && request.resource.data.contactPhone is string
+        && (!('details' in request.resource.data) || request.resource.data.details.size() <= 500)
+        // নিরাপত্তা (স্প্যাম/ফ্লাডিং প্রতিরোধ): request.html-এর একই batch-এ
+        // users/{uid}.lastRequestAt আপডেট হয় — তার আগেরটার সাথে কমপক্ষে
+        // ৬০ সেকেন্ড ব্যবধান না থাকলে নতুন অনুরোধ তৈরি হবে না। প্রথমবার
+        // (users ডকে lastRequestAt না থাকলে) বাধা নেই।
+        && (
+          !exists(/databases/$(database)/documents/users/$(request.auth.uid))
+          || !('lastRequestAt' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data)
+          || request.time > get(/databases/$(database)/documents/users/$(request.auth.uid)).data.lastRequestAt + duration.value(60, 's')
+        );
+
+      // status বদলানো (যেমন ভবিষ্যতে "পূরণ হয়েছে" মার্ক করা) শুধু নিজের
+      // অনুরোধেই, বা অ্যাডমিন। মূল তথ্য (uid, contactPhone ইত্যাদি)
+      // অন্য কেউ বদলাতে পারবে না।
+      allow update: if isOwner(resource.data.uid) || isAdmin();
+      allow delete: if isOwner(resource.data.uid) || isAdmin();
+    }
+
+    // ── feedback: ইউজার মতামত ──────────────────────────────────────
+    match /feedback/{fbId} {
+      // read শুধু admin — সাধারণ ইউজারের মতামত পাবলিকভাবে ব্রাউজযোগ্য
+      // হওয়ার দরকার নেই, আর about.html নিজেই নাম/টেক্সট দেখায় না।
+      allow get, list: if isAdmin();
+      // যে কেউ (লগইন ছাড়াও) মতামত পাঠাতে পারেন — about.html-এর বর্তমান
+      // ডিজাইন অনুযায়ী — কিন্তু rating আর length বাধ্যতামূলকভাবে বৈধ হতে হবে।
+      allow create: if request.resource.data.rating is int
+        && request.resource.data.rating >= 1 && request.resource.data.rating <= 5
+        && request.resource.data.text is string && request.resource.data.text.size() <= 1000
+        && request.resource.data.text.size() > 0;
+      allow update, delete: if isAdmin();
+    }
+
+    // ── bloodBanks / ambulances: অ্যাডমিন-কিউরেটেড পাবলিক ডিরেক্টরি ──
+    match /bloodBanks/{id} {
+      allow get, list: if true;
+      allow write: if isAdmin();
+    }
+    match /ambulances/{id} {
+      allow get, list: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── বাকি সবকিছু ডিফল্টভাবে বন্ধ ─────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

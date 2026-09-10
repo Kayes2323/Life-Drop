@@ -320,7 +320,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { isValidBdPhone, normalizeBdPhone, initials, DIVISIONS, fillDistrictSelect, fillUpazilaSelect } from './app.js';
+import { isValidBdPhone, normalizeBdPhone, initials, isValidFacebookUrl, DIVISIONS, fillDistrictSelect, fillUpazilaSelect } from './app.js';
 import {
   onAuthStateChanged, signInWithPopup, GoogleAuthProvider,
   sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink
@@ -643,10 +643,6 @@ const COORDS = {
   'বরিশাল':{lat:22.7010,lng:90.3535},'রংপুর':{lat:25.7439,lng:89.2752},
   'ময়মনসিংহ':{lat:24.7471,lng:90.4203}
 };
-
-function isValidFacebookUrl(v) {
-  return /^https?:\/\/(www\.|m\.|web\.)?(facebook\.com|fb\.com|fb\.me)\//i.test(v.trim());
-}
 
 window.submitDonor = async () => {
   if (!CU) { showToast('একটু অপেক্ষা করুন...'); return; }
