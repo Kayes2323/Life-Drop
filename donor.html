@@ -45,6 +45,13 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 
 .field-label{font-size:12.5px;font-weight:700;color:#555;margin-bottom:8px;font-family:'Hind Siliguri',sans-serif}
 
+/* ── প্রোফাইল ছবি (ফর্মের উপরে) ── */
+.avatar-wrap{position:relative;width:84px;height:84px;margin:2px auto 0;cursor:pointer}
+.avatar-circle{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,#fdecea,#fde);border:2.5px solid #f7d9d5;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#c0392b;font-family:'Inter',sans-serif;overflow:hidden}
+.avatar-circle img{width:100%;height:100%;object-fit:cover}
+.avatar-camera{position:absolute;right:-2px;bottom:-2px;width:28px;height:28px;border-radius:50%;background:#c0392b;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff}
+.avatar-hint{text-align:center;font-size:11px;color:#bbb;font-family:'Hind Siliguri',sans-serif;margin-top:7px}
+
 .submit-btn{width:100%;padding:16px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:15px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 6px 18px rgba(192,57,43,.32);margin-top:6px}
 .submit-btn:disabled{background:#e0a0a0;box-shadow:none;cursor:not-allowed}
 .ghost-btn{width:100%;padding:13px;background:none;border:none;color:#999;font-size:13px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;margin-top:6px}
@@ -138,6 +145,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3.5 6 8.5 6.5L20.5 6"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l1.5-2.5h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></symbol>
 </svg>
 
 <div class="hero">
@@ -223,7 +231,14 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 
   <!-- ধাপ ২: ডোনার ফর্ম -->
   <div class="screen" id="screen-form">
-    <div class="field-label" style="margin-bottom:16px;font-size:13px;color:#333" id="welcome-line">স্বাগতম! নিচে আপনার তথ্য দিন।</div>
+    <div class="avatar-wrap" onclick="document.getElementById('photo-inp').click()">
+      <div class="avatar-circle" id="avatar-circle"></div>
+      <div class="avatar-camera"><svg class="ic ic-sm"><use href="#i-cam"/></svg></div>
+      <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="uploadPhoto(this)"/>
+    </div>
+    <div class="avatar-hint">ছবি বদলাতে ট্যাপ করুন</div>
+
+    <div class="field-label" style="margin-bottom:16px;font-size:13px;color:#333;margin-top:18px" id="welcome-line">স্বাগতম! নিচে আপনার তথ্য দিন।</div>
 
     <div class="field-label">আপনার নাম</div>
     <div class="iw">
@@ -304,7 +319,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { isValidBdPhone, normalizeBdPhone, DIVISIONS, fillDistrictSelect, fillUpazilaSelect } from './app.js';
+import { isValidBdPhone, normalizeBdPhone, initials, DIVISIONS, fillDistrictSelect, fillUpazilaSelect } from './app.js';
 import {
   onAuthStateChanged, signInWithPopup, GoogleAuthProvider,
   sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink
@@ -566,8 +581,55 @@ onAuthStateChanged(auth, async user => {
   document.getElementById('f-name').value = name;
   document.getElementById('welcome-line').textContent =
     name ? `স্বাগতম ${name}! নিচে আপনার তথ্য দিন।` : 'স্বাগতম! নিচে আপনার তথ্য দিন।';
+  renderAvatar();
   showScreen('screen-form');
 });
+
+// ── প্রোফাইল ছবি: Google/email থেকে default, বা নিজে বদলানো যায় ──
+let SELECTED_PHOTO = null;
+function renderAvatar() {
+  const el = document.getElementById('avatar-circle');
+  const src = SELECTED_PHOTO || CU?.photoURL || '';
+  el.innerHTML = src
+    ? `<img src="${src}" alt=""/>`
+    : initials(document.getElementById('f-name').value || CU?.displayName || '');
+}
+document.getElementById('f-name').addEventListener('input', () => { if (!SELECTED_PHOTO && !CU?.photoURL) renderAvatar(); });
+
+window.uploadPhoto = (inp) => {
+  const f = inp.files?.[0];
+  if (!f) return;
+  if (!/^image\//.test(f.type)) { showToast('ছবির ফাইল বেছে নিন'); inp.value = ''; return; }
+  const reader = new FileReader();
+  reader.onerror = () => { showToast('ছবি পড়া যায়নি'); inp.value = ''; };
+  reader.onload = () => {
+    const img = new Image();
+    img.onerror = () => { showToast('ছবিটি ব্যবহার করা যাচ্ছে না'); inp.value = ''; };
+    img.onload = () => {
+      const MAX = 640;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = Math.round(h * (MAX / w)); w = MAX; } }
+      else { if (h > MAX) { w = Math.round(w * (MAX / h)); h = MAX; } }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const LIMIT = 700 * 1024;
+      let b64 = '', q = 0.8;
+      for (let i = 0; i < 5; i++) {
+        b64 = canvas.toDataURL('image/jpeg', q);
+        if (b64.length <= LIMIT) break;
+        q -= 0.15;
+        if (q < 0.3) break;
+      }
+      if (b64.length > LIMIT) { showToast('ছবিটি খুব বড় — ছোট একটি ছবি দিন'); inp.value = ''; return; }
+      SELECTED_PHOTO = b64;
+      renderAvatar();
+      inp.value = '';
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(f);
+};
 
 // ══════════════════════════════════════════════════
 // SUBMIT — donors (public, PII-মুক্ত) + donorsPrivate (phone/wa/facebook)
@@ -622,7 +684,7 @@ window.submitDonor = async () => {
     const donorData = {
       uid: CU.uid,
       name: name.slice(0, 100),
-      photo: CU.photoURL || '',
+      photo: SELECTED_PHOTO || CU.photoURL || '',
       blood: SELECTED_BLOOD,
       division, district, upazila, area: '',
       lat: coords.lat + (Math.random() - .5) * .04,
@@ -661,7 +723,7 @@ window.submitDonor = async () => {
     }
 
     try {
-      await updateDoc(doc(db, 'users', CU.uid), { isDonor: true, available: true, blood: SELECTED_BLOOD, division, district });
+      await updateDoc(doc(db, 'users', CU.uid), { isDonor: true, available: true, blood: SELECTED_BLOOD, division, district, ...(SELECTED_PHOTO ? { photo: SELECTED_PHOTO } : {}) });
     } catch (_) {}
 
     document.getElementById('success-overlay').classList.add('show');

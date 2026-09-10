@@ -154,7 +154,7 @@
             <div class="htag">সহজ নিবন্ধন</div>
             <div class="htitle">রক্তদাতা হয়ে উঠুন</div>
             <div class="hsub">এক ব্যাগ রক্ত বাঁচাতে পারে একটা জীবন</div>
-            <button class="hcta" onclick="goGuarded('register.html')">
+            <button class="hcta" onclick="window.location.href='donor.html'">
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               ডোনার হিসেবে নিবন্ধন
             </button>
@@ -253,7 +253,7 @@
           <div class="ac-label">ব্লাড ব্যাংক</div>
           <div class="ac-sub">কাছাকাছি ব্লাড ব্যাংক খুঁজুন</div>
         </button>
-        <button class="ac green" onclick="goGuarded('register.html')">
+        <button class="ac green" onclick="window.location.href='donor.html'">
           <div class="ac-bg"><svg width="100" height="100" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.2"/><path d="M4 19c0-3 2.7-5 6-5"/><path d="M17 14v6M14 17h6"/></svg></div>
           <div class="ac-ico"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.2"/><path d="M4 19c0-3 2.7-5 6-5"/><path d="M17 14v6M14 17h6"/></svg></div>
           <div class="ac-label">Donor হোন</div>
@@ -607,7 +607,7 @@ if (document.readyState !== 'loading') hideSplash();
   };
   window.dpGoRegister = function(){
     document.getElementById('dp-overlay').classList.remove('show');
-    goGuarded('register.html');
+    window.location.href = 'donor.html';
   };
 
   window._maybeShowDonorPrompt = function(){
