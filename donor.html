@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#c0392b"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>Sondhan — রক্তদাতা নিবন্ধন</title>
+<meta name="description" content="সন্ধানের সাথে মানবতার সেবায় আপনার যাত্রা শুরু করুন — রক্তদাতা হিসেবে নিবন্ধন করুন।"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+
+/* ── হিরো ── */
+.hero{text-align:center;padding:40px 22px 22px;color:#fff;width:100%;display:flex;flex-direction:column;align-items:center}
+.hero .sondhan-logo{margin-bottom:12px}
+.hero-title{font-size:19px;font-weight:800;font-family:'Hind Siliguri',sans-serif;line-height:1.5;max-width:340px}
+.hero-sub{font-size:12.5px;margin-top:9px;opacity:.85;font-family:'Hind Siliguri',sans-serif;max-width:300px;line-height:1.7}
+
+.card{background:#fff;border-radius:26px 26px 0 0;width:100%;max-width:480px;flex:1;padding:26px 22px 36px;overflow-y:auto}
+
+.err{background:#fdecea;color:#c0392b;padding:11px 14px;border-radius:11px;font-size:13px;margin-bottom:14px;border-left:3px solid #c0392b;display:none;font-family:'Hind Siliguri',sans-serif;line-height:1.6}
+.screen{display:none}
+.screen.active{display:block}
+
+/* ── auth বাটন ── */
+.google-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:15px;background:#fff;border:1.5px solid #eee;border-radius:14px;font-size:14.5px;font-weight:700;color:#333;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:12px;font-family:'Hind Siliguri',sans-serif;transition:.15s}
+.google-btn:disabled{opacity:.6;cursor:not-allowed}
+.email-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#fdecea;border:1.5px solid #f7d9d5;border-radius:14px;font-size:14.5px;font-weight:700;color:#c0392b;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.15s}
+.email-btn:disabled{opacity:.6;cursor:not-allowed}
+.auth-note{text-align:center;font-size:11.5px;color:#bbb;font-family:'Hind Siliguri',sans-serif;line-height:1.7;margin-top:14px}
+
+/* ── ইনপুট ── */
+.iw{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:13px;padding:0 14px;margin-bottom:12px;transition:.2s}
+.iw:focus-within{border-color:#c0392b;background:#fff}
+.ico{font-size:16px;margin-right:10px;opacity:.6;flex-shrink:0}
+.iw input,.iw select{flex:1;border:none;background:transparent;padding:14px 0;font-size:14.5px;color:#222;outline:none;font-family:'Hind Siliguri',sans-serif}
+
+.field-label{font-size:12.5px;font-weight:700;color:#555;margin-bottom:8px;font-family:'Hind Siliguri',sans-serif}
+
+.submit-btn{width:100%;padding:16px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:15px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 6px 18px rgba(192,57,43,.32);margin-top:6px}
+.submit-btn:disabled{background:#e0a0a0;box-shadow:none;cursor:not-allowed}
+.ghost-btn{width:100%;padding:13px;background:none;border:none;color:#999;font-size:13px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;margin-top:6px}
+.back-link{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:#aaa;font-size:12.5px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;margin-bottom:16px;padding:4px 0}
+
+/* ── রক্তের গ্রুপ গ্রিড (search.html-এর প্যাটার্ন পুনঃব্যবহার) ── */
+.bg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px}
+.bg-item{padding:13px 0;border-radius:12px;border:1.5px solid #fdecea;background:#fdecea;color:#c0392b;font-size:14.5px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s}
+.bg-item:active{transform:scale(.95)}
+.bg-item.on{background:#c0392b;border-color:#c0392b;color:#fff}
+
+/* ── যোগাযোগ মাধ্যম চিপস ── */
+.contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.contact-chip{display:flex;flex-direction:column;align-items:center;gap:6px;padding:13px 4px;border-radius:13px;border:1.5px solid #eee;background:#f8f8f8;color:#888;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-size:12px;font-weight:700;transition:.15s}
+.contact-chip:active{transform:scale(.96)}
+.contact-chip.on{border-color:#c0392b;background:#fdecea;color:#c0392b}
+.contact-chip svg{width:20px;height:20px}
+.contact-field{display:none;margin-top:10px}
+.contact-field.show{display:block}
+
+.section-gap{margin-top:22px}
+.section-title{font-size:12px;font-weight:800;color:#999;font-family:'Hind Siliguri',sans-serif;margin-bottom:10px;letter-spacing:.2px}
+
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.loading-overlay.show{display:flex}
+.spinner{width:36px;height:36px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay p{font-size:13px;color:#c0392b;font-weight:600;font-family:'Hind Siliguri',sans-serif}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:'Hind Siliguri',sans-serif;max-width:88vw;text-align:center}
+.toast.show{opacity:1}
+
+/* ── স্ট্যাটাস স্ক্রিন (already-donor / email-sent) ── */
+.status-box{background:#fff;border-radius:18px;padding:30px 22px;text-align:center}
+.status-icon{width:60px;height:60px;border-radius:50%;background:#eaf3de;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.status-icon svg{width:28px;height:28px;color:#3B6D11}
+.status-icon.mail{background:#E6F1FB}
+.status-icon.mail svg{color:#185FA5}
+.status-title{font-size:16px;font-weight:800;font-family:'Hind Siliguri',sans-serif;margin-bottom:8px;color:#1a1a1a}
+.status-sub{font-size:12.5px;color:#999;font-family:'Hind Siliguri',sans-serif;line-height:1.7;margin-bottom:20px}
+.status-sub b{color:#555}
+
+.privacy-note{text-align:center;margin-top:18px}
+.privacy-note a{font-size:11.5px;color:#bbb;text-decoration:underline;font-family:'Hind Siliguri',sans-serif}
+
+.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;display:block}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 3h4l2 5-2.5 1.5a12 12 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3.5 6 8.5 6.5L20.5 6"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></symbol>
+</svg>
+
+<div class="hero">
+  <div class="sondhan-logo sondhan-logo--navbar-crop">
+    <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
+  </div>
+  <div class="hero-title">সন্ধানের সাথে মানবতার সেবায়<br>আপনার যাত্রা শুরু করুন</div>
+  <div class="hero-sub">আপনার একটি ছোট্ট উদ্যোগ, কারও জীবনে হয়ে উঠতে পারে আশার কারণ।</div>
+</div>
+
+<div class="card">
+  <div id="err" class="err"></div>
+
+  <!-- প্রাথমিক লোড — auth অবস্থা যাচাই হচ্ছে -->
+  <div class="screen active" id="screen-loading">
+    <div style="text-align:center;padding:30px 10px;color:#bbb">
+      <div class="spinner" style="margin:0 auto 12px"></div>
+      <p style="font-size:13px;font-family:'Hind Siliguri',sans-serif">লোড হচ্ছে...</p>
+    </div>
+  </div>
+
+  <!-- ধাপ ১: অ্যাকাউন্ট যাচাই -->
+  <div class="screen" id="screen-intro">
+    <button class="google-btn" id="g-btn" onclick="loginGoogle()">
+      <svg width="20" height="20" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Google দিয়ে চালিয়ে যান
+    </button>
+    <button class="email-btn" id="e-open-btn" onclick="showScreen('screen-email-entry')">
+      <svg class="ic ic-sm"><use href="#i-mail"/></svg>
+      ইমেইল দিয়ে চালিয়ে যান
+    </button>
+    <div class="auth-note">যেকোনো একটি পদ্ধতিতে যাচাই করলেই যথেষ্ট — পাসওয়ার্ড দরকার নেই।</div>
+  </div>
+
+  <!-- ধাপ ১বি: ইমেইল প্রবেশ -->
+  <div class="screen" id="screen-email-entry">
+    <button class="back-link" onclick="showScreen('screen-intro')">‹ পেছনে</button>
+    <div class="field-label">আপনার ইমেইল ঠিকানা লিখুন</div>
+    <div class="iw">
+      <span class="ico">✉️</span>
+      <input type="email" id="email-input" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <button class="submit-btn" id="send-link-btn" onclick="sendEmailLink()">যাচাইকরণ লিংক পাঠান</button>
+  </div>
+
+  <!-- ধাপ ১সি: লিংক পাঠানো হয়েছে -->
+  <div class="screen" id="screen-email-sent">
+    <div class="status-box">
+      <div class="status-icon mail"><svg viewBox="0 0 24 24"><use href="#i-mail"/></svg></div>
+      <div class="status-title">ইমেইল চেক করুন</div>
+      <div class="status-sub"><b id="sent-email-display"></b>-এ একটি যাচাইকরণ লিংক পাঠানো হয়েছে। ইমেইলে থাকা লিংকে ক্লিক করলেই এই পেজে ফিরে আসবেন, স্বয়ংক্রিয়ভাবে যাচাই হয়ে যাবে।<br><br>ইনবক্সে না পেলে Spam/Junk ফোল্ডার দেখুন।</div>
+      <button class="submit-btn" id="resend-btn" onclick="sendEmailLink(true)">আবার পাঠান</button>
+      <button class="ghost-btn" onclick="showScreen('screen-email-entry')">অন্য ইমেইল ব্যবহার করুন</button>
+    </div>
+  </div>
+
+  <!-- ধাপ ১ডি: লিংকে ক্লিক করা হয়েছে কিন্তু ইমেইল মনে নেই (অন্য ব্রাউজার/ডিভাইস) -->
+  <div class="screen" id="screen-email-confirm">
+    <div class="field-label">নিশ্চিত করতে আপনার ইমেইলটি আবার লিখুন</div>
+    <div class="iw">
+      <span class="ico">✉️</span>
+      <input type="email" id="confirm-email-input" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <button class="submit-btn" id="confirm-link-btn" onclick="completeEmailLinkSignIn()">যাচাই সম্পন্ন করুন</button>
+    <button class="ghost-btn" onclick="requestFreshLink()">লিংকের মেয়াদ শেষ? নতুন লিংক চান</button>
+  </div>
+
+  <!-- ইতিমধ্যে ডোনার -->
+  <div class="screen" id="screen-already-donor">
+    <div class="status-box">
+      <div class="status-icon"><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></div>
+      <div class="status-title">আপনি ইতোমধ্যেই Sondhan-এর একজন রক্তদাতা।</div>
+      <div class="status-sub">আপনার তথ্য আগে থেকেই সংরক্ষিত আছে — নতুন করে নিবন্ধনের দরকার নেই।</div>
+      <a href="profile.html" class="submit-btn" style="display:block;text-decoration:none;text-align:center;box-sizing:border-box">আমার প্রোফাইলে যান</a>
+      <a href="profile.html" class="ghost-btn" style="display:block;text-decoration:none">তথ্য হালনাগাদ করুন</a>
+    </div>
+  </div>
+
+  <!-- ধাপ ২: ডোনার ফর্ম -->
+  <div class="screen" id="screen-form">
+    <div class="field-label" style="margin-bottom:16px;font-size:13px;color:#333" id="welcome-line">স্বাগতম! নিচে আপনার তথ্য দিন।</div>
+
+    <div class="field-label">আপনার নাম</div>
+    <div class="iw">
+      <span class="ico">🧑</span>
+      <input type="text" id="f-name" placeholder="আপনার পূর্ণ নাম" maxlength="100"/>
+    </div>
+
+    <div class="section-gap"></div>
+    <div class="field-label">আপনার রক্তের গ্রুপ নির্বাচন করুন</div>
+    <div class="bg-grid" id="bg-grid">
+      <button type="button" class="bg-item" data-g="A+">A+</button>
+      <button type="button" class="bg-item" data-g="A-">A-</button>
+      <button type="button" class="bg-item" data-g="B+">B+</button>
+      <button type="button" class="bg-item" data-g="B-">B-</button>
+      <button type="button" class="bg-item" data-g="AB+">AB+</button>
+      <button type="button" class="bg-item" data-g="AB-">AB-</button>
+      <button type="button" class="bg-item" data-g="O+">O+</button>
+      <button type="button" class="bg-item" data-g="O-">O-</button>
+    </div>
+
+    <div class="section-gap"></div>
+    <div class="field-label">আপনার অবস্থান</div>
+    <div class="iw">
+      <select id="f-division">
+        <option value="">বিভাগ বেছে নিন</option>
+      </select>
+    </div>
+    <div class="iw">
+      <select id="f-district"><option value="">জেলা বেছে নিন</option></select>
+    </div>
+    <div class="iw">
+      <select id="f-upazila"><option value="">উপজেলা বেছে নিন</option></select>
+    </div>
+
+    <div class="section-gap"></div>
+    <div class="section-title">আপনার সাথে দ্রুত কোন মাধ্যমে যোগাযোগ করা যাবে?</div>
+    <div class="contact-grid" id="contact-grid">
+      <button type="button" class="contact-chip" data-c="phone">
+        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" fill="none" stroke-linecap="round"><path d="M5 3h4l2 5-2.5 1.5a12 12 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></svg>
+        ফোন
+      </button>
+      <button type="button" class="contact-chip" data-c="wa">
+        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2zm5.6 14.2c-.24.68-1.4 1.3-1.9 1.34-.5.05-1 .24-3.3-.7-2.8-1.15-4.6-4-4.75-4.2-.14-.2-1.14-1.5-1.14-2.87 0-1.37.72-2.03.97-2.3.25-.28.55-.35.73-.35h.53c.17 0 .4-.06.62.48.24.58.8 2 .87 2.14.07.14.12.3.02.5-.1.2-.15.32-.3.5-.14.17-.3.38-.44.5-.14.14-.3.3-.13.6.17.3.76 1.25 1.63 2.02 1.12 1 2.06 1.3 2.36 1.45.3.14.47.12.65-.07.17-.2.73-.85.93-1.14.2-.3.4-.24.65-.14.27.1 1.68.8 1.97.94.3.14.48.2.55.32.07.13.07.72-.17 1.4z"/></svg>
+        WhatsApp
+      </button>
+      <button type="button" class="contact-chip" data-c="facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M17 3H7a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h5v-7H9.5v-2.7H12V9.4c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6v2h2.8l-.4 2.7h-2.4V21H17a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4z"/></svg>
+        Facebook
+      </button>
+    </div>
+
+    <div class="contact-field" id="field-phone">
+      <div class="iw"><span class="ico">📞</span><input type="tel" id="f-phone" placeholder="আপনার ফোন নম্বর"/></div>
+    </div>
+    <div class="contact-field" id="field-wa">
+      <div class="iw"><span class="ico">💬</span><input type="tel" id="f-wa" placeholder="আপনার WhatsApp নম্বর"/></div>
+    </div>
+    <div class="contact-field" id="field-facebook">
+      <div class="iw"><span class="ico">🔗</span><input type="text" id="f-facebook" placeholder="আপনার Facebook প্রোফাইলের লিংক"/></div>
+    </div>
+
+    <button class="submit-btn section-gap" id="submit-btn" onclick="submitDonor()">সন্ধানের সাথে আপনার যাত্রা শুরু করুন</button>
+
+    <div class="privacy-note"><a href="privacy.html" target="_blank" rel="noopener">তথ্য ও গোপনীয়তা নীতি</a></div>
+  </div>
+</div>
+
+<div id="loading" class="loading-overlay"><div class="spinner"></div><p id="loading-text">অপেক্ষা করুন...</p></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { isValidBdPhone, normalizeBdPhone, DIVISIONS, fillDistrictSelect, fillUpazilaSelect } from './app.js';
+import {
+  onAuthStateChanged, signInWithPopup, GoogleAuthProvider,
+  sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc, setDoc, updateDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const EMAIL_KEY = 'sondhanDonorEmailForSignIn';
+const RESEND_COOLDOWN_MS = 45000;
+
+function showToast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+function setLoad(v, text) {
+  document.getElementById('loading').classList.toggle('show', v);
+  if (text) document.getElementById('loading-text').textContent = text;
+}
+function showErr(msg) {
+  const el = document.getElementById('err');
+  el.textContent = msg;
+  el.style.display = 'block';
+  window.scrollTo(0, 0);
+}
+function hideErr() {
+  document.getElementById('err').style.display = 'none';
+}
+
+window.showScreen = (id) => {
+  hideErr();
+  document.querySelectorAll('.screen').forEach(el => el.classList.toggle('active', el.id === id));
+  window.scrollTo(0, 0);
+};
+
+// ── বিভাগ/জেলা/উপজেলা — app.js-এর যাচাইকৃত সম্পূর্ণ ডেটাসেট (৮ বিভাগ, ৬৪ জেলা) ──
+const divSel = document.getElementById('f-division');
+DIVISIONS.forEach(d => {
+  const o = document.createElement('option');
+  o.value = d; o.textContent = d;
+  divSel.appendChild(o);
+});
+divSel.addEventListener('change', () => {
+  fillDistrictSelect(document.getElementById('f-district'), divSel.value, 'জেলা বেছে নিন');
+  document.getElementById('f-upazila').innerHTML = '<option value="">উপজেলা বেছে নিন</option>';
+});
+document.getElementById('f-district').addEventListener('change', function () {
+  fillUpazilaSelect(document.getElementById('f-upazila'), this.value, 'উপজেলা বেছে নিন');
+});
+
+// ── রক্তের গ্রুপ গ্রিড ──
+let SELECTED_BLOOD = null;
+document.getElementById('bg-grid').addEventListener('click', e => {
+  const btn = e.target.closest('.bg-item');
+  if (!btn) return;
+  document.querySelectorAll('.bg-item').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  SELECTED_BLOOD = btn.dataset.g;
+});
+
+// ── যোগাযোগ মাধ্যম — প্রগ্রেসিভ ফিল্ড ──
+const SELECTED_CONTACTS = new Set();
+document.getElementById('contact-grid').addEventListener('click', e => {
+  const btn = e.target.closest('.contact-chip');
+  if (!btn) return;
+  const c = btn.dataset.c;
+  const on = btn.classList.toggle('on');
+  if (on) SELECTED_CONTACTS.add(c); else SELECTED_CONTACTS.delete(c);
+  document.getElementById('field-' + c).classList.toggle('show', on);
+});
+
+// ══════════════════════════════════════════════════
+// AUTH — Google (popup) + Email link (passwordless)
+// ══════════════════════════════════════════════════
+let CU = null;
+
+window.loginGoogle = async () => {
+  const btn = document.getElementById('g-btn');
+  const original = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = 'অপেক্ষা করুন...';
+  hideErr();
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    await signInWithPopup(auth, provider);
+    // onAuthStateChanged নিচে বাকিটা সামলাবে
+  } catch (e) {
+    if (e.code !== 'auth/popup-closed-by-user') showErr('Google দিয়ে যাচাই ব্যর্থ হয়েছে। আবার চেষ্টা করুন।');
+    btn.disabled = false; btn.innerHTML = original;
+  }
+};
+
+function actionCodeSettings() {
+  return {
+    url: window.location.origin + '/donor',
+    handleCodeInApp: true
+  };
+}
+
+let lastSentAt = 0;
+window.sendEmailLink = async (isResend) => {
+  const emailFieldId = isResend ? null : 'email-input';
+  const email = (emailFieldId ? document.getElementById(emailFieldId).value : localStorage.getItem(EMAIL_KEY) || '').trim();
+  hideErr();
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showErr('সঠিক ইমেইল ঠিকানা দিন।');
+    return;
+  }
+  if (Date.now() - lastSentAt < RESEND_COOLDOWN_MS) {
+    showToast('একটু পর আবার চেষ্টা করুন।');
+    return;
+  }
+
+  const btn = document.getElementById(isResend ? 'resend-btn' : 'send-link-btn');
+  const originalText = btn.textContent;
+  btn.disabled = true; btn.textContent = 'পাঠানো হচ্ছে...';
+
+  try {
+    await sendSignInLinkToEmail(auth, email, actionCodeSettings());
+    localStorage.setItem(EMAIL_KEY, email);
+    lastSentAt = Date.now();
+    document.getElementById('sent-email-display').textContent = email;
+    showScreen('screen-email-sent');
+    startResendCooldown();
+  } catch (e) {
+    showErr(emailLinkErrMsg(e?.code) || ('লিংক পাঠানো যায়নি: ' + (e?.message || String(e))));
+  } finally {
+    btn.disabled = false; btn.textContent = originalText;
+  }
+};
+
+function startResendCooldown() {
+  const btn = document.getElementById('resend-btn');
+  let remain = Math.ceil(RESEND_COOLDOWN_MS / 1000);
+  btn.disabled = true;
+  const bn = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+  const tick = () => {
+    if (remain <= 0) {
+      btn.disabled = false; btn.textContent = 'আবার পাঠান';
+      return;
+    }
+    btn.textContent = `আবার পাঠান (${bn(remain)})`;
+    remain--;
+    setTimeout(tick, 1000);
+  };
+  tick();
+}
+
+function emailLinkErrMsg(c) {
+  return {
+    'auth/invalid-email': 'সঠিক ইমেইল ঠিকানা দিন।',
+    'auth/user-disabled': 'এই একাউন্ট নিষ্ক্রিয় করা হয়েছে।',
+    'auth/too-many-requests': 'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
+    'auth/network-request-failed': 'ইন্টারনেট সংযোগ চেক করুন।',
+    'auth/unauthorized-continue-uri': 'এই ডোমেইন থেকে যাচাইকরণ অনুমোদিত নয়।',
+    'auth/operation-not-allowed': 'ইমেইল দিয়ে যাচাইকরণ এই মুহূর্তে চালু নেই।'
+  }[c] || '';
+}
+
+function emailLinkCompleteErrMsg(c) {
+  return {
+    'auth/invalid-action-code': 'লিংকটি অকার্যকর অথবা ইতিমধ্যে ব্যবহৃত হয়ে গেছে। নতুন লিংক চান।',
+    'auth/expired-action-code': 'লিংকের মেয়াদ শেষ হয়ে গেছে। নতুন লিংক চান।',
+    'auth/invalid-email': 'ইমেইলটি লিংক পাঠানো ইমেইলের সাথে মিলছে না।',
+    'auth/user-disabled': 'এই একাউন্ট নিষ্ক্রিয় করা হয়েছে।'
+  }[c] || 'যাচাই করা যায়নি। আবার চেষ্টা করুন।';
+}
+
+window.completeEmailLinkSignIn = async () => {
+  const email = document.getElementById('confirm-email-input').value.trim();
+  hideErr();
+  if (!email) { showErr('ইমেইল দিন।'); return; }
+  const btn = document.getElementById('confirm-link-btn');
+  btn.disabled = true; btn.textContent = 'যাচাই হচ্ছে...';
+  try {
+    await signInWithEmailLink(auth, email, window.location.href);
+    localStorage.removeItem(EMAIL_KEY);
+    cleanUpLinkUrl();
+    // onAuthStateChanged বাকিটা সামলাবে
+  } catch (e) {
+    showErr(emailLinkCompleteErrMsg(e?.code));
+    btn.disabled = false; btn.textContent = 'যাচাই সম্পন্ন করুন';
+  }
+};
+
+window.requestFreshLink = () => {
+  localStorage.removeItem(EMAIL_KEY);
+  cleanUpLinkUrl();
+  showScreen('screen-email-entry');
+};
+
+function cleanUpLinkUrl() {
+  try {
+    const url = new URL(window.location.href);
+    ['apiKey', 'oobCode', 'mode', 'lang', 'continueUrl'].forEach(k => url.searchParams.delete(k));
+    window.history.replaceState({}, document.title, url.pathname);
+  } catch (_) {}
+}
+
+// ── পেজ লোডে: এটা কি ইমেইল-লিংক থেকে ফেরা ভিজিট? ──
+async function handleEmailLinkReturnIfAny() {
+  if (!isSignInWithEmailLink(auth, window.location.href)) return false;
+  const savedEmail = localStorage.getItem(EMAIL_KEY);
+  if (savedEmail) {
+    setLoad(true, 'যাচাই হচ্ছে...');
+    try {
+      await signInWithEmailLink(auth, savedEmail, window.location.href);
+      localStorage.removeItem(EMAIL_KEY);
+      cleanUpLinkUrl();
+    } catch (e) {
+      setLoad(false);
+      showErr(emailLinkCompleteErrMsg(e?.code));
+      showScreen('screen-email-entry');
+      return true;
+    }
+    setLoad(false);
+    return true;
+  }
+  // অন্য ব্রাউজার/ডিভাইস থেকে লিংক খোলা হয়েছে — ইমেইল জানা নেই
+  showScreen('screen-email-confirm');
+  return true;
+}
+
+// ══════════════════════════════════════════════════
+// AUTH RESOLVED → ডুপ্লিকেট ডোনার চেক → ফর্ম দেখাও
+// ══════════════════════════════════════════════════
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    const handledLink = await handleEmailLinkReturnIfAny();
+    if (!handledLink) showScreen('screen-intro');
+    return;
+  }
+
+  CU = user;
+
+  // Google/email দিয়ে প্রথমবার এলে users ডকুমেন্ট না থাকতে পারে — বানিয়ে রাখি
+  try {
+    const uref = doc(db, 'users', user.uid);
+    const usnap = await getDoc(uref);
+    if (!usnap.exists()) {
+      await setDoc(uref, {
+        uid: user.uid, name: user.displayName || '', email: user.email || '',
+        photo: user.photoURL || '', isDonor: false, available: false,
+        donations: 0, rating: 0, raters: 0, createdAt: serverTimestamp()
+      });
+    }
+  } catch (_) {}
+
+  // ইতিমধ্যে ডোনার কিনা যাচাই — ডুপ্লিকেট প্রোফাইল ঠেকাতে
+  try {
+    const dsnap = await getDoc(doc(db, 'donors', user.uid));
+    if (dsnap.exists()) {
+      showScreen('screen-already-donor');
+      return;
+    }
+  } catch (_) {}
+
+  const name = user.displayName || '';
+  document.getElementById('f-name').value = name;
+  document.getElementById('welcome-line').textContent =
+    name ? `স্বাগতম ${name}! নিচে আপনার তথ্য দিন।` : 'স্বাগতম! নিচে আপনার তথ্য দিন।';
+  showScreen('screen-form');
+});
+
+// ══════════════════════════════════════════════════
+// SUBMIT — donors (public, PII-মুক্ত) + donorsPrivate (phone/wa/facebook)
+// ══════════════════════════════════════════════════
+const COORDS = {
+  'ঢাকা':{lat:23.8103,lng:90.4125},'গাজীপুর':{lat:23.9999,lng:90.4203},
+  'নারায়ণগঞ্জ':{lat:23.6238,lng:90.4997},'চট্টগ্রাম':{lat:22.3569,lng:91.7832},
+  'কুমিল্লা':{lat:23.4682,lng:91.1788},'সিলেট':{lat:24.8949,lng:91.8687},
+  'রাজশাহী':{lat:24.3745,lng:88.6042},'খুলনা':{lat:22.8456,lng:89.5403},
+  'বরিশাল':{lat:22.7010,lng:90.3535},'রংপুর':{lat:25.7439,lng:89.2752},
+  'ময়মনসিংহ':{lat:24.7471,lng:90.4203}
+};
+
+function isValidFacebookUrl(v) {
+  return /^https?:\/\/(www\.|m\.|web\.)?(facebook\.com|fb\.com|fb\.me)\//i.test(v.trim());
+}
+
+window.submitDonor = async () => {
+  if (!CU) { showToast('একটু অপেক্ষা করুন...'); return; }
+  hideErr();
+
+  const name = document.getElementById('f-name').value.trim();
+  const division = document.getElementById('f-division').value;
+  const district = document.getElementById('f-district').value;
+  const upazila  = document.getElementById('f-upazila').value;
+  const phone    = SELECTED_CONTACTS.has('phone') ? document.getElementById('f-phone').value.trim() : '';
+  const wa       = SELECTED_CONTACTS.has('wa') ? document.getElementById('f-wa').value.trim() : '';
+  const facebook = SELECTED_CONTACTS.has('facebook') ? document.getElementById('f-facebook').value.trim() : '';
+
+  if (!name) { showErr('আপনার নাম লিখুন।'); return; }
+  if (!SELECTED_BLOOD) { showErr('রক্তের গ্রুপ নির্বাচন করুন।'); return; }
+  if (!division) { showErr('বিভাগ বেছে নিন।'); return; }
+  if (!district) { showErr('জেলা বেছে নিন।'); return; }
+  if (!upazila)  { showErr('উপজেলা বেছে নিন।'); return; }
+  if (SELECTED_CONTACTS.size === 0) { showErr('অন্তত একটি যোগাযোগ মাধ্যম বেছে নিয়ে তথ্য দিন।'); return; }
+  if (SELECTED_CONTACTS.has('phone') && (!phone || !isValidBdPhone(phone))) { showErr('সঠিক ফোন নম্বর দিন (01XXXXXXXXX)।'); return; }
+  if (SELECTED_CONTACTS.has('wa') && (!wa || !isValidBdPhone(wa))) { showErr('সঠিক WhatsApp নম্বর দিন (01XXXXXXXXX)।'); return; }
+  if (SELECTED_CONTACTS.has('facebook') && (!facebook || !isValidFacebookUrl(facebook))) { showErr('সঠিক Facebook প্রোফাইল লিংক দিন (facebook.com/...)।'); return; }
+
+  const normPhone = phone ? normalizeBdPhone(phone) : '';
+  const normWa    = wa ? normalizeBdPhone(wa) : '';
+
+  setLoad(true, 'নিবন্ধন হচ্ছে...');
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+
+  try {
+    const coords = COORDS[district] || COORDS[division] || COORDS['ঢাকা'];
+    // নিরাপত্তা: phone/wa/facebook/email এখানে রাখা হয় না — সব
+    // donorsPrivate-এ আলাদা। donors পাবলিকভাবে পড়া যায় (লগইন ছাড়া
+    // সার্চ), তাই কোনো ব্যক্তিগত যোগাযোগ তথ্য এখানে থাকা চলবে না।
+    const donorData = {
+      uid: CU.uid,
+      name: name.slice(0, 100),
+      photo: CU.photoURL || '',
+      blood: SELECTED_BLOOD,
+      division, district, upazila, area: '',
+      lat: coords.lat + (Math.random() - .5) * .04,
+      lng: coords.lng + (Math.random() - .5) * .04,
+      lastDonation: null,
+      neverDonated: true,
+      hemoglobin: '',
+      urgentReady: false,
+      available: true,
+      isDonor: true,
+      donations: 0,
+      rating: 0,
+      raters: 0,
+      createdAt: serverTimestamp()
+    };
+
+    const privateData = {};
+    if (normPhone) privateData.phone = normPhone;
+    if (normWa) privateData.wa = normWa;
+    if (facebook) privateData.facebook = facebook;
+
+    const batch = writeBatch(db);
+    if (normPhone) batch.set(doc(db, 'phoneIndex', normPhone), { uid: CU.uid });
+    batch.set(doc(db, 'donors', CU.uid), donorData);
+    batch.set(doc(db, 'donorsPrivate', CU.uid), privateData);
+
+    try {
+      await batch.commit();
+    } catch (batchErr) {
+      console.warn('donor batch commit error:', batchErr);
+      showErr(normPhone
+        ? 'এই ফোন নম্বর দিয়ে আগেই একজন Donor নিবন্ধিত আছেন, অথবা লেখার অনুমতি নেই।'
+        : 'তথ্য সংরক্ষণ করা যায়নি — অনুমতি নেই। ফোন বা WhatsApp নম্বর যোগ করে আবার চেষ্টা করুন।');
+      setLoad(false); btn.disabled = false;
+      return;
+    }
+
+    try {
+      await updateDoc(doc(db, 'users', CU.uid), { isDonor: true, available: true, blood: SELECTED_BLOOD, division, district });
+    } catch (_) {}
+
+    showToast('আপনার যাত্রা শুরু হলো — স্বাগতম, Sondhan পরিবারে।');
+    setTimeout(() => { window.location.href = 'profile.html'; }, 1600);
+
+  } catch (e) {
+    console.warn('submitDonor error:', e);
+    showErr('নিবন্ধন সম্পন্ন করা যায়নি — আবার চেষ্টা করুন।');
+    btn.disabled = false;
+  } finally {
+    setLoad(false);
+  }
+};
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW register failed:', err));
+  });
+}
+</script>
+</body>
+</html>
