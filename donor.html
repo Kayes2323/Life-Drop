@@ -90,6 +90,46 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 .privacy-note a{font-size:11.5px;color:#bbb;text-decoration:underline;font-family:'Hind Siliguri',sans-serif}
 
 .ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;display:block}
+
+/* ── সাবমিট সফল হলে — "নীরব সূচনা" স্বাগত অ্যানিমেশন ── */
+.success-overlay{
+  display:none;
+  position:fixed;inset:0;z-index:10000;
+  background:radial-gradient(120% 110% at 50% 38%,#cf4433,#a52d1f);
+  flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  padding:0 30px;overflow:hidden;
+}
+.success-overlay.show{display:flex}
+.success-glow{
+  position:absolute;left:50%;top:34%;width:280px;height:280px;margin:-140px 0 0 -140px;
+  border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 70%);
+  opacity:0;animation:successGlow 1.7s ease-out .2s forwards;
+}
+@keyframes successGlow{0%{opacity:0;transform:scale(.7)}45%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.25)}}
+.success-logo{
+  width:200px;max-width:62vw;height:auto;opacity:0;transform:scale(.96);
+  animation:successLogo 1s cubic-bezier(.25,.7,.35,1) .85s forwards;
+}
+@keyframes successLogo{to{opacity:1;transform:scale(1)}}
+.success-headline{
+  color:#fff;font-size:19px;font-weight:700;line-height:1.55;max-width:280px;margin-top:20px;
+  opacity:0;animation:fadeUp .6s ease-out 2s forwards;
+}
+.success-subline{
+  color:rgba(255,255,255,.82);font-size:12.5px;line-height:1.75;max-width:260px;margin-top:10px;
+  opacity:0;animation:fadeUp .55s ease-out 2.7s forwards;
+}
+.success-cta{
+  display:inline-block;margin-top:30px;padding:14px 30px;border-radius:15px;
+  background:#fff;color:#a5301f;font-family:'Hind Siliguri',sans-serif;font-weight:700;font-size:14px;
+  text-decoration:none;box-shadow:0 12px 26px rgba(0,0,0,.24);
+  opacity:0;transform:translateY(9px);animation:fadeUp .55s ease-out 3.4s forwards;
+}
+.success-cta:active{transform:scale(.97)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion: reduce){
+  .success-glow,.success-logo,.success-headline,.success-subline,.success-cta{animation-duration:.01ms !important;animation-delay:0s !important}
+}
 </style>
 </head>
 <body>
@@ -249,6 +289,14 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 
     <div class="privacy-note"><a href="privacy.html" target="_blank" rel="noopener">তথ্য ও গোপনীয়তা নীতি</a></div>
   </div>
+</div>
+
+<div class="success-overlay" id="success-overlay">
+  <div class="success-glow"></div>
+  <img class="success-logo" src="sondhan-logo-white.png" alt="Sondhan"/>
+  <div class="success-headline">সন্ধানের সাথে<br>আপনার যাত্রা শুরু হলো।</div>
+  <div class="success-subline">মানবতার সেবায় পাশে থাকার জন্য ধন্যবাদ।</div>
+  <a class="success-cta" href="index.html">Sondhan অ্যাপে প্রবেশ করুন</a>
 </div>
 
 <div id="loading" class="loading-overlay"><div class="spinner"></div><p id="loading-text">অপেক্ষা করুন...</p></div>
@@ -616,8 +664,7 @@ window.submitDonor = async () => {
       await updateDoc(doc(db, 'users', CU.uid), { isDonor: true, available: true, blood: SELECTED_BLOOD, division, district });
     } catch (_) {}
 
-    showToast('আপনার যাত্রা শুরু হলো — স্বাগতম, Sondhan পরিবারে।');
-    setTimeout(() => { window.location.href = 'profile.html'; }, 1600);
+    document.getElementById('success-overlay').classList.add('show');
 
   } catch (e) {
     console.warn('submitDonor error:', e);
