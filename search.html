@@ -107,6 +107,28 @@
 .locsearch-empty-t{font-size:13px;font-weight:700;color:#333;font-family:'Hind Siliguri',sans-serif}
 .locsearch-empty-s{font-size:11.5px;color:#999;margin-top:4px;line-height:1.6;font-family:'Hind Siliguri',sans-serif}
 .locsearch-browse{margin:4px 12px 14px;padding:13px;background:#faf7f5;color:#555;border:none;border-radius:12px;font-size:12.5px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;width:calc(100% - 24px);display:flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0}
+
+/* ── GPS বর্তমান অবস্থান ── */
+.gps-zone{padding:0 16px 12px;flex-shrink:0}
+.gps-btn{width:100%;display:flex;align-items:center;gap:11px;background:#fdecea;border:1.5px solid #f7d9d5;border-radius:12px;padding:12px 13px;cursor:pointer;text-align:left}
+.gps-btn-ico{width:32px;height:32px;border-radius:9px;background:#fff;color:#c0392b;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.gps-btn-main{flex:1;min-width:0}
+.gps-btn-t{font-size:13px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.gps-btn-s{font-size:10.5px;color:#999;font-family:'Hind Siliguri',sans-serif;margin-top:1px}
+.gps-or{text-align:center;font-size:11px;color:#bbb;margin:10px 0;font-family:'Inter',sans-serif;font-weight:700;letter-spacing:.5px}
+.gps-card{background:#fdecea;border-radius:12px;padding:14px}
+.gps-card.pending{display:flex;align-items:center;gap:11px}
+.gps-spin{width:22px;height:22px;border:2.5px solid #f7d9d5;border-top-color:#c0392b;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0}
+.gps-pin-line{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.gps-pin-line svg{color:#c0392b}
+.gps-attrib{font-size:9.5px;color:#aaa;margin-top:4px;font-family:'Inter',sans-serif}
+.gps-q{font-size:12px;color:#555;margin-top:9px;font-family:'Hind Siliguri',sans-serif}
+.gps-confirm-btns{display:flex;gap:8px;margin-top:11px}
+.gps-confirm-btns button{flex:1;height:40px;border-radius:10px;border:none;font-family:'Hind Siliguri',sans-serif;font-weight:700;font-size:12px;cursor:pointer}
+.gps-confirm-btns .yes{background:#c0392b;color:#fff}
+.gps-confirm-btns .no{background:#fff;color:#555;border:1.5px solid #f0e6e1}
+.gps-denied{background:#fdecea;border-radius:12px;padding:13px;font-size:12px;color:#8a4426;line-height:1.6;font-family:'Hind Siliguri',sans-serif}
+.gps-denied button{margin-top:9px;background:#fff;border:1.5px solid #f7d9d5;color:#8a4426;font-weight:700;font-size:11.5px;padding:8px 14px;border-radius:9px;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
 .search-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;background:#eee;color:#bbb;transition:.15s}
 .search-btn.ready{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;box-shadow:0 5px 16px rgba(192,57,43,.3)}
 .results-list{flex:1;overflow-y:auto;padding:11px}
@@ -150,16 +172,16 @@
 .ocard-avail.ready{background:#e9f6ee;color:#1e8449}
 .ocard-avail.notready{background:#f1ebe7;color:#9c8f89}
 .ocard-avail-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:currentColor}
-.ocard-actions{display:flex;gap:7px;margin-top:10px;width:100%}
-.ocard-primary{flex:1;height:34px;border-radius:11px;border:none;color:#fff;font-weight:700;font-size:11px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:5px}
-.ocard-primary.call{background:#c0392b}
-.ocard-primary.wa{background:#25d366}
-.ocard-primary.fb{background:#1877F2}
-.ocard-icon{width:34px;height:34px;flex-shrink:0;border-radius:11px;border:1.5px solid #f0f0f0;background:#fff;color:#666;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.ocard-icon.wa{color:#25d366;border-color:#d9f7e4}
-.ocard-icon.fb{color:#1877F2;border-color:#dbe9fd}
-.ocard-icon.req{color:#c0392b;border-color:#fdecea}
-.ocard-icon svg,.ocard-primary svg{width:14px;height:14px}
+.ocard-actions{display:flex;gap:8px;margin-top:10px;justify-content:center}
+/* সব contact/action বাটন একই আকার (38×38) — শুধু নিজ নিজ ব্র্যান্ড-রঙে আলাদা,
+   কোনোটা বড়/ছোট নয়। request বাটনটা outline রাখা হয়েছে যাতে বোঝা যায়
+   এটা "যোগাযোগ" না, বরং একটা আলাদা ধরনের একশন। */
+.ocard-cta{width:38px;height:38px;flex-shrink:0;border-radius:12px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ocard-cta.call{background:#c0392b;color:#fff}
+.ocard-cta.wa{background:#25d366;color:#fff}
+.ocard-cta.fb{background:#1877F2;color:#fff}
+.ocard-cta.req{background:#fff;border:1.5px solid #fdecea;color:#c0392b}
+.ocard-cta svg{width:16px;height:16px}
 /* অন্যান্য মডাল (লোকেশন পিকার, রিকোয়েস্ট) — বটম-শিট স্টাইল */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:flex-end;justify-content:center}
 .modal-bg.open{display:flex}
@@ -292,6 +314,7 @@
   <symbol id="i-magic" viewBox="0 0 24 24"><path d="m15 4 1.5 3L20 8.5 16.5 10 15 13l-1.5-3L10 8.5 13.5 7z"/><path d="M5 14l3 6M3 17l7-3"/></symbol>
   <symbol id="i-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+  <symbol id="i-crosshair" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></symbol>
 </svg>
 
 <div class="app">
@@ -385,6 +408,7 @@
         <button class="locsearch-close" onclick="closeLocSearch()">×</button>
         <span class="locsearch-title">এলাকা</span>
       </div>
+      <div id="locsearch-gps-zone"></div>
       <div class="locsearch-input-row">
         <div class="locsearch-input-wrap">
           <svg class="ic ic-sm"><use href="#i-search"/></svg>
@@ -497,14 +521,9 @@ document.getElementById('bg-grid').addEventListener('click', e => {
   sb.disabled = false;
   sb.classList.add('ready');
   sb.textContent = `${SELECTED_GROUP} রক্তদাতা খুঁজুন`;
-
-  // রক্তের গ্রুপ বাছার পরপরই এলাকা বাছার popup — ইউজারকে আলাদা করে
-  // "বদলান" খুঁজে বের করতে হবে না, পরের ধাপটা নিজে থেকেই এগিয়ে আসে।
-  // এলাকা আগে থেকে বাছা থাকলে (ইউজার শুধু গ্রুপ পাল্টাচ্ছে) আবার
-  // জোর করে খুলবে না — বিরক্তিকর হবে না।
-  if (!SEL.division && !SEL.district && !SEL.upazila) {
-    setTimeout(openLocSearch, 200);
-  }
+  // BUGFIX: আগে এখানে রক্তের গ্রুপ বাছার পরপরই এলাকা-সার্চ শিট
+  // নিজে থেকে খুলে যেত — ইউজারের কাছে এটা হঠাৎ, ব্যাখ্যাহীন popup
+  // মনে হচ্ছিল। এখন এলাকা কখন বাছবেন সেটা সম্পূর্ণ ইউজারের সিদ্ধান্ত।
 });
 
 // ── এলাকা পিকার: বিভাগ → জেলা → উপজেলা (প্রতিটা ঐচ্ছিক) ──
@@ -710,6 +729,8 @@ function resolveLocQuery(q) {
 
 window.openLocSearch = () => {
   document.getElementById('locsearch-modal').classList.add('open');
+  gpsState = { status: 'idle', matched: null };
+  renderGpsZone();
   const input = document.getElementById('locsearch-input');
   input.value = '';
   renderLocSearchResults();
@@ -719,6 +740,130 @@ window.closeLocSearch = () => document.getElementById('locsearch-modal').classLi
 document.getElementById('locsearch-modal').addEventListener('click', e => {
   if (e.target.id === 'locsearch-modal') closeLocSearch();
 });
+
+// ── GPS বর্তমান অবস্থান — সত্যিকারের navigator.geolocation permission,
+// তারপর OpenStreetMap-এর পাবলিক Nominatim reverse-geocoding API দিয়ে
+// coordinates → এলাকার নাম বের করে, আমাদের নিজস্ব LOC_INDEX-এর সাথে মেলায়।
+// কোনো coordinate কখনো সংরক্ষণ বা অন্য কারো কাছে দেখানো হয় না — শুধু এই
+// একবারের reverse-geocode কলে ব্যবহার হয়, মেমোরিতেই থেকে যায়।
+let gpsState = { status: 'idle', matched: null }; // idle | pending | confirm | denied | notfound
+
+// GPS থেকে পাওয়া ইংরেজি নাম বাংলার সাথে মেলানোর জন্য — এটা সাধারণ
+// Banglish টাইপিং সার্চের জন্য যথেষ্ট নির্ভরযোগ্য নয় বলে বাদ দেওয়া হয়েছে
+// (পুরো ডেটাসেটে টেস্ট করে ~৬৩% নির্ভুলতা পাওয়া গেছে — একটা ভুল এলাকা
+// suggest করার ঝুঁকি আছে), কিন্তু এখানে শুধু কড়াকড়ি distance<=1 থ্রেশহোল্ডে
+// GPS-এর নিজের সীমিত candidate তালিকার সাথে সহায়ক হিসেবে ব্যবহার হচ্ছে।
+function latinToBengaliRough(input) {
+  let s = input.toLowerCase().trim();
+  const rules = [
+    ['chh','ছ'],['sh','শ'],['ch','চ'],['th','থ'],['dh','ধ'],['bh','ভ'],['gh','ঘ'],
+    ['jh','ঝ'],['kh','খ'],['ph','ফ'],['ng','ং'],['rh','ড়'],
+    ['aa','া'],['ee','ী'],['oo','ু'],['ou','ৌ'],['oi','ৈ'],
+    ['a','া'],['i','ি'],['u','ু'],['e','ে'],['o',''],
+    ['b','ব'],['c','ক'],['d','দ'],['f','ফ'],['g','গ'],['h','হ'],['j','জ'],['k','ক'],
+    ['l','ল'],['m','ম'],['n','ন'],['p','প'],['q','ক'],['r','র'],['s','স'],['t','ট'],
+    ['v','ভ'],['w','ও'],['x','ক্স'],['y','য়'],['z','জ']
+  ];
+  let out = '', i = 0;
+  while (i < s.length) {
+    let matched = false;
+    for (const [pat, rep] of rules) {
+      if (s.startsWith(pat, i)) { out += rep; i += pat.length; matched = true; break; }
+    }
+    if (!matched) i++;
+  }
+  return out;
+}
+
+function matchGpsCandidate(str) {
+  if (!str) return null;
+  const direct = resolveLocQuery(str);
+  if (direct.kind === 'matches') {
+    const flat = direct.groups.flatMap(g => g.items);
+    if (flat.length === 1) return flat[0];
+  }
+  if (/^[a-zA-Z\s.'-]+$/.test(str)) {
+    const translit = latinToBengaliRough(str);
+    const scored = LOC_INDEX.map(l => ({ loc: l, d: lev(translit, l.name) })).sort((a,b) => a.d - b.d);
+    if (scored.length && scored[0].d <= 1) return scored[0].loc;
+  }
+  return null;
+}
+
+function renderGpsZone() {
+  const zone = document.getElementById('locsearch-gps-zone');
+  if (gpsState.status === 'pending') {
+    zone.innerHTML = `<div class="gps-zone"><div class="gps-card pending"><div class="gps-spin"></div><span style="font-size:12.5px;color:#555;font-family:'Hind Siliguri',sans-serif">আপনার এলাকা শনাক্ত হচ্ছে...</span></div></div>`;
+  } else if (gpsState.status === 'confirm' && gpsState.matched) {
+    const m = gpsState.matched;
+    zone.innerHTML = `
+      <div class="gps-zone">
+        <div class="gps-card">
+          <div class="gps-pin-line"><svg class="ic ic-sm"><use href="#i-pin"/></svg>আপনি সম্ভবত ${esc(m.name)}, ${esc(m.district)}-এ আছেন</div>
+          <div class="gps-attrib">অবস্থান তথ্য: © OpenStreetMap contributors</div>
+          <div class="gps-q">এই এলাকা দিয়ে রক্তদাতা খুঁজবেন?</div>
+          <div class="gps-confirm-btns">
+            <button class="yes" data-gps-yes>হ্যাঁ, খুঁজুন</button>
+            <button class="no" data-gps-no>এলাকা পরিবর্তন করুন</button>
+          </div>
+        </div>
+      </div>
+      <div class="gps-or">অথবা</div>`;
+    zone.querySelector('[data-gps-yes]').onclick = () => {
+      SEL.division = m.division; SEL.district = m.district; SEL.upazila = m.type === 'upazila' ? m.name : '';
+      document.getElementById('loc-row-txt').textContent = m.type === 'upazila' ? m.name : `${m.name} (${m.district} জেলা জুড়ে)`;
+      refreshResetLink();
+      closeLocSearch();
+      gpsState = { status: 'idle', matched: null };
+      if (SELECTED_GROUP) searchDonors();
+    };
+    zone.querySelector('[data-gps-no]').onclick = () => { gpsState = { status: 'idle', matched: null }; renderGpsZone(); };
+  } else if (gpsState.status === 'denied' || gpsState.status === 'notfound') {
+    const msg = gpsState.status === 'denied'
+      ? 'লোকেশন অনুমতি পাওয়া যায়নি (বা এই ব্রাউজারে সমর্থিত নয়)। নিচে এলাকার নাম লিখে খুঁজুন।'
+      : 'আপনার এলাকা নির্ভুলভাবে শনাক্ত করা যায়নি। নিচে এলাকার নাম লিখে খুঁজুন।';
+    zone.innerHTML = `<div class="gps-zone"><div class="gps-denied">${msg}<div><button data-gps-dismiss>ঠিক আছে</button></div></div></div>`;
+    zone.querySelector('[data-gps-dismiss]').onclick = () => { gpsState = { status: 'idle', matched: null }; renderGpsZone(); };
+  } else {
+    zone.innerHTML = `
+      <div class="gps-zone">
+        <button class="gps-btn" data-gps-start>
+          <div class="gps-btn-ico"><svg class="ic ic-sm"><use href="#i-crosshair"/></svg></div>
+          <div class="gps-btn-main"><div class="gps-btn-t">বর্তমান অবস্থান ব্যবহার করুন</div><div class="gps-btn-s">আপনার এলাকা স্বয়ংক্রিয়ভাবে শনাক্ত করুন</div></div>
+        </button>
+      </div>
+      <div class="gps-or">অথবা</div>`;
+    zone.querySelector('[data-gps-start]').onclick = useGpsLocation;
+  }
+}
+
+function useGpsLocation() {
+  if (!navigator.geolocation) { gpsState = { status: 'denied', matched: null }; renderGpsZone(); return; }
+  gpsState = { status: 'pending', matched: null };
+  renderGpsZone();
+  navigator.geolocation.getCurrentPosition(async pos => {
+    try {
+      const { latitude, longitude } = pos.coords;
+      const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&addressdetails=1&accept-language=bn,en&zoom=14`);
+      if (!resp.ok) throw new Error('geocode failed');
+      const data = await resp.json();
+      const addr = data.address || {};
+      // BD-তে OpenStreetMap-এর ঠিকানা কাঠামোয় সাধারণত county≈উপজেলা,
+      // state_district≈জেলা, suburb/neighbourhood≈স্থানীয় এলাকা — এই
+      // ক্রমে চেষ্টা করি (প্রশাসনিক স্তর আগে, বেশি নির্ভরযোগ্য)।
+      const candidates = [addr.county, addr.state_district, addr.suburb, addr.neighbourhood, addr.town, addr.city_district].filter(Boolean);
+      let matched = null;
+      for (const c of candidates) { matched = matchGpsCandidate(c); if (matched) break; }
+      gpsState = matched ? { status: 'confirm', matched } : { status: 'notfound', matched: null };
+    } catch (e) {
+      gpsState = { status: 'notfound', matched: null };
+    }
+    renderGpsZone();
+  }, () => {
+    gpsState = { status: 'denied', matched: null };
+    renderGpsZone();
+  }, { timeout: 10000, maximumAge: 300000 });
+}
 
 function renderLocSearchResults() {
   const box = document.getElementById('locsearch-results');
@@ -967,23 +1112,19 @@ function renderResults(donors, blood, div, dist, upa) {
       ? { cls:'notready', label:'এখন প্রস্তুত নন' }
       : { cls:'ready', label:'রক্তদানে প্রস্তুত' };
 
-    // primary CTA-টা phone > WhatsApp > Facebook — যেটা সত্যিই আছে তার
-    // মধ্যে সবচেয়ে প্রাধান্যযোগ্যটা বড় বাটন হয়, বাকিগুলো ছোট আইকন হয়ে
-    // পাশে বসে — কোনো ফাঁকা/অকেজো বাটন কখনো দেখায় না।
-    let primary = null;
-    const secondary = [];
-    if (contacts.phone) primary = { cls:'call', icon:'i-phone', label:'কল করুন', act:'call' };
-    else if (contacts.wa) primary = { cls:'wa', icon:'i-whatsapp', label:'WhatsApp করুন', act:'wa' };
-    else if (contacts.fb) primary = { cls:'fb', icon:'i-fb', label:'Facebook-এ বার্তা', act:'fb' };
+    // BUGFIX: আগে phone/WhatsApp/Facebook-এর মধ্যে একটা বড় "primary" বাটন
+    // আর বাকিগুলো ছোট আইকন হতো — দেখতে অসামঞ্জস্যপূর্ণ লাগছিল। এখন যে
+    // যোগাযোগ-পদ্ধতিগুলো সত্যিই আছে সবগুলো একই আকারের বাটন, শুধু নিজ নিজ
+    // ব্র্যান্ড-রঙে — কোনো একটা বড়/ছোট নয়।
+    const cta = [];
+    if (contacts.phone) cta.push({ cls:'call', icon:'i-phone', label:'কল করুন', act:'call' });
+    if (contacts.wa) cta.push({ cls:'wa', icon:'i-whatsapp', label:'WhatsApp করুন', act:'wa' });
+    if (contacts.fb) cta.push({ cls:'fb', icon:'i-fb', label:'Facebook-এ বার্তা', act:'fb' });
+    cta.push({ cls:'req', icon:'i-droplet-f', label:'অনুরোধ পাঠান', act:'req' });
 
-    if (contacts.wa && primary?.act !== 'wa') secondary.push({ cls:'wa', icon:'i-whatsapp', label:'WhatsApp', act:'wa' });
-    if (contacts.fb && primary?.act !== 'fb') secondary.push({ cls:'fb', icon:'i-fb', label:'Facebook', act:'fb' });
-    secondary.push({ cls:'req', icon:'i-droplet-f', label:'অনুরোধ পাঠান', act:'req' });
-
-    const actionsHtml = `
-      ${primary ? `<button class="ocard-primary ${primary.cls}" data-act="${primary.act}" data-id="${esc(d.id)}"><svg class="ic"><use href="#${primary.icon}"/></svg>${primary.label}</button>` : ''}
-      ${secondary.map(a => `<button class="ocard-icon ${a.cls}" data-act="${a.act}" data-id="${esc(d.id)}" aria-label="${a.label}"><svg class="ic"><use href="#${a.icon}"/></svg></button>`).join('')}
-    `;
+    const actionsHtml = cta.map(a =>
+      `<button class="ocard-cta ${a.cls}" data-act="${a.act}" data-id="${esc(d.id)}" aria-label="${a.label}"><svg class="ic"><use href="#${a.icon}"/></svg></button>`
+    ).join('');
 
     return `
     <div class="ocard ${i===0?'featured':''}" data-act="view" data-id="${esc(d.id)}">

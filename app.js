@@ -283,3 +283,21 @@ export const SUPER_ADMIN_EMAIL = 'aakayes99@gmail.com';
 export function isSuperAdmin(user) {
   return !!user && (user.email || '').toLowerCase() === SUPER_ADMIN_EMAIL;
 }
+
+/* ── মোবাইল কীবোর্ড input ঢেকে ফেলা এড়ানো ──────────────────
+   কীবোর্ড খুললে কিছু ব্রাউজারে (iOS Safari, কিছু Android WebView)
+   viewport ঠিকমতো resize হয় না, ফলে যে input-এ টাইপ করা হচ্ছে
+   সেটা কীবোর্ডের নিচে ঢাকা পড়ে যায়। app.js সব পেজেই import হয়,
+   তাই এখানে একবার যোগ করলেই পুরো সাইটে কাজ করে — প্রতিটা পেজে
+   আলাদা করে বসাতে হয় না। কীবোর্ডের animation শেষ হওয়ার সময় দিয়ে
+   (~300ms পর) focus হওয়া input/textarea/select-কে দৃশ্যমান জায়গায়
+   scroll করে আনে। */
+if (typeof document !== 'undefined') {
+  document.addEventListener('focusin', e => {
+    const el = e.target;
+    if (!el.matches || !el.matches('input, textarea, select')) return;
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  });
+}
