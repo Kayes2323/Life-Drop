@@ -569,14 +569,27 @@ window.resetFilters = () => {
 
 let CU = null;
 
-// LOGIN GUARD
+// BUGFIX (login wall সরানো): সার্চ করা এখন সবার জন্য public — লগইন না
+// থাকলেও রক্তদাতা খোঁজা ও ফলাফল দেখা যায়। CU null-ই থাকে, শুধু
+// নম্বর দেখা/কল/WhatsApp/অনুরোধ পাঠানোর মতো ব্যক্তিগত/লেখার একশনেই
+// needLogin() দিয়ে লগইন চাওয়া হয় (নিচে দেখুন)।
 onAuthStateChanged(auth, user => {
-  if(!user){ window.location.href='login.html?redirect=search.html'; return; }
   CU = user;
-  document.getElementById('auth-info').textContent = user.displayName?.split(' ')[0]||'';
-  // pre-fill request form
-  document.getElementById('req-name').value = user.displayName||'';
+  if (user) {
+    document.getElementById('auth-info').textContent = user.displayName?.split(' ')[0]||'';
+    // pre-fill request form
+    document.getElementById('req-name').value = user.displayName||'';
+  }
 });
+
+// PII/লেখার একশনের আগে লগইন চেক — সার্চ/ব্রাউজ করতে এটা লাগে না,
+// শুধু ফোন নম্বর দেখা বা অনুরোধ পাঠানোর মতো ব্যক্তিগত একশনে লাগে।
+function needLogin() {
+  if (CU) return false;
+  showToast('এই সুবিধা ব্যবহার করতে লগইন করুন');
+  setTimeout(() => { window.location.href = 'login.html?redirect=search.html'; }, 800);
+  return true;
+}
 
 // SEARCH — donors collection, JS filter
 window.searchDonors = async (override) => {
@@ -804,6 +817,7 @@ async function tryConsumeRevealQuota() {
 }
 
 async function ensurePrivate(id) {
+  if (needLogin()) return null;
   const d = LAST_RESULTS.get(id);
   if(!d) return null;
   if(d._revealed) return d;
@@ -911,12 +925,14 @@ document.getElementById('dp-body').addEventListener('click', async e => {
 
 // REQUEST
 window.openReq = (id,name,blood) => {
+  if (needLogin()) return;
   document.getElementById('req-donor-id').value = id;
   document.getElementById('req-title').textContent = `${name} (${blood}) কে অনুরোধ`;
   document.getElementById('req-modal').classList.add('open');
 };
 
 window.submitReq = async () => {
+  if (needLogin()) return;
   const id    = document.getElementById('req-donor-id').value;
   const name  = document.getElementById('req-name').value.trim();
   const phone = document.getElementById('req-phone').value.trim();
