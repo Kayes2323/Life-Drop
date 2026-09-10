@@ -106,38 +106,33 @@
 .abtn.view{background:#f0f0f0;color:#444}
 .abtn.disabled{background:#eee;color:#ccc;cursor:not-allowed}
 
-/* ── ডোনার কার্ড (বোর্ডিং পাস কনসেপ্ট — approved) ── */
-.bcard{background:#fff;border-radius:18px;box-shadow:0 2px 10px rgba(35,22,15,.07);overflow:hidden;margin-bottom:12px;cursor:pointer}
-.bcard.featured{box-shadow:0 4px 18px rgba(192,57,43,.18)}
-.bcard-top{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:14px 14px 12px;display:flex;align-items:center;gap:11px;position:relative}
-.bcard-avatar{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;font-family:'Inter',sans-serif}
-.bcard-avatar img{width:100%;height:100%;object-fit:cover}
-.bcard-id{flex:1;min-width:0}
-.bcard-name{font-size:14px;font-weight:700;color:#fff;font-family:'Hind Siliguri',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bcard-loc{font-size:11px;color:rgba(255,255,255,.82);font-family:'Hind Siliguri',sans-serif;margin-top:2px;display:flex;align-items:center;gap:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bcard-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
-.bcard-tag{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.2);color:#fff;display:inline-flex;align-items:center;gap:2px}
-.bcard-code{flex-shrink:0;text-align:right;padding-left:6px}
-.bcard-code b{font-family:'Inter',sans-serif;font-weight:800;font-size:21px;color:#fff;display:block;line-height:1}
-.bcard-code span{font-size:8.5px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.75);font-family:'Inter',sans-serif}
-.bcard-perf{position:relative;height:0;border-top:2px dashed #f0e6e2;margin:0 12px}
-.bcard-perf::before,.bcard-perf::after{content:'';position:absolute;top:-8px;width:16px;height:16px;border-radius:50%;background:#f5f5f5}
-.bcard-perf::before{left:-20px}
-.bcard-perf::after{right:-20px}
-.bcard-bottom{padding:11px 14px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.bcard-avail{font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;font-family:'Hind Siliguri',sans-serif;flex-shrink:0}
-.bcard-avail.ready{color:#1e8449}
-.bcard-avail.notready{color:#9c8f89}
-.bcard-avail-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.bcard-avail.ready .bcard-avail-dot{background:#1e8449}
-.bcard-avail.notready .bcard-avail-dot{background:#9c8f89}
-.bcard-actions{display:flex;gap:6px;flex-shrink:0}
-.bcard-act{width:34px;height:34px;border-radius:10px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.bcard-act svg{width:15px;height:15px}
-.bcard-act.call{background:#c0392b;color:#fff}
-.bcard-act.wa{background:#25d366;color:#fff}
-.bcard-act.fb{background:#1877F2;color:#fff}
-.bcard-act.req{background:#fdecea;color:#c0392b}
+/* ── ডোনার কার্ড (Premium Oval কনসেপ্ট — approved) ── */
+.ocard{background:#fff;border-radius:26px;box-shadow:0 2px 8px rgba(35,22,15,.05),0 14px 30px -16px rgba(35,22,15,.16);padding:22px 18px 18px;margin-bottom:14px;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer}
+.ocard.featured{box-shadow:0 2px 8px rgba(35,22,15,.05),0 16px 34px -14px rgba(192,57,43,.32)}
+.ocard-avatar-wrap{position:relative;width:76px;height:76px;margin-bottom:10px;flex-shrink:0}
+.ocard-avatar{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#fdecea,#fde);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#c0392b;overflow:hidden;font-family:'Inter',sans-serif}
+.ocard-avatar img{width:100%;height:100%;object-fit:cover}
+.ocard-ring{position:absolute;inset:-4px;border-radius:50%;border:2.5px solid #1e8449;pointer-events:none}
+.ocard-ring.notready{border-color:#9c8f89;border-style:dashed}
+.ocard-blood{position:absolute;right:-4px;bottom:-4px;background:#c0392b;color:#fff;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;padding:4px 9px;border-radius:20px;border:3px solid #fff}
+.ocard-name{font-size:15.5px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.ocard-loc{font-size:11.5px;color:#999;font-family:'Hind Siliguri',sans-serif;margin-top:3px;display:flex;align-items:center;justify-content:center;gap:4px}
+.ocard-tags{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.ocard-tag{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:10px;background:#fdecea;color:#c0392b;display:inline-flex;align-items:center;gap:2px;font-family:'Hind Siliguri',sans-serif}
+.ocard-avail{font-size:11px;font-weight:700;margin-top:11px;padding:5px 13px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;font-family:'Hind Siliguri',sans-serif}
+.ocard-avail.ready{background:#e9f6ee;color:#1e8449}
+.ocard-avail.notready{background:#f1ebe7;color:#9c8f89}
+.ocard-avail-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:currentColor}
+.ocard-actions{display:flex;gap:9px;margin-top:15px;width:100%}
+.ocard-primary{flex:1;height:42px;border-radius:14px;border:none;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px}
+.ocard-primary.call{background:#c0392b}
+.ocard-primary.wa{background:#25d366}
+.ocard-primary.fb{background:#1877F2}
+.ocard-icon{width:42px;height:42px;flex-shrink:0;border-radius:14px;border:1.5px solid #f0f0f0;background:#fff;color:#666;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ocard-icon.wa{color:#25d366;border-color:#d9f7e4}
+.ocard-icon.fb{color:#1877F2;border-color:#dbe9fd}
+.ocard-icon.req{color:#c0392b;border-color:#fdecea}
+.ocard-icon svg,.ocard-primary svg{width:16px;height:16px}
 /* DONOR PROFILE MODAL */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:flex-end;justify-content:center}
 .modal-bg.open{display:flex}
@@ -779,10 +774,10 @@ function renderResults(donors, blood, div, dist, upa) {
       : { phone: true, wa: false, fb: false };
 
     const tags = [];
-    if (d.urgentReady) tags.push(`<span class="bcard-tag"><svg class="ic" style="width:9px;height:9px"><use href="#i-alert"/></svg>জরুরি প্রস্তুত</span>`);
+    if (d.urgentReady) tags.push(`<span class="ocard-tag"><svg class="ic" style="width:9px;height:9px"><use href="#i-alert"/></svg>জরুরি প্রস্তুত</span>`);
     if (upa) tags.push(d._upaMatch
-      ? `<span class="bcard-tag">${esc(upa)}</span>`
-      : `<span class="bcard-tag">${esc(dist)} জেলায়</span>`);
+      ? `<span class="ocard-tag">${esc(upa)}</span>`
+      : `<span class="ocard-tag">${esc(dist)} জেলায়</span>`);
 
     // available সাধারণত true-ই থাকে (সার্চ কোয়েরি নিজেই available:true ফিল্টার করে) —
     // তবু কার্ডটা "প্রস্তুত নই" অবস্থাও দেখাতে সক্ষম রাখা হলো, ভবিষ্যতে অন্য
@@ -791,28 +786,36 @@ function renderResults(donors, blood, div, dist, upa) {
       ? { cls:'notready', label:'এখন প্রস্তুত নন' }
       : { cls:'ready', label:'রক্তদানে প্রস্তুত' };
 
-    const actions = [];
-    if (contacts.phone) actions.push(`<button class="bcard-act call" data-act="call" data-id="${esc(d.id)}" aria-label="কল করুন"><svg class="ic"><use href="#i-phone"/></svg></button>`);
-    if (contacts.wa) actions.push(`<button class="bcard-act wa" data-act="wa" data-id="${esc(d.id)}" aria-label="WhatsApp"><svg class="ic"><use href="#i-whatsapp"/></svg></button>`);
-    if (contacts.fb) actions.push(`<button class="bcard-act fb" data-act="fb" data-id="${esc(d.id)}" aria-label="Facebook"><svg class="ic"><use href="#i-fb"/></svg></button>`);
-    actions.push(`<button class="bcard-act req" data-act="req" data-id="${esc(d.id)}" aria-label="অনুরোধ পাঠান"><svg class="ic"><use href="#i-droplet-f"/></svg></button>`);
+    // primary CTA-টা phone > WhatsApp > Facebook — যেটা সত্যিই আছে তার
+    // মধ্যে সবচেয়ে প্রাধান্যযোগ্যটা বড় বাটন হয়, বাকিগুলো ছোট আইকন হয়ে
+    // পাশে বসে — কোনো ফাঁকা/অকেজো বাটন কখনো দেখায় না।
+    let primary = null;
+    const secondary = [];
+    if (contacts.phone) primary = { cls:'call', icon:'i-phone', label:'কল করুন', act:'call' };
+    else if (contacts.wa) primary = { cls:'wa', icon:'i-whatsapp', label:'WhatsApp করুন', act:'wa' };
+    else if (contacts.fb) primary = { cls:'fb', icon:'i-fb', label:'Facebook-এ বার্তা', act:'fb' };
+
+    if (contacts.wa && primary?.act !== 'wa') secondary.push({ cls:'wa', icon:'i-whatsapp', label:'WhatsApp', act:'wa' });
+    if (contacts.fb && primary?.act !== 'fb') secondary.push({ cls:'fb', icon:'i-fb', label:'Facebook', act:'fb' });
+    secondary.push({ cls:'req', icon:'i-droplet-f', label:'অনুরোধ পাঠান', act:'req' });
+
+    const actionsHtml = `
+      ${primary ? `<button class="ocard-primary ${primary.cls}" data-act="${primary.act}" data-id="${esc(d.id)}"><svg class="ic"><use href="#${primary.icon}"/></svg>${primary.label}</button>` : ''}
+      ${secondary.map(a => `<button class="ocard-icon ${a.cls}" data-act="${a.act}" data-id="${esc(d.id)}" aria-label="${a.label}"><svg class="ic"><use href="#${a.icon}"/></svg></button>`).join('')}
+    `;
 
     return `
-    <div class="bcard ${i===0?'featured':''}" data-act="view" data-id="${esc(d.id)}">
-      <div class="bcard-top">
-        <div class="bcard-avatar">${avatarHtml}</div>
-        <div class="bcard-id">
-          <div class="bcard-name">${esc(d.name)}</div>
-          <div class="bcard-loc"><svg class="ic" style="width:10px;height:10px"><use href="#i-pin"/></svg>${location}</div>
-          ${tags.length ? `<div class="bcard-tags">${tags.join('')}</div>` : ''}
-        </div>
-        <div class="bcard-code"><b>${esc(d.blood)}</b><span>ব্লাড গ্রুপ</span></div>
+    <div class="ocard ${i===0?'featured':''}" data-act="view" data-id="${esc(d.id)}">
+      <div class="ocard-avatar-wrap">
+        <div class="ocard-avatar">${avatarHtml}</div>
+        <div class="ocard-ring ${avail.cls}"></div>
+        <div class="ocard-blood">${esc(d.blood)}</div>
       </div>
-      <div class="bcard-perf"></div>
-      <div class="bcard-bottom">
-        <div class="bcard-avail ${avail.cls}"><span class="bcard-avail-dot"></span>${avail.label}</div>
-        <div class="bcard-actions">${actions.join('')}</div>
-      </div>
+      <div class="ocard-name">${esc(d.name)}</div>
+      <div class="ocard-loc"><svg class="ic" style="width:10px;height:10px"><use href="#i-pin"/></svg>${location}</div>
+      ${tags.length ? `<div class="ocard-tags">${tags.join('')}</div>` : ''}
+      <div class="ocard-avail ${avail.cls}"><span class="ocard-avail-dot"></span>${avail.label}</div>
+      <div class="ocard-actions">${actionsHtml}</div>
     </div>`;
   }).join('');
 }
@@ -882,18 +885,7 @@ document.getElementById('results-list').addEventListener('click', async e => {
   if (!btn) return;
   const act = btn.dataset.act;
 
-  if (act === 'reveal') {
-    btn.textContent = 'লোড হচ্ছে...'; btn.disabled = true;
-    const d = await ensurePrivate(btn.dataset.id);
-    if(!d){ btn.disabled=false; btn.innerHTML='<svg class="ic ic-sm"><use href="#i-shield-lock"/></svg>নম্বর দেখুন'; return; }
-    btn.closest('.phone-row').innerHTML =
-      `<span><svg class="ic ic-sm" style="vertical-align:-2px;margin-right:4px"><use href="#i-phone"/></svg>${esc(d.phone||'—')}</span>
-       <button class="phone-copy" data-act="copy" data-phone="${esc(d.phone||'')}"><svg class="ic ic-sm"><use href="#i-copy"/></svg></button>`;
-  } else if (act === 'copy') {
-    navigator.clipboard?.writeText(btn.dataset.phone)
-      .then(() => showToast('নম্বর কপি হয়েছে!'))
-      .catch(() => showToast('কপি করা যায়নি'));
-  } else if (act === 'call') {
+  if (act === 'call') {
     const d = await ensurePrivate(btn.dataset.id);
     if(!d || !d.phone){ showToast('নম্বর পাওয়া যায়নি'); return; }
     window.location.href = telLink(d.phone);
@@ -920,6 +912,20 @@ window.viewProfile = (id) => {
   const d = LAST_RESULTS.get(id);
   if(!d){ showToast('পাওয়া যায়নি'); return; }
 
+  // নিরাপত্তা: এই প্রোফাইলে কখনো raw ফোন নম্বর টেক্সট হিসেবে দেখানো হয় না —
+  // শুধু Call/WhatsApp/Facebook অ্যাকশন বাটন, আর তাও শুধু যেটা ডোনার
+  // আসলেই দিয়েছেন সেটাই (কার্ডের মতো একই contacts-flag লজিক)।
+  const flagsKnown = d.hasPhone !== undefined || d.hasWa !== undefined || d.hasFacebook !== undefined;
+  const contacts = flagsKnown
+    ? { phone: !!d.hasPhone, wa: !!d.hasWa, fb: !!d.hasFacebook }
+    : { phone: true, wa: false, fb: false };
+
+  const actionBtns = [];
+  if (contacts.phone) actionBtns.push(`<button class="abtn call" data-act="call" data-id="${esc(d.id)}" style="flex:1;padding:12px"><svg class="ic ic-sm"><use href="#i-phone"/></svg>Call</button>`);
+  if (contacts.wa) actionBtns.push(`<button class="abtn wa" data-act="wa" data-id="${esc(d.id)}" style="flex:1;padding:12px"><svg class="ic ic-sm"><use href="#i-whatsapp"/></svg>WhatsApp</button>`);
+  if (contacts.fb) actionBtns.push(`<button class="abtn fb" data-act="fb" data-id="${esc(d.id)}" style="flex:1;padding:12px;background:#1877F2;color:#fff"><svg class="ic ic-sm"><use href="#i-fb"/></svg>Facebook</button>`);
+  actionBtns.push(`<button class="abtn req" data-act="req" data-id="${esc(d.id)}" style="flex:1;padding:12px"><svg class="ic ic-sm"><use href="#i-droplet-f"/></svg>অনুরোধ</button>`);
+
   document.getElementById('dp-title').textContent = `${d.name} (${d.blood})`;
   document.getElementById('dp-body').innerHTML=`
     <div style="text-align:center;margin-bottom:14px">
@@ -930,15 +936,10 @@ window.viewProfile = (id) => {
       <span style="display:inline-block;background:#c0392b;color:#fff;font-size:12px;font-weight:700;padding:3px 14px;border-radius:20px;margin:6px 0">${esc(d.blood)}</span>
     </div>
     <div class="info-row"><svg class="ic info-ico2"><use href="#i-pin"/></svg><span class="info-label">অবস্থান</span><span class="info-val">${esc([d.area,d.district,d.division].filter(Boolean).join(', '))}</span></div>
-    <div class="info-row" id="dp-phone-row"><svg class="ic info-ico2"><use href="#i-phone"/></svg><span class="info-label">ফোন</span><span class="info-val"><button data-act="reveal" data-id="${esc(d.id)}" style="border:none;background:#fdecea;color:#c0392b;font-weight:700;font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:inline-flex;align-items:center;gap:4px"><svg class="ic ic-sm"><use href="#i-shield-lock"/></svg>দেখুন</button></span></div>
     <div class="info-row"><svg class="ic info-ico2"><use href="#i-droplet"/></svg><span class="info-label">মোট দান</span><span class="info-val">${esc(d.donations||0)} বার</span></div>
     <div class="info-row"><svg class="ic info-ico2"><use href="#i-cal"/></svg><span class="info-label">শেষ দান</span><span class="info-val">${esc(d.lastDonation||(d.neverDonated?'এখনো দেননি':'—'))}</span></div>
     <div class="info-row"><span class="info-ico">⭐</span><span class="info-label">Rating</span><span class="info-val">${starsHtml(d.rating||0)} ${d.raters?'('+esc(d.raters)+' জন)':''}</span></div>
-    <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="abtn call" data-act="call" data-id="${esc(d.id)}" style="flex:1;padding:12px"><svg class="ic ic-sm"><use href="#i-phone"/></svg>Call</button>
-      <button class="abtn wa" data-act="wa" data-id="${esc(d.id)}" style="flex:1;padding:12px"><svg class="ic ic-sm"><use href="#i-chat"/></svg>WhatsApp</button>
-      <button class="abtn req" data-act="req" data-id="${esc(d.id)}" style="flex:1;padding:12px"><svg class="ic ic-sm"><use href="#i-droplet-f"/></svg>অনুরোধ</button>
-    </div>`;
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">${actionBtns.join('')}</div>`;
   document.getElementById('dp-modal').classList.add('open');
 };
 
@@ -948,11 +949,7 @@ document.getElementById('dp-body').addEventListener('click', async e => {
   if(!btn) return;
   const act = btn.dataset.act;
 
-  if (act === 'reveal') {
-    const d = await ensurePrivate(btn.dataset.id);
-    if(!d) return;
-    document.querySelector('#dp-phone-row .info-val').textContent = d.phone || '—';
-  } else if (act === 'call') {
+  if (act === 'call') {
     const d = await ensurePrivate(btn.dataset.id);
     if(!d || !d.phone){ showToast('নম্বর পাওয়া যায়নি'); return; }
     window.location.href = telLink(d.phone);
@@ -960,6 +957,10 @@ document.getElementById('dp-body').addEventListener('click', async e => {
     const d = await ensurePrivate(btn.dataset.id);
     if(!d || !d.wa){ showToast('এই ডোনারের WhatsApp নম্বর নেই'); return; }
     window.open(waLink(d.wa), '_blank', 'noopener');
+  } else if (act === 'fb') {
+    const d = await ensurePrivate(btn.dataset.id);
+    if(!d || !d.facebook){ showToast('এই ডোনারের Facebook লিংক নেই'); return; }
+    window.open(d.facebook, '_blank', 'noopener');
   } else if (act === 'req') {
     const d = LAST_RESULTS.get(btn.dataset.id);
     if(d){ document.getElementById('dp-modal').classList.remove('open'); window.openReq(d.id,d.name,d.blood); }
