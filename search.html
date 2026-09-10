@@ -74,6 +74,39 @@
 .area-item.selected{background:#fdecea}
 .area-pick-all{margin:10px 16px 4px;padding:13px;background:#c0392b;color:#fff;border:none;border-radius:12px;font-size:13.5px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;width:calc(100% - 32px)}
 .area-clear{margin:6px 16px 4px;padding:11px;background:#fff;color:#888;border:1px solid #e5e5e5;border-radius:12px;font-size:12.5px;font-weight:600;font-family:'Hind Siliguri',sans-serif;cursor:pointer;width:calc(100% - 32px)}
+
+/* ── এলাকা সার্চ শিট (approved "Searchable Location") — .area-modal-এর
+   একই ভিজ্যুয়াল ভাষা, কিন্তু primary entry এখন এটাই; পুরনো ধাপে-ধাপে
+   ব্রাউজ (.area-modal) নিচের লিংক দিয়ে এখনো পাওয়া যায়, মুছে ফেলা হয়নি ── */
+.locsearch-modal{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:501;display:none;align-items:flex-end}
+.locsearch-modal.open{display:flex}
+.locsearch-sheet{background:#fff;width:100%;max-width:480px;margin:0 auto;border-radius:20px 20px 0 0;max-height:82vh;display:flex;flex-direction:column;animation:sheetUp .25s ease}
+.locsearch-head{display:flex;align-items:center;gap:10px;padding:15px 16px 12px;flex-shrink:0}
+.locsearch-close{width:30px;height:30px;border-radius:50%;background:#f5f5f5;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;color:#666}
+.locsearch-title{flex:1;font-size:17px;font-weight:800;color:#111;font-family:'Hind Siliguri',sans-serif}
+.locsearch-input-row{padding:0 16px 12px;flex-shrink:0}
+.locsearch-input-wrap{display:flex;align-items:center;gap:8px;background:#f7f7f7;border:1.5px solid #eee;border-radius:12px;padding:0 13px}
+.locsearch-input-wrap:focus-within{border-color:#c0392b;background:#fff}
+.locsearch-input-wrap svg{color:#999;flex-shrink:0}
+.locsearch-input-wrap input{flex:1;border:none;background:transparent;padding:12px 0;font-size:14px;outline:none;font-family:'Hind Siliguri',sans-serif}
+.locsearch-results{overflow-y:auto;padding:2px 6px 8px;flex:1}
+.locsearch-hint{text-align:center;color:#bbb;font-size:12.5px;padding:30px 20px;line-height:1.7;font-family:'Hind Siliguri',sans-serif}
+.locsearch-dupe-hd{padding:12px 12px 6px;font-size:12.5px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.locsearch-group-hd:first-child{margin-top:0}
+.locsearch-row{display:flex;align-items:center;gap:11px;padding:12px;border-radius:12px;cursor:pointer}
+.locsearch-row:active{background:#faf0ef}
+.locsearch-row-ico{width:32px;height:32px;border-radius:9px;background:#fdecea;color:#c0392b;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.locsearch-row-main{flex:1;min-width:0}
+.locsearch-row-name{font-size:13.5px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.locsearch-row-tag{font-size:10.5px;color:#999;font-family:'Hind Siliguri',sans-serif;margin-top:1px}
+.locsearch-row-badge{font-size:9.5px;font-weight:700;color:#c98a1f;background:#fdf1dc;padding:3px 7px;border-radius:8px;flex-shrink:0;font-family:'Hind Siliguri',sans-serif}
+.locsearch-fuzzy-hd{display:flex;align-items:center;gap:6px;padding:10px 12px 4px;font-size:12.5px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.locsearch-fuzzy-hd svg{color:#c98a1f}
+.locsearch-empty{text-align:center;padding:26px 20px}
+.locsearch-empty svg{width:32px;height:32px;color:#e2d3cd;margin-bottom:8px}
+.locsearch-empty-t{font-size:13px;font-weight:700;color:#333;font-family:'Hind Siliguri',sans-serif}
+.locsearch-empty-s{font-size:11.5px;color:#999;margin-top:4px;line-height:1.6;font-family:'Hind Siliguri',sans-serif}
+.locsearch-browse{margin:4px 12px 14px;padding:13px;background:#faf7f5;color:#555;border:none;border-radius:12px;font-size:12.5px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;width:calc(100% - 24px);display:flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0}
 .search-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;background:#eee;color:#bbb;transition:.15s}
 .search-btn.ready{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;box-shadow:0 5px 16px rgba(192,57,43,.3)}
 .results-list{flex:1;overflow-y:auto;padding:11px}
@@ -101,32 +134,32 @@
 .badge.inactive{background:#eee;color:#aaa}
 
 /* ── ডোনার কার্ড (Premium Oval কনসেপ্ট — approved) ── */
-.ocard{background:#fff;border-radius:26px;box-shadow:0 2px 8px rgba(35,22,15,.05),0 14px 30px -16px rgba(35,22,15,.16);padding:22px 18px 18px;margin-bottom:14px;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer}
+.ocard{background:#fff;border-radius:20px;box-shadow:0 2px 8px rgba(35,22,15,.05),0 14px 30px -16px rgba(35,22,15,.16);padding:15px 14px 13px;margin-bottom:10px;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer}
 .ocard.featured{box-shadow:0 2px 8px rgba(35,22,15,.05),0 16px 34px -14px rgba(192,57,43,.32)}
-.ocard-avatar-wrap{position:relative;width:76px;height:76px;margin-bottom:10px;flex-shrink:0}
-.ocard-avatar{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#fdecea,#fde);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#c0392b;overflow:hidden;font-family:'Inter',sans-serif}
+.ocard-avatar-wrap{position:relative;width:58px;height:58px;margin-bottom:8px;flex-shrink:0}
+.ocard-avatar{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#fdecea,#fde);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#c0392b;overflow:hidden;font-family:'Inter',sans-serif}
 .ocard-avatar img{width:100%;height:100%;object-fit:cover}
-.ocard-ring{position:absolute;inset:-4px;border-radius:50%;border:2.5px solid #1e8449;pointer-events:none}
+.ocard-ring{position:absolute;inset:-3px;border-radius:50%;border:2px solid #1e8449;pointer-events:none}
 .ocard-ring.notready{border-color:#9c8f89;border-style:dashed}
-.ocard-blood{position:absolute;right:-4px;bottom:-4px;background:#c0392b;color:#fff;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;padding:4px 9px;border-radius:20px;border:3px solid #fff}
-.ocard-name{font-size:15.5px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
-.ocard-loc{font-size:11.5px;color:#999;font-family:'Hind Siliguri',sans-serif;margin-top:3px;display:flex;align-items:center;justify-content:center;gap:4px}
-.ocard-tags{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:6px}
-.ocard-tag{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:10px;background:#fdecea;color:#c0392b;display:inline-flex;align-items:center;gap:2px;font-family:'Hind Siliguri',sans-serif}
-.ocard-avail{font-size:11px;font-weight:700;margin-top:11px;padding:5px 13px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;font-family:'Hind Siliguri',sans-serif}
+.ocard-blood{position:absolute;right:-3px;bottom:-3px;background:#c0392b;color:#fff;font-size:10.5px;font-weight:800;font-family:'Inter',sans-serif;padding:3px 7px;border-radius:20px;border:2.5px solid #fff}
+.ocard-name{font-size:13.5px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.ocard-loc{font-size:10.5px;color:#999;font-family:'Hind Siliguri',sans-serif;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:4px}
+.ocard-tags{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:5px}
+.ocard-tag{font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:10px;background:#fdecea;color:#c0392b;display:inline-flex;align-items:center;gap:2px;font-family:'Hind Siliguri',sans-serif}
+.ocard-avail{font-size:10px;font-weight:700;margin-top:8px;padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;font-family:'Hind Siliguri',sans-serif}
 .ocard-avail.ready{background:#e9f6ee;color:#1e8449}
 .ocard-avail.notready{background:#f1ebe7;color:#9c8f89}
 .ocard-avail-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:currentColor}
-.ocard-actions{display:flex;gap:9px;margin-top:15px;width:100%}
-.ocard-primary{flex:1;height:42px;border-radius:14px;border:none;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px}
+.ocard-actions{display:flex;gap:7px;margin-top:10px;width:100%}
+.ocard-primary{flex:1;height:34px;border-radius:11px;border:none;color:#fff;font-weight:700;font-size:11px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:5px}
 .ocard-primary.call{background:#c0392b}
 .ocard-primary.wa{background:#25d366}
 .ocard-primary.fb{background:#1877F2}
-.ocard-icon{width:42px;height:42px;flex-shrink:0;border-radius:14px;border:1.5px solid #f0f0f0;background:#fff;color:#666;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ocard-icon{width:34px;height:34px;flex-shrink:0;border-radius:11px;border:1.5px solid #f0f0f0;background:#fff;color:#666;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .ocard-icon.wa{color:#25d366;border-color:#d9f7e4}
 .ocard-icon.fb{color:#1877F2;border-color:#dbe9fd}
 .ocard-icon.req{color:#c0392b;border-color:#fdecea}
-.ocard-icon svg,.ocard-primary svg{width:16px;height:16px}
+.ocard-icon svg,.ocard-primary svg{width:14px;height:14px}
 /* অন্যান্য মডাল (লোকেশন পিকার, রিকোয়েস্ট) — বটম-শিট স্টাইল */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:flex-end;justify-content:center}
 .modal-bg.open{display:flex}
@@ -256,6 +289,8 @@
   <symbol id="i-bag" viewBox="0 0 24 24"><path d="M8 3h8v3a4 4 0 0 1-1 2.6V19a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V8.6A4 4 0 0 1 8 6V3z"/></symbol>
   <symbol id="i-shield-lock" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/><rect x="9.5" y="10.5" width="5" height="4" rx="1"/><path d="M10.5 10.5V9a1.5 1.5 0 0 1 3 0v1.5"/></symbol>
   <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 12h5l2 3h4l2-3h5"/><path d="M5 5h14l2 7v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6l2-7z"/></symbol>
+  <symbol id="i-magic" viewBox="0 0 24 24"><path d="m15 4 1.5 3L20 8.5 16.5 10 15 13l-1.5-3L10 8.5 13.5 7z"/><path d="M5 14l3 6M3 17l7-3"/></symbol>
+  <symbol id="i-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
 </svg>
 
@@ -288,7 +323,7 @@
         <button class="bg-item" data-g="O-">O-</button>
       </div>
 
-      <div class="loc-row" id="loc-row" onclick="openLocModal()">
+      <div class="loc-row" id="loc-row" onclick="openLocSearch()">
         <svg class="ic" style="color:#c0392b"><use href="#i-pin"/></svg>
         <span class="loc-row-txt" id="loc-row-txt">এলাকা বেছে নিন</span>
         <span style="font-size:11.5px;color:#c0392b;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-right:2px">বদলান</span>
@@ -338,6 +373,28 @@
       </div>
 
       <div class="area-list" id="area-list"></div>
+    </div>
+  </div>
+
+  <!-- ── এলাকা সার্চ শিট (approved "Searchable Location") — এখন এলাকা বাছার
+       প্রধান উপায়; নিচের "বিভাগ থেকে ব্রাউজ করুন" লিংকে আগের ধাপে-ধাপে
+       পিকার (area-modal, অপরিবর্তিত) এখনো পাওয়া যায় ── -->
+  <div class="locsearch-modal" id="locsearch-modal">
+    <div class="locsearch-sheet">
+      <div class="locsearch-head">
+        <button class="locsearch-close" onclick="closeLocSearch()">×</button>
+        <span class="locsearch-title">এলাকা</span>
+      </div>
+      <div class="locsearch-input-row">
+        <div class="locsearch-input-wrap">
+          <svg class="ic ic-sm"><use href="#i-search"/></svg>
+          <input id="locsearch-input" placeholder="এলাকার নাম লিখে খুঁজুন" autocomplete="off"/>
+        </div>
+      </div>
+      <div class="locsearch-results" id="locsearch-results"></div>
+      <button class="locsearch-browse" onclick="closeLocSearch(); openLocModal();">
+        <svg class="ic ic-sm"><use href="#i-right"/></svg>বিভাগ থেকে ব্রাউজ করে বেছে নিন
+      </button>
     </div>
   </div>
 
@@ -446,7 +503,7 @@ document.getElementById('bg-grid').addEventListener('click', e => {
   // এলাকা আগে থেকে বাছা থাকলে (ইউজার শুধু গ্রুপ পাল্টাচ্ছে) আবার
   // জোর করে খুলবে না — বিরক্তিকর হবে না।
   if (!SEL.division && !SEL.district && !SEL.upazila) {
-    setTimeout(openLocModal, 200);
+    setTimeout(openLocSearch, 200);
   }
 });
 
@@ -596,6 +653,115 @@ window.resetFilters = () => {
   showToast('ফিল্টার মুছে ফেলা হয়েছে');
 };
 
+// ══════════════════════════════════════════════════════════════
+// এলাকা সার্চ (approved "Searchable Location") — বিভাগ/জেলা/উপজেলা
+// dropdown-এর বদলে সরাসরি এলাকার নাম লিখে খোঁজা। DIVISIONS/DISTRICTS/
+// UPAZILAS একই app.js ডেটাসেট থেকে — নতুন কোনো ডেটা বানানো হয়নি।
+// ══════════════════════════════════════════════════════════════
+
+// ঢাকা সিটির পরিচিত এলাকা — এগুলো প্রশাসনিক "উপজেলা" নয় (ঢাকা শহর আসলে
+// কোনো উপজেলায় ভাগ হয় না), তাই আলাদাভাবে "locality" হিসেবে রাখা হলো।
+// ডোনার ডেটায় এখনো locality-নির্দিষ্ট কোনো ফিল্ড নেই, তাই এগুলো বাছলে
+// পুরো ঢাকা জেলা জুড়ে খোঁজা হয় — এলাকা-নির্দিষ্ট করে বলা হয় না যা সত্যি নয়।
+const DHAKA_LOCALITIES = ['মোহাম্মদপুর','ফার্মগেট','মিরপুর','ধানমন্ডি','উত্তরা','গুলশান','বনানী','মহাখালী','মতিঝিল','মালিবাগ','তেজগাঁও','বাড্ডা','রামপুরা','যাত্রাবাড়ী'];
+
+function findDivision(district) {
+  for (const div of DIVISIONS) if ((DISTRICTS[div] || []).includes(district)) return div;
+  return '';
+}
+
+// কেন্দ্রীয় লোকেশন ইনডেক্স — সব উপজেলা (৬৪ জেলার প্রকৃত তালিকা) + ঢাকার এলাকা
+const LOC_INDEX = [
+  ...DHAKA_LOCALITIES.map(name => ({ name, type: 'locality', district: 'ঢাকা', division: 'ঢাকা' })),
+  ...Object.entries(UPAZILAS).flatMap(([dist, ups]) =>
+    ups.map(u => ({ name: u, type: 'upazila', district: dist, division: findDivision(dist) }))
+  )
+];
+
+// Levenshtein distance — ভুল বানান ধরার জন্য
+function lev(a, b) {
+  const m = a.length, n = b.length;
+  if (!m) return n; if (!n) return m;
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+    dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+function groupByName(list) {
+  const map = new Map();
+  list.forEach(l => { if (!map.has(l.name)) map.set(l.name, []); map.get(l.name).push(l); });
+  return [...map.entries()].map(([name, items]) => ({ name, items }));
+}
+// exact match সর্বোচ্চ priority; না পেলে fuzzy suggestion — সিস্টেম নিজে থেকে
+// কখনো ভুল location বেছে নেয় না, চূড়ান্ত নির্বাচন সবসময় ব্যবহারকারীর ট্যাপে হয়।
+function resolveLocQuery(q) {
+  q = q.trim();
+  if (!q) return { kind: 'empty' };
+  const substr = LOC_INDEX.filter(l => l.name.includes(q));
+  if (substr.length) return { kind: 'matches', groups: groupByName(substr) };
+  const threshold = q.length <= 3 ? 1 : 2;
+  const scored = LOC_INDEX.map(l => ({ loc: l, d: lev(q, l.name) })).sort((a,b) => a.d - b.d);
+  const close = scored.filter(s => s.d <= threshold).slice(0, 4);
+  if (close.length) return { kind: 'fuzzy', groups: groupByName(close.map(c => c.loc)) };
+  return { kind: 'none' };
+}
+
+window.openLocSearch = () => {
+  document.getElementById('locsearch-modal').classList.add('open');
+  const input = document.getElementById('locsearch-input');
+  input.value = '';
+  renderLocSearchResults();
+  setTimeout(() => input.focus(), 50);
+};
+window.closeLocSearch = () => document.getElementById('locsearch-modal').classList.remove('open');
+document.getElementById('locsearch-modal').addEventListener('click', e => {
+  if (e.target.id === 'locsearch-modal') closeLocSearch();
+});
+
+function renderLocSearchResults() {
+  const box = document.getElementById('locsearch-results');
+  const q = document.getElementById('locsearch-input').value;
+  const res = resolveLocQuery(q);
+
+  const rowHtml = (l, suggestion) => `
+    <div class="locsearch-row" data-pick data-name="${esc(l.name)}" data-type="${l.type}" data-district="${esc(l.district)}" data-division="${esc(l.division)}">
+      <div class="locsearch-row-ico"><svg class="ic ic-sm"><use href="#i-pin"/></svg></div>
+      <div class="locsearch-row-main"><div class="locsearch-row-name">${esc(l.name)}</div><div class="locsearch-row-tag">${l.type==='locality'?'এলাকা':'উপজেলা'} · ${esc(l.district)} জেলা</div></div>
+      ${suggestion ? `<span class="locsearch-row-badge">সাজেশন</span>` : ''}
+    </div>`;
+  const groupsHtml = (groups, suggestion) => groups.map(g => {
+    if (g.items.length > 1) return `<div class="locsearch-dupe-hd">কোন জেলার "${esc(g.name)}"?</div>` + g.items.map(l => rowHtml(l, suggestion)).join('');
+    return rowHtml(g.items[0], suggestion);
+  }).join('');
+
+  if (res.kind === 'empty') {
+    box.innerHTML = `<div class="locsearch-hint">টাইপ করা শুরু করুন — এলাকা বা উপজেলার নাম<br>(যেমন: মোহাম্মদপুর, হাজীগঞ্জ, সাভার)</div>`;
+  } else if (res.kind === 'matches') {
+    box.innerHTML = groupsHtml(res.groups, false);
+  } else if (res.kind === 'fuzzy') {
+    box.innerHTML = `<div class="locsearch-fuzzy-hd"><svg class="ic ic-sm"><use href="#i-magic"/></svg>আপনি কি এটি খুঁজছেন?</div>` + groupsHtml(res.groups, true);
+  } else {
+    box.innerHTML = `
+      <div class="locsearch-empty">
+        <svg class="ic"><use href="#i-alert-circle"/></svg>
+        <div class="locsearch-empty-t">কোনো এলাকা পাওয়া যায়নি</div>
+        <div class="locsearch-empty-s">বানান পরীক্ষা করুন, অথবা নিচের "বিভাগ থেকে ব্রাউজ করুন" ব্যবহার করুন।</div>
+      </div>`;
+  }
+  box.querySelectorAll('[data-pick]').forEach(row => {
+    row.addEventListener('click', () => {
+      const type = row.dataset.type, name = row.dataset.name, district = row.dataset.district, division = row.dataset.division;
+      SEL.division = division; SEL.district = district;
+      SEL.upazila = type === 'upazila' ? name : '';
+      document.getElementById('loc-row-txt').textContent = type === 'upazila' ? name : `${name} (${district} জেলা জুড়ে)`;
+      refreshResetLink();
+      closeLocSearch();
+    });
+  });
+}
+document.getElementById('locsearch-input').addEventListener('input', renderLocSearchResults);
 
 
 let CU = null;
