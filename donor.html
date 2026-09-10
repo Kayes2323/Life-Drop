@@ -696,6 +696,12 @@ window.submitDonor = async () => {
       urgentReady: false,
       available: true,
       isDonor: true,
+      // এই তিনটা শুধু boolean — কোনো নম্বর/লিংক না, শুধু "আছে কিনা"।
+      // ডোনার কার্ড এভাবেই আগে থেকে জানে কোন contact আইকন দেখাবে,
+      // আসল নম্বর/লিংক তখনো donorsPrivate-এই থাকে, reveal করা লাগে।
+      hasPhone: !!normPhone,
+      hasWa: !!normWa,
+      hasFacebook: !!facebook,
       donations: 0,
       rating: 0,
       raters: 0,
