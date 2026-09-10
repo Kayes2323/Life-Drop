@@ -23,11 +23,16 @@
 .bg-item{padding:12px 0;border-radius:11px;border:1.5px solid #fdecea;background:#fdecea;color:#c0392b;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s}
 .bg-item:active{transform:scale(.95)}
 .bg-item.on{background:#c0392b;border-color:#c0392b;color:#fff}
-.loc-row{display:flex;align-items:center;gap:9px;background:#fafafa;border:0.5px solid #eee;border-radius:11px;padding:11px 12px;margin-bottom:10px;cursor:pointer}
-.loc-row-icon{font-size:15px;color:#c0392b;flex-shrink:0}
-.loc-row-txt{flex:1;font-size:14px;font-weight:600;color:#222;font-family:'Hind Siliguri',sans-serif}
-.loc-row-chev{color:#ccc;font-size:13px;flex-shrink:0;transition:transform .2s}
-.loc-row-chev.open{transform:rotate(180deg)}
+.loc-label{font-size:12px;color:#999;font-weight:600;font-family:'Hind Siliguri',sans-serif;margin-bottom:7px}
+.ls-resolved-inline{display:flex;align-items:center;gap:10px;background:#fdecea;border-radius:12px;padding:12px 13px;margin-bottom:10px}
+.ls-resolved-inline .ic{color:#c0392b}
+.ls-resolved-inline-main{flex:1;min-width:0}
+.ls-resolved-inline-name{font-size:14px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
+.ls-resolved-inline-tag{font-size:11px;color:#a3705a;font-family:'Hind Siliguri',sans-serif;margin-top:1px}
+.ls-resolved-inline-x{width:28px;height:28px;border-radius:50%;background:#fff;border:none;color:#c0392b;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.loc-picker-wrap .gps-zone{padding:0 0 12px}
+.loc-picker-wrap .locsearch-input-row{padding:0 0 10px}
+.loc-picker-wrap .locsearch-results{padding:0;max-height:280px;overflow-y:auto}
 .reset-link{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:#999;font-size:12px;font-weight:600;font-family:'Hind Siliguri',sans-serif;cursor:pointer;padding:2px 2px 10px;margin-top:-2px}
 .reset-link:active{color:#c0392b}
 
@@ -75,15 +80,10 @@
 .area-pick-all{margin:10px 16px 4px;padding:13px;background:#c0392b;color:#fff;border:none;border-radius:12px;font-size:13.5px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;width:calc(100% - 32px)}
 .area-clear{margin:6px 16px 4px;padding:11px;background:#fff;color:#888;border:1px solid #e5e5e5;border-radius:12px;font-size:12.5px;font-weight:600;font-family:'Hind Siliguri',sans-serif;cursor:pointer;width:calc(100% - 32px)}
 
-/* ── এলাকা সার্চ শিট (approved "Searchable Location") — .area-modal-এর
-   একই ভিজ্যুয়াল ভাষা, কিন্তু primary entry এখন এটাই; পুরনো ধাপে-ধাপে
-   ব্রাউজ (.area-modal) নিচের লিংক দিয়ে এখনো পাওয়া যায়, মুছে ফেলা হয়নি ── */
-.locsearch-modal{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:501;display:none;align-items:flex-end}
-.locsearch-modal.open{display:flex}
-.locsearch-sheet{background:#fff;width:100%;max-width:480px;margin:0 auto;border-radius:20px 20px 0 0;max-height:82vh;display:flex;flex-direction:column;animation:sheetUp .25s ease}
-.locsearch-head{display:flex;align-items:center;gap:10px;padding:15px 16px 12px;flex-shrink:0}
-.locsearch-close{width:30px;height:30px;border-radius:50%;background:#f5f5f5;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;color:#666}
-.locsearch-title{flex:1;font-size:17px;font-weight:800;color:#111;font-family:'Hind Siliguri',sans-serif}
+/* ── এলাকা সার্চ (approved "Searchable Location") — এখন আর আলাদা মডাল
+   নয়, রক্তের গ্রুপের ঠিক নিচে সরাসরি পেজেই (GPS প্রথমে, তারপর টাইপ-করা
+   সার্চ)। পুরনো ধাপে-ধাপে ব্রাউজ (.area-modal) নিচের লিংক দিয়ে এখনো
+   পাওয়া যায়, মুছে ফেলা হয়নি ── */
 .locsearch-input-row{padding:0 16px 12px;flex-shrink:0}
 .locsearch-input-wrap{display:flex;align-items:center;gap:8px;background:#f7f7f7;border:1.5px solid #eee;border-radius:12px;padding:0 13px}
 .locsearch-input-wrap:focus-within{border-color:#c0392b;background:#fff}
@@ -135,6 +135,8 @@
 .hint-box{text-align:center;padding:40px 20px;color:#bbb}
 .hint-box p{margin-top:8px;font-size:13px;font-family:'Hind Siliguri',sans-serif}
 .result-header{font-size:11px;color:#aaa;font-family:'Hind Siliguri',sans-serif;margin-bottom:9px}
+.scope-note{display:flex;align-items:center;gap:8px;background:#fdf8ee;color:#8a6d3b;font-size:11.5px;font-family:'Hind Siliguri',sans-serif;padding:10px 12px;border-radius:11px;margin-bottom:10px;line-height:1.5}
+.scope-note .ic{color:#c98a1f;flex-shrink:0}
 
 /* EMPTY STATE — কোনো donor না পেলে */
 .ns-wrap{padding:26px 4px 10px}
@@ -315,6 +317,7 @@
   <symbol id="i-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
   <symbol id="i-crosshair" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
 </svg>
 
 <div class="app">
@@ -346,15 +349,39 @@
         <button class="bg-item" data-g="O-">O-</button>
       </div>
 
-      <div class="loc-row" id="loc-row" onclick="openLocSearch()">
-        <svg class="ic" style="color:#c0392b"><use href="#i-pin"/></svg>
-        <span class="loc-row-txt" id="loc-row-txt">এলাকা বেছে নিন</span>
-        <span style="font-size:11.5px;color:#c0392b;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-right:2px">বদলান</span>
-        <span class="loc-row-chev">›</span>
+      <div class="loc-label">এলাকা বেছে নিন</div>
+
+      <!-- এলাকা নির্বাচিত হয়ে গেলে এই chip দেখায়, নিচের picker লুকানো থাকে -->
+      <div class="loc-resolved-wrap" id="loc-resolved-wrap" style="display:none">
+        <div class="ls-resolved-inline">
+          <svg class="ic"><use href="#i-pin"/></svg>
+          <div class="ls-resolved-inline-main">
+            <div class="ls-resolved-inline-name" id="loc-resolved-name"></div>
+            <div class="ls-resolved-inline-tag" id="loc-resolved-tag"></div>
+          </div>
+          <button class="ls-resolved-inline-x" onclick="clearLocInline()" aria-label="এলাকা পরিবর্তন করুন"><svg class="ic ic-sm"><use href="#i-x"/></svg></button>
+        </div>
+      </div>
+
+      <!-- GPS + টাইপ-করে-খোঁজা — এখন সরাসরি পেজেই, আলাদা মডালে ঢুকতে হয় না।
+           GPS সবার আগে দেখানো হয়, তারপর "অথবা" দিয়ে টাইপ-করা অপশন — একই
+           পেজে থেকেই ইউজার যেটাতে স্বাচ্ছন্দ্য বোধ করেন সেটা বেছে নিতে পারেন। -->
+      <div class="loc-picker-wrap" id="loc-picker-wrap">
+        <div id="locsearch-gps-zone"></div>
+        <div class="locsearch-input-row">
+          <div class="locsearch-input-wrap">
+            <svg class="ic ic-sm"><use href="#i-search"/></svg>
+            <input id="locsearch-input" placeholder="উপজেলা বা এলাকার নাম লিখে খুঁজুন" autocomplete="off"/>
+          </div>
+        </div>
+        <div class="locsearch-results" id="locsearch-results"></div>
+        <button class="locsearch-browse" onclick="openLocModal()" style="margin:4px 0 12px;width:100%">
+          <svg class="ic ic-sm"><use href="#i-right"/></svg>বিভাগ থেকে ব্রাউজ করে বেছে নিন
+        </button>
       </div>
 
       <button class="reset-link" id="reset-link" onclick="resetFilters()" style="display:none">
-        <svg class="ic" style="width:13px;height:13px"><use href="#i-alert"/></svg>সব ফিল্টার মুছুন
+        <svg class="ic" style="width:13px;height:13px"><use href="#i-alert"/></svg>এলাকা মুছে ফেলুন
       </button>
 
       <button class="search-btn" id="search-btn" disabled onclick="searchDonors()">খুঁজুন</button>
@@ -396,29 +423,6 @@
       </div>
 
       <div class="area-list" id="area-list"></div>
-    </div>
-  </div>
-
-  <!-- ── এলাকা সার্চ শিট (approved "Searchable Location") — এখন এলাকা বাছার
-       প্রধান উপায়; নিচের "বিভাগ থেকে ব্রাউজ করুন" লিংকে আগের ধাপে-ধাপে
-       পিকার (area-modal, অপরিবর্তিত) এখনো পাওয়া যায় ── -->
-  <div class="locsearch-modal" id="locsearch-modal">
-    <div class="locsearch-sheet">
-      <div class="locsearch-head">
-        <button class="locsearch-close" onclick="closeLocSearch()">×</button>
-        <span class="locsearch-title">এলাকা</span>
-      </div>
-      <div id="locsearch-gps-zone"></div>
-      <div class="locsearch-input-row">
-        <div class="locsearch-input-wrap">
-          <svg class="ic ic-sm"><use href="#i-search"/></svg>
-          <input id="locsearch-input" placeholder="এলাকার নাম লিখে খুঁজুন" autocomplete="off"/>
-        </div>
-      </div>
-      <div class="locsearch-results" id="locsearch-results"></div>
-      <button class="locsearch-browse" onclick="closeLocSearch(); openLocModal();">
-        <svg class="ic ic-sm"><use href="#i-right"/></svg>বিভাগ থেকে ব্রাউজ করে বেছে নিন
-      </button>
     </div>
   </div>
 
@@ -511,16 +515,23 @@ import { collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTi
 
 // ── রক্তের গ্রুপ গ্রিড — সিলেক্ট করলে হাইলাইট + সার্চ বাটন সক্রিয় ──
 let SELECTED_GROUP = null;
+// রক্তের গ্রুপ + এলাকা দুটোই বাছা না হলে "খুঁজুন" সক্রিয় হয় না — এলাকা
+// ছাড়া সরাসরি পুরো বাংলাদেশ সার্চ করার সুযোগ ইচ্ছাকৃতভাবে রাখা হয়নি।
+function updateSearchBtnState() {
+  const sb = document.getElementById('search-btn');
+  const hasLoc = !!(SEL.division || SEL.district || SEL.upazila);
+  const ready = !!SELECTED_GROUP && hasLoc;
+  sb.disabled = !ready;
+  sb.classList.toggle('ready', ready);
+  sb.textContent = SELECTED_GROUP ? `${SELECTED_GROUP} রক্তদাতা খুঁজুন` : 'খুঁজুন';
+}
 document.getElementById('bg-grid').addEventListener('click', e => {
   const btn = e.target.closest('.bg-item');
   if (!btn) return;
   document.querySelectorAll('.bg-item').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   SELECTED_GROUP = btn.dataset.g;
-  const sb = document.getElementById('search-btn');
-  sb.disabled = false;
-  sb.classList.add('ready');
-  sb.textContent = `${SELECTED_GROUP} রক্তদাতা খুঁজুন`;
+  updateSearchBtnState();
   // BUGFIX: আগে এখানে রক্তের গ্রুপ বাছার পরপরই এলাকা-সার্চ শিট
   // নিজে থেকে খুলে যেত — ইউজারের কাছে এটা হঠাৎ, ব্যাখ্যাহীন popup
   // মনে হচ্ছিল। এখন এলাকা কখন বাছবেন সেটা সম্পূর্ণ ইউজারের সিদ্ধান্ত।
@@ -529,7 +540,39 @@ document.getElementById('bg-grid').addEventListener('click', e => {
 // ── এলাকা পিকার: বিভাগ → জেলা → উপজেলা (প্রতিটা ঐচ্ছিক) ──
 // নির্বাচিত মান রাখি; খালি মানে "সব"
 let SEL = { division: '', district: '', upazila: '' };
+let SEL_TYPE = ''; // 'upazila' | 'locality' | 'district' | 'division' | '' — শুধু চিপে সঠিক লেবেল দেখানোর জন্য
 let areaLevel = 'division';   // এখন কোন স্তর দেখাচ্ছি
+
+// SEL অনুযায়ী "এলাকা নির্বাচিত হয়েছে" chip, নাকি GPS+সার্চ picker — কোনটা
+// দেখাবে ঠিক করে, আর সার্চ-বাটনের অবস্থাও হালনাগাদ করে।
+function renderLocResolved() {
+  const has = !!(SEL.division || SEL.district || SEL.upazila);
+  document.getElementById('loc-resolved-wrap').style.display = has ? 'block' : 'none';
+  document.getElementById('loc-picker-wrap').style.display = has ? 'none' : 'block';
+  if (has) {
+    const loc = {
+      name: SEL.upazila || SEL.district || SEL.division,
+      type: SEL_TYPE || (SEL.upazila ? 'upazila' : SEL.district ? 'district' : 'division'),
+      district: SEL.district, division: SEL.division
+    };
+    document.getElementById('loc-resolved-name').textContent = locResultLabel(loc);
+    document.getElementById('loc-resolved-tag').textContent = locTypeTag(loc);
+  }
+  refreshResetLink();
+  updateSearchBtnState();
+}
+
+window.clearLocInline = () => {
+  SEL = { division: '', district: '', upazila: '' };
+  SEL_TYPE = '';
+  areaLevel = 'division';
+  gpsState = { status: 'idle', matched: null };
+  const input = document.getElementById('locsearch-input');
+  if (input) input.value = '';
+  renderGpsZone();
+  renderLocSearchResults();
+  renderLocResolved();
+};
 
 window.openLocModal = () => {
   areaLevel = 'division';
@@ -649,27 +692,23 @@ document.getElementById('area-list').addEventListener('click', e => {
   }
 });
 
-// বাছাই শেষ — লেবেল আপডেট করে মডাল বন্ধ
+// বাছাই শেষ — চিপ দেখাই, মডাল বন্ধ
 function finishArea() {
-  const label = SEL.upazila || SEL.district || SEL.division || 'সব বিভাগ';
-  document.getElementById('loc-row-txt').textContent = label;
-  refreshResetLink();
+  SEL_TYPE = SEL.upazila ? 'upazila' : SEL.district ? 'district' : SEL.division ? 'division' : '';
+  renderLocResolved();
   closeArea();
 }
 
-// এলাকা নির্বাচন করা থাকলেই "সব ফিল্টার মুছুন" লিংক দেখাই
+// এলাকা নির্বাচন করা থাকলেই "এলাকা মুছে ফেলুন" লিংক দেখাই
 function refreshResetLink() {
   const any = SEL.division || SEL.district || SEL.upazila;
   document.getElementById('reset-link').style.display = any ? 'inline-flex' : 'none';
 }
 
-// এক ক্লিকে সব এলাকা-ফিল্টার মুছে "সারা বাংলাদেশ" অবস্থায় ফেরা
+// এক ক্লিকে এলাকা-ফিল্টার মুছে আবার GPS+সার্চ picker দেখানো
 window.resetFilters = () => {
-  SEL = { division: '', district: '', upazila: '' };
-  areaLevel = 'division';
-  document.getElementById('loc-row-txt').textContent = 'সব বিভাগ';
-  refreshResetLink();
-  showToast('ফিল্টার মুছে ফেলা হয়েছে');
+  clearLocInline();
+  showToast('এলাকা মুছে ফেলা হয়েছে');
 };
 
 // ══════════════════════════════════════════════════════════════
@@ -772,19 +811,6 @@ function resolveLocQuery(q) {
   return { kind: 'none' };
 }
 
-window.openLocSearch = () => {
-  document.getElementById('locsearch-modal').classList.add('open');
-  gpsState = { status: 'idle', matched: null };
-  renderGpsZone();
-  const input = document.getElementById('locsearch-input');
-  input.value = '';
-  renderLocSearchResults();
-  setTimeout(() => input.focus(), 50);
-};
-window.closeLocSearch = () => document.getElementById('locsearch-modal').classList.remove('open');
-document.getElementById('locsearch-modal').addEventListener('click', e => {
-  if (e.target.id === 'locsearch-modal') closeLocSearch();
-});
 
 // ── GPS বর্তমান অবস্থান — সত্যিকারের navigator.geolocation permission,
 // তারপর OpenStreetMap-এর পাবলিক Nominatim reverse-geocoding API দিয়ে
@@ -860,10 +886,9 @@ function renderGpsZone() {
       <div class="gps-or">অথবা</div>`;
     zone.querySelector('[data-gps-yes]').onclick = () => {
       SEL.division = m.division; SEL.district = m.district; SEL.upazila = m.type === 'upazila' ? m.name : '';
-      document.getElementById('loc-row-txt').textContent = locResultLabel(m);
-      refreshResetLink();
-      closeLocSearch();
+      SEL_TYPE = m.type;
       gpsState = { status: 'idle', matched: null };
+      renderLocResolved();
       if (SELECTED_GROUP) searchDonors();
     };
     zone.querySelector('[data-gps-no]').onclick = () => { gpsState = { status: 'idle', matched: null }; renderGpsZone(); };
@@ -966,9 +991,8 @@ function renderLocSearchResults() {
       const type = row.dataset.type, name = row.dataset.name, district = row.dataset.district, division = row.dataset.division;
       SEL.division = division; SEL.district = district;
       SEL.upazila = type === 'upazila' ? name : '';
-      document.getElementById('loc-row-txt').textContent = locResultLabel({ name, type, district, division });
-      refreshResetLink();
-      closeLocSearch();
+      SEL_TYPE = type;
+      renderLocResolved();
     });
   });
 }
@@ -1006,13 +1030,14 @@ function needLogin() {
 }
 
 // SEARCH — donors collection, JS filter
-window.searchDonors = async (override) => {
+window.searchDonors = async () => {
   const blood = SELECTED_GROUP;
-  // override দিলে সেটা (nationwide পুনঃসার্চের জন্য), নাহলে SEL থেকে
-  const div  = override ? (override.division || '') : SEL.division;
-  const dist = override ? (override.district || '') : SEL.district;
-  const upa  = override ? (override.upazila  || '') : SEL.upazila;
+  const div = SEL.division, dist = SEL.district, upa = SEL.upazila;
   if(!blood){ showToast('রক্তের গ্রুপ বেছে নিন'); return; }
+  // BUGFIX: এলাকা ছাড়া সরাসরি পুরো বাংলাদেশ জুড়ে সার্চ করার সুযোগ ছিল —
+  // ফলাফল অপ্রাসঙ্গিক/অনেক দূরের হয়ে যেত। এখন এলাকা (অন্তত বিভাগ) বাছা
+  // বাধ্যতামূলক — search-btn নিজেই disabled থাকে, তবু ডিফেন্সিভভাবে এখানেও চেক।
+  if(!div && !dist && !upa){ showToast('এলাকা বেছে নিন'); return; }
 
   // Nice loading UI
   const el = document.getElementById('results-list');
@@ -1044,40 +1069,38 @@ window.searchDonors = async (override) => {
     // list-এ limit বাধ্যতামূলক। এখন filter সার্ভার-সাইডে হয়, limit(30)
     // সহ — শুধু প্রাসঙ্গিক ডেটা আসে, আর phone/wa আসেই না (donorsPrivate
     // আলাদা collection, list করা যায় না)।
-    const filters = [where('blood','==',blood), where('available','==',true)];
-    // সবচেয়ে নির্দিষ্ট স্তর যেটা দেওয়া আছে সেটাই ব্যবহার করি
-    if (dist) filters.push(where('district','==',dist));
-    else if (div) filters.push(where('division','==',div));
-
-    let donors = [];
-    if (upa) {
-      // BUGFIX: উপজেলা দিয়ে খুঁজলে যাদের ডকুমেন্টে upazila field-ই নেই
-      // (উপজেলা ফিচার আসার আগে যারা register করেছেন, অথবা যারা ফর্মে
-      // ঐচ্ছিক এই ফিল্ডটা খালি রেখেছেন) তারা বাদ পড়ে যেতেন — যদিও তারা
-      // ঠিক ওই জেলাতেই আছেন। তাই এখন দুটো query একসাথে চালাই:
-      // ১) ঠিক এই উপজেলার (নিশ্চিত), ২) পুরো জেলার (fallback)।
-      // ফলাফল মিলিয়ে, উপজেলা-নিশ্চিত যাদের আগে দেখানো হয়।
-      const [exactSnap, districtSnap] = await Promise.all([
-        getDocs(query(collection(db,'donors'), ...filters, where('upazila','==',upa), limit(30))),
-        getDocs(query(collection(db,'donors'), ...filters, limit(30)))
-      ]);
-      const exact = [];
-      exactSnap.forEach(d => { if (d.id !== CU?.uid) exact.push({id:d.id, ...d.data(), _upaMatch:true}); });
-      const seen = new Set(exact.map(d => d.id));
-      const rest = [];
-      districtSnap.forEach(d => {
-        if (d.id !== CU?.uid && !seen.has(d.id)) rest.push({id:d.id, ...d.data(), _upaMatch:false});
-      });
-      donors = [...exact, ...rest];
-    } else {
-      const snap = await getDocs(query(collection(db,'donors'), ...filters, limit(30)));
-      snap.forEach(d => { if (d.id !== CU?.uid) donors.push({id:d.id, ...d.data()}); });
+    async function fetchAt(level) {
+      const f = [where('blood','==',blood), where('available','==',true)];
+      if (level === 'upazila') f.push(where('district','==',dist), where('upazila','==',upa));
+      else if (level === 'district') f.push(where('district','==',dist));
+      else if (level === 'division') f.push(where('division','==',div));
+      const snap = await getDocs(query(collection(db,'donors'), ...f, limit(30)));
+      const out = [];
+      snap.forEach(d => { if (d.id !== CU?.uid) out.push({id:d.id, ...d.data()}); });
+      return out;
     }
 
-    // rating বেশি যার আগে (কিন্তু উপজেলা-নিশ্চিতরা সবসময় প্রথমে)
-    donors.sort((a,b) => (b._upaMatch===a._upaMatch ? 0 : (b._upaMatch?1:-1)) || ((b.rating||0) - (a.rating||0)));
+    // স্বয়ংক্রিয় cascade: উপজেলায় কাউকে না পেলে তবেই পুরো জেলা, জেলাতেও
+    // কাউকে না পেলে তবেই পুরো বিভাগ — প্রতিবার একধাপ, চুপচাপ নয় (renderResults
+    // widen হলে স্পষ্ট নোট দেখায়)। শুরুতেই সব একসাথে মিলিয়ে দেখানো হয় না,
+    // যাতে উপজেলার প্রকৃত ফলাফল থাকলে অপ্রাসঙ্গিক দূরের ডোনার না মিশে যায়।
+    let donors = [];
+    let scopeUsed = upa ? 'upazila' : dist ? 'district' : 'division';
+
+    if (upa) {
+      donors = await fetchAt('upazila');
+      if (!donors.length && dist) { scopeUsed = 'district'; donors = await fetchAt('district'); }
+      if (!donors.length && div)  { scopeUsed = 'division'; donors = await fetchAt('division'); }
+    } else if (dist) {
+      donors = await fetchAt('district');
+      if (!donors.length && div) { scopeUsed = 'division'; donors = await fetchAt('division'); }
+    } else {
+      donors = await fetchAt('division');
+    }
+
+    donors.sort((a,b) => (b.rating||0) - (a.rating||0));
     stopLoadingMsgs();
-    renderResults(donors, blood, div, dist, upa);
+    renderResults(donors, blood, div, dist, upa, scopeUsed);
   } catch(e){
     stopLoadingMsgs();
     console.warn('search error (Firestore composite index লাগতে পারে):', e);
@@ -1089,34 +1112,24 @@ window.searchDonors = async (override) => {
 // পড়তে হয় না (একটা কম read, আর দ্রুত)
 let LAST_RESULTS = new Map();
 
-function renderResults(donors, blood, div, dist, upa) {
+function renderResults(donors, blood, div, dist, upa, scopeUsed) {
   const el = document.getElementById('results-list');
   LAST_RESULTS = new Map(donors.map(d => [d.id, d]));
 
-  if(!donors.length){
-    const areaText = upa ? esc(upa) : (dist ? esc(dist) : (div ? esc(div) : ''));
-    const hasAreaFilter = !!(div || dist || upa);
-    // এক ধাপ চওড়া করার সাজেশন: (উপজেলা সার্চে জেলাও একসাথে চেক হয়ে
-    // গেছে, তাই খালি ফল মানে জেলাতেও কেউ নেই — সরাসরি বিভাগে যাই)
-    let widerLabel = 'সারা দেশে খুঁজুন', widerSub = 'এলাকার সীমা তুলে দিন';
-    if (upa)        { widerLabel = div + ' বিভাগে খুঁজুন'; widerSub = dist + ' জেলায় কেউ পাওয়া যায়নি'; }
-    else if (dist)  { widerLabel = div + ' বিভাগে খুঁজুন'; widerSub = 'জেলার সীমা তুলে দিন'; }
+  // যেটা আসলে বাছা হয়েছিল (upazila/district/division) বনাম শেষমেষ কোন
+  // স্তরে গিয়ে ফলাফল পাওয়া গেছে (searchDonors স্বয়ংক্রিয়ভাবে চওড়া করে) —
+  // দুটো আলাদা হলে ইউজারকে স্পষ্টভাবে জানানো হয়, চুপচাপ না।
+  const requested = upa ? 'upazila' : dist ? 'district' : 'division';
+  const scopeLabel = { upazila: upa, district: dist, division: div };
+  const widened = scopeUsed && scopeUsed !== requested;
 
+  if(!donors.length){
+    const areaText = esc(scopeLabel[scopeUsed || requested] || '');
     el.innerHTML = `
       <div class="ns-wrap">
         <div class="ns-icon"><svg class="ic ic-lg" style="color:#c0392b"><use href="#i-search"/></svg></div>
         <div class="ns-title">${areaText ? areaText+'য়' : 'এই মুহূর্তে'} ${esc(blood)} রক্তদাতা পাওয়া যায়নি</div>
-        <div class="ns-sub">হাল ছাড়বেন না — নিচের যেকোনো উপায়ে চেষ্টা করুন</div>
-
-        ${hasAreaFilter ? `
-        <div class="ns-action" data-act="wider">
-          <div class="ns-ico" style="background:#E6F1FB"><svg class="ic ic-lg" style="color:#185FA5"><use href="#i-pin"/></svg></div>
-          <div class="ns-txt">
-            <div class="ns-txt-t">${esc(widerLabel)}</div>
-            <div class="ns-txt-s">${esc(widerSub)}</div>
-          </div>
-          <span class="ns-chev">›</span>
-        </div>` : ''}
+        <div class="ns-sub">উপজেলা থেকে জেলা, জেলা থেকে বিভাগ পর্যন্ত খুঁজে দেখা হয়েছে — হাল ছাড়বেন না, নিচের উপায়ে চেষ্টা করুন</div>
 
         <a class="ns-action" href="request.html">
           <div class="ns-ico" style="background:#FAEEDA"><svg class="ic ic-lg" style="color:#854F0B"><use href="#i-alert"/></svg></div>
@@ -1136,16 +1149,6 @@ function renderResults(donors, blood, div, dist, upa) {
           <span class="ns-chev">›</span>
         </a>
       </div>`;
-
-    const nw = el.querySelector('[data-act="wider"]');
-    if (nw) nw.addEventListener('click', () => {
-      // এক ধাপ চওড়া: উপজেলা→জেলা ইতিমধ্যে চেক হয়ে গেছে, তাই সরাসরি
-      // বিভাগে যাই। জেলা থেকে হলে বিভাগে, বিভাগ থেকে হলে সারা দেশে।
-      if (upa || dist) { SEL.district = ''; SEL.upazila = ''; searchDonors(); }
-      else             { SEL.division = ''; SEL.district = ''; SEL.upazila = ''; searchDonors(); }
-      document.getElementById('loc-row-txt').textContent =
-        SEL.upazila || SEL.district || SEL.division || 'সব বিভাগ';
-    });
     return;
   }
   // নিরাপত্তা: Firestore থেকে আসা প্রতিটা মান esc() দিয়ে পাস করানো হয়েছে,
@@ -1155,7 +1158,10 @@ function renderResults(donors, blood, div, dist, upa) {
   // ফোন/WhatsApp এখন public donors ডেটায় নেই (donorsPrivate আলাদা) —
   // তাই "নম্বর দেখুন" চাপলে তখনই সেই একজন donor-এর জন্য আলাদা করে
   // fetch হয়, পুরো তালিকার জন্য না।
-  el.innerHTML=`<div class="result-header">${esc(donors.length)} জন ${esc(blood)} donor পাওয়া গেছে</div>`+
+  const widenNoteHtml = widened
+    ? `<div class="scope-note"><svg class="ic ic-sm"><use href="#i-alert"/></svg>${esc(scopeLabel[requested])}${requested==='upazila'?' উপজেলায়':' জেলায়'} কেউ পাওয়া যায়নি, তাই ${esc(scopeLabel[scopeUsed])} ${scopeUsed==='district'?'জেলা':'বিভাগ'} জুড়ে দেখানো হচ্ছে</div>`
+    : '';
+  el.innerHTML= widenNoteHtml + `<div class="result-header">${esc(donors.length)} জন ${esc(blood)} donor পাওয়া গেছে</div>`+
   donors.map((d,i)=>{
     const avatarHtml = d.photo
       ? `<img src="${esc(d.photo)}" alt=""/>`
@@ -1173,9 +1179,10 @@ function renderResults(donors, blood, div, dist, upa) {
 
     const tags = [];
     if (d.urgentReady) tags.push(`<span class="ocard-tag"><svg class="ic" style="width:9px;height:9px"><use href="#i-alert"/></svg>জরুরি প্রস্তুত</span>`);
-    if (upa) tags.push(d._upaMatch
-      ? `<span class="ocard-tag">${esc(upa)}</span>`
-      : `<span class="ocard-tag">${esc(dist)} জেলায়</span>`);
+    // scope widen হলে (উপজেলায় কেউ না পাওয়ায় জেলা/বিভাগ দেখানো হচ্ছে) সেটা
+    // ইতিমধ্যে ওপরের scope-note-এ বলা আছে — প্রতিটা কার্ডে আলাদা করে বলার
+    // দরকার নেই, শুধু নিশ্চিত উপজেলা-মিল হলেই ছোট ব্যাজ দেখানো হয়।
+    if (scopeUsed === 'upazila' && upa) tags.push(`<span class="ocard-tag">${esc(upa)}</span>`);
 
     // available সাধারণত true-ই থাকে (সার্চ কোয়েরি নিজেই available:true ফিল্টার করে) —
     // তবু কার্ডটা "প্রস্তুত নই" অবস্থাও দেখাতে সক্ষম রাখা হলো, ভবিষ্যতে অন্য
@@ -1413,6 +1420,12 @@ window.submitReq = async () => {
   } catch(e){ showToast('অনুরোধ পাঠানো যায়নি'); console.warn(e); }
   finally{ btn.innerHTML='<svg class="ic ic-sm" style="vertical-align:-2px;margin-right:5px"><use href="#i-droplet-f"/></svg>অনুরোধ পাঠান'; btn.disabled=false; }
 };
+
+// এলাকা (GPS+সার্চ) UI পেজ লোড হওয়ার সাথে সাথেই রেডি থাকে — আলাদা কোনো
+// মডালে ট্যাপ করে ঢুকতে হয় না, রক্তের গ্রুপের ঠিক নিচেই দৃশ্যমান।
+renderGpsZone();
+renderLocSearchResults();
+renderLocResolved();
 </script>
 <div class="install-banner" id="install-banner">
   <div class="install-modal">
