@@ -111,6 +111,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
   position:absolute;left:50%;top:34%;width:280px;height:280px;margin:-140px 0 0 -140px;
   border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 70%);
   opacity:0;animation:successGlow 1.7s ease-out .2s forwards;
+  pointer-events:none;
 }
 @keyframes successGlow{0%{opacity:0;transform:scale(.7)}45%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.25)}}
 .success-logo{
@@ -311,7 +312,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
   <img class="success-logo" src="sondhan-logo-white.png" alt="Sondhan"/>
   <div class="success-headline">সন্ধানের সাথে<br>আপনার যাত্রা শুরু হলো।</div>
   <div class="success-subline">মানবতার সেবায় পাশে থাকার জন্য ধন্যবাদ।</div>
-  <a class="success-cta" href="index.html">Sondhan অ্যাপে প্রবেশ করুন</a>
+  <a class="success-cta" href="index.html" onclick="this.textContent='যাচ্ছি...'">Sondhan অ্যাপে প্রবেশ করুন</a>
 </div>
 
 <div id="loading" class="loading-overlay"><div class="spinner"></div><p id="loading-text">অপেক্ষা করুন...</p></div>
