@@ -689,13 +689,48 @@ function findDivision(district) {
   return '';
 }
 
-// কেন্দ্রীয় লোকেশন ইনডেক্স — সব উপজেলা (৬৪ জেলার প্রকৃত তালিকা) + ঢাকার এলাকা
-const LOC_INDEX = [
-  ...DHAKA_LOCALITIES.map(name => ({ name, type: 'locality', district: 'ঢাকা', division: 'ঢাকা' })),
+// কেন্দ্রীয় লোকেশন ইনডেক্স — সব উপজেলা (৬৪ জেলার প্রকৃত তালিকা) + ঢাকার এলাকা।
+// BUGFIX: মূল UPAZILAS ডেটাসেটে ২১টা নামের শেষে অতিরিক্ত স্পেস ছিল
+// (যেমন "হোসেনপুর ") আর একই জেলায় "নাটোর সদর" দুইবার — এগুলো trim+dedupe
+// না করলে "কোন জেলার...?" ভুলভাবে একই জেলা দুইবার দেখাতো, আর মিল
+// যাচাইয়ে (Levenshtein) অতিরিক্ত স্পেসটাও গোনা হয়ে distance বাড়িয়ে দিতো।
+function dedupeLocations(list) {
+  const seen = new Set();
+  const out = [];
+  list.forEach(l => {
+    const key = l.name + '|' + l.district;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(l);
+  });
+  return out;
+}
+// BUGFIX: আগে শুধু উপজেলা+এলাকা ইনডেক্স করা ছিল — কেউ যদি সরাসরি তার
+// জেলা বা বিভাগের নাম লেখেন (যেমন কেউ হয়তো নির্দিষ্ট উপজেলার নাম জানেন
+// না, কিন্তু জেলা জানেন), আগে কোনো ফলাফলই আসতো না, এমনকি বানান হুবহু
+// ঠিক থাকলেও। এখন জেলা ও বিভাগও সার্চযোগ্য — বাছলে পুরো জেলা/বিভাগ
+// জুড়ে খোঁজা হয়, "locality"-এর মতোই।
+const LOC_INDEX = dedupeLocations([
+  ...DHAKA_LOCALITIES.map(name => ({ name: name.trim(), type: 'locality', district: 'ঢাকা', division: 'ঢাকা' })),
   ...Object.entries(UPAZILAS).flatMap(([dist, ups]) =>
-    ups.map(u => ({ name: u, type: 'upazila', district: dist, division: findDivision(dist) }))
-  )
-];
+    ups.map(u => ({ name: u.trim(), type: 'upazila', district: dist, division: findDivision(dist) }))
+  ),
+  ...DIVISIONS.flatMap(div => (DISTRICTS[div] || []).map(dist => ({ name: dist, type: 'district', district: dist, division: div }))),
+  ...DIVISIONS.map(div => ({ name: div, type: 'division', district: '', division: div }))
+]);
+
+function locTypeTag(l) {
+  if (l.type === 'locality') return `এলাকা · ${l.district} জেলা`;
+  if (l.type === 'upazila')  return `উপজেলা · ${l.district} জেলা`;
+  if (l.type === 'district') return `জেলা · ${l.division} বিভাগ`;
+  return 'বিভাগ';
+}
+function locResultLabel(l) {
+  if (l.type === 'upazila')  return l.name;
+  if (l.type === 'locality') return `${l.name} (${l.district} জেলা জুড়ে)`;
+  if (l.type === 'district') return `${l.name} জেলা জুড়ে`;
+  return `${l.name} বিভাগ জুড়ে`;
+}
 
 // Levenshtein distance — ভুল বানান ধরার জন্য
 function lev(a, b) {
@@ -708,10 +743,15 @@ function lev(a, b) {
     dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
   return dp[m][n];
 }
+// name+type দিয়ে গ্রুপ করা হয় — শুধু name দিয়ে করলে ৮টা বিভাগেরই নিজ
+// নিজ সদর জেলার নাম হুবহু একই (যেমন "ঢাকা" বিভাগ ও "ঢাকা" জেলা), তখন
+// ভুলভাবে "কোন জেলার ঢাকা?" জিজ্ঞেস করত যদিও একটা আসলে বিভাগ, জেলা না।
+// "duplicate name" ডায়ালগ শুধু একই ধরনের (যেমন দুইটা উপজেলা) মধ্যে সত্যিকারের
+// দ্বন্দ্ব থাকলেই আসা উচিত — যেমন "নবাবগঞ্জ" (ঢাকা জেলা vs দিনাজপুর জেলা)।
 function groupByName(list) {
   const map = new Map();
-  list.forEach(l => { if (!map.has(l.name)) map.set(l.name, []); map.get(l.name).push(l); });
-  return [...map.entries()].map(([name, items]) => ({ name, items }));
+  list.forEach(l => { const key = l.name + '|' + l.type; if (!map.has(key)) map.set(key, []); map.get(key).push(l); });
+  return [...map.values()].map(items => ({ name: items[0].name, items }));
 }
 // exact match সর্বোচ্চ priority; না পেলে fuzzy suggestion — সিস্টেম নিজে থেকে
 // কখনো ভুল location বেছে নেয় না, চূড়ান্ত নির্বাচন সবসময় ব্যবহারকারীর ট্যাপে হয়।
@@ -720,9 +760,14 @@ function resolveLocQuery(q) {
   if (!q) return { kind: 'empty' };
   const substr = LOC_INDEX.filter(l => l.name.includes(q));
   if (substr.length) return { kind: 'matches', groups: groupByName(substr) };
-  const threshold = q.length <= 3 ? 1 : 2;
+  // BUGFIX: থ্রেশহোল্ড আগে অনেক কড়া ছিল (৩ অক্ষরের বেশি হলেও মাত্র ২)।
+  // উপজেলার নাম প্রায়ই ৫-১০ অক্ষরের জটিল যুক্তাক্ষরসহ শব্দ — ফোনের কীবোর্ডে
+  // একটা মাত্রা/যুক্তাক্ষর এদিক-ওদিক হলেই আগে কোনো suggestion আসতো না।
+  // চূড়ান্ত নির্বাচন সবসময় ব্যবহারকারীর ট্যাপে হয় বলে এখানে একটু বেশি
+  // উদার হলেও ঝুঁকি নেই — ভুল কিছু নিজে থেকে বেছে নেওয়া হয় না।
+  const threshold = q.length <= 3 ? 1 : Math.max(2, Math.ceil(q.length * 0.35));
   const scored = LOC_INDEX.map(l => ({ loc: l, d: lev(q, l.name) })).sort((a,b) => a.d - b.d);
-  const close = scored.filter(s => s.d <= threshold).slice(0, 4);
+  const close = scored.filter(s => s.d <= threshold).slice(0, 5);
   if (close.length) return { kind: 'fuzzy', groups: groupByName(close.map(c => c.loc)) };
   return { kind: 'none' };
 }
@@ -775,17 +820,21 @@ function latinToBengaliRough(input) {
   return out;
 }
 
+// GPS-এ confirm ধাপ সবসময় বাধ্যতামূলক (ব্যবহারকারী "হ্যাঁ, খুঁজুন" না চাপলে
+// কিছুই সার্চ হয় না) — তাই এখানে টাইপ-করা সার্চের চেয়ে কিছুটা বেশি উদার
+// হলেও নিরাপদ, ভুল suggestion হলেও ব্যবহারকারী "এলাকা পরিবর্তন করুন" চাপতে পারবেন।
 function matchGpsCandidate(str) {
   if (!str) return null;
-  const direct = resolveLocQuery(str);
-  if (direct.kind === 'matches') {
+  const clean = str.replace(/\s*(Upazila|District|উপজেলা|জেলা)\s*$/i, '').trim();
+  const direct = resolveLocQuery(clean);
+  if (direct.kind === 'matches' || direct.kind === 'fuzzy') {
     const flat = direct.groups.flatMap(g => g.items);
     if (flat.length === 1) return flat[0];
   }
-  if (/^[a-zA-Z\s.'-]+$/.test(str)) {
-    const translit = latinToBengaliRough(str);
+  if (/^[a-zA-Z\s.'-]+$/.test(clean)) {
+    const translit = latinToBengaliRough(clean);
     const scored = LOC_INDEX.map(l => ({ loc: l, d: lev(translit, l.name) })).sort((a,b) => a.d - b.d);
-    if (scored.length && scored[0].d <= 1) return scored[0].loc;
+    if (scored.length && scored[0].d <= 2) return scored[0].loc;
   }
   return null;
 }
@@ -799,7 +848,7 @@ function renderGpsZone() {
     zone.innerHTML = `
       <div class="gps-zone">
         <div class="gps-card">
-          <div class="gps-pin-line"><svg class="ic ic-sm"><use href="#i-pin"/></svg>আপনি সম্ভবত ${esc(m.name)}, ${esc(m.district)}-এ আছেন</div>
+          <div class="gps-pin-line"><svg class="ic ic-sm"><use href="#i-pin"/></svg>আপনি সম্ভবত ${esc(locResultLabel(m))}-এ আছেন</div>
           <div class="gps-attrib">অবস্থান তথ্য: © OpenStreetMap contributors</div>
           <div class="gps-q">এই এলাকা দিয়ে রক্তদাতা খুঁজবেন?</div>
           <div class="gps-confirm-btns">
@@ -811,7 +860,7 @@ function renderGpsZone() {
       <div class="gps-or">অথবা</div>`;
     zone.querySelector('[data-gps-yes]').onclick = () => {
       SEL.division = m.division; SEL.district = m.district; SEL.upazila = m.type === 'upazila' ? m.name : '';
-      document.getElementById('loc-row-txt').textContent = m.type === 'upazila' ? m.name : `${m.name} (${m.district} জেলা জুড়ে)`;
+      document.getElementById('loc-row-txt').textContent = locResultLabel(m);
       refreshResetLink();
       closeLocSearch();
       gpsState = { status: 'idle', matched: null };
@@ -821,9 +870,15 @@ function renderGpsZone() {
   } else if (gpsState.status === 'denied' || gpsState.status === 'notfound') {
     const msg = gpsState.status === 'denied'
       ? 'লোকেশন অনুমতি পাওয়া যায়নি (বা এই ব্রাউজারে সমর্থিত নয়)। নিচে এলাকার নাম লিখে খুঁজুন।'
-      : 'আপনার এলাকা নির্ভুলভাবে শনাক্ত করা যায়নি। নিচে এলাকার নাম লিখে খুঁজুন।';
-    zone.innerHTML = `<div class="gps-zone"><div class="gps-denied">${msg}<div><button data-gps-dismiss>ঠিক আছে</button></div></div></div>`;
+      : 'আপনার এলাকা সঠিকভাবে শনাক্ত করা যায়নি। নিচে দেওয়া সাজেশন থেকে বেছে নিন, অথবা নিজে লিখে খুঁজুন।';
+    zone.innerHTML = `<div class="gps-zone"><div class="gps-denied">${esc(msg)}<div><button data-gps-dismiss>ঠিক আছে</button></div></div></div>`;
     zone.querySelector('[data-gps-dismiss]').onclick = () => { gpsState = { status: 'idle', matched: null }; renderGpsZone(); };
+    // GPS থেকে পাওয়া raw নাম (মিলেনি এমন হলেও) সার্চ-বক্সে বসিয়ে দিই —
+    // ব্যবহারকারী একদম খালি হাতে শুরু না করে সেখান থেকেই suggestion পাবেন।
+    if (gpsState.status === 'notfound' && gpsState.rawGuess) {
+      const input = document.getElementById('locsearch-input');
+      if (input && !input.value) { input.value = gpsState.rawGuess; renderLocSearchResults(); }
+    }
   } else {
     zone.innerHTML = `
       <div class="gps-zone">
@@ -850,13 +905,24 @@ function useGpsLocation() {
       const addr = data.address || {};
       // BD-তে OpenStreetMap-এর ঠিকানা কাঠামোয় সাধারণত county≈উপজেলা,
       // state_district≈জেলা, suburb/neighbourhood≈স্থানীয় এলাকা — এই
-      // ক্রমে চেষ্টা করি (প্রশাসনিক স্তর আগে, বেশি নির্ভরযোগ্য)।
-      const candidates = [addr.county, addr.state_district, addr.suburb, addr.neighbourhood, addr.town, addr.city_district].filter(Boolean);
+      // ক্রমে চেষ্টা করি (প্রশাসনিক স্তর আগে, বেশি নির্ভরযোগ্য), আর
+      // OSM-ভেদে ভিন্ন ভিন্ন ফিল্ড আসতে পারে বলে যতগুলো সম্ভব চেষ্টা করি।
+      const candidates = [
+        addr.county, addr.state_district, addr.suburb, addr.neighbourhood,
+        addr.town, addr.city_district, addr.municipality, addr.village, addr.district
+      ].filter(Boolean);
       let matched = null;
       for (const c of candidates) { matched = matchGpsCandidate(c); if (matched) break; }
-      gpsState = matched ? { status: 'confirm', matched } : { status: 'notfound', matched: null };
+      if (matched) {
+        gpsState = { status: 'confirm', matched };
+      } else {
+        // পুরোপুরি মেলাতে না পারলেও ব্যবহারকারীকে খালি হাতে ফেরত পাঠাই না —
+        // OSM যা বলেছে (হোক বাংলা বা ইংরেজি) সেটা সার্চ-বক্সে বসিয়ে দিই,
+        // যাতে ব্যবহারকারী নিজে সেখান থেকে সঠিক suggestion বেছে নিতে পারেন।
+        gpsState = { status: 'notfound', matched: null, rawGuess: candidates[0] || '' };
+      }
     } catch (e) {
-      gpsState = { status: 'notfound', matched: null };
+      gpsState = { status: 'notfound', matched: null, rawGuess: '' };
     }
     renderGpsZone();
   }, () => {
@@ -873,7 +939,7 @@ function renderLocSearchResults() {
   const rowHtml = (l, suggestion) => `
     <div class="locsearch-row" data-pick data-name="${esc(l.name)}" data-type="${l.type}" data-district="${esc(l.district)}" data-division="${esc(l.division)}">
       <div class="locsearch-row-ico"><svg class="ic ic-sm"><use href="#i-pin"/></svg></div>
-      <div class="locsearch-row-main"><div class="locsearch-row-name">${esc(l.name)}</div><div class="locsearch-row-tag">${l.type==='locality'?'এলাকা':'উপজেলা'} · ${esc(l.district)} জেলা</div></div>
+      <div class="locsearch-row-main"><div class="locsearch-row-name">${esc(l.name)}</div><div class="locsearch-row-tag">${esc(locTypeTag(l))}</div></div>
       ${suggestion ? `<span class="locsearch-row-badge">সাজেশন</span>` : ''}
     </div>`;
   const groupsHtml = (groups, suggestion) => groups.map(g => {
@@ -882,7 +948,7 @@ function renderLocSearchResults() {
   }).join('');
 
   if (res.kind === 'empty') {
-    box.innerHTML = `<div class="locsearch-hint">টাইপ করা শুরু করুন — এলাকা বা উপজেলার নাম<br>(যেমন: মোহাম্মদপুর, হাজীগঞ্জ, সাভার)</div>`;
+    box.innerHTML = `<div class="locsearch-hint">টাইপ করা শুরু করুন — এলাকা বা উপজেলার নাম<br>(যেমন: মোহাম্মদপুর, হাজীগঞ্জ, সাভার)<br><br>পুরো বানান মনে না থাকলেও সমস্যা নেই, কাছাকাছি লিখলেই suggestion আসবে</div>`;
   } else if (res.kind === 'matches') {
     box.innerHTML = groupsHtml(res.groups, false);
   } else if (res.kind === 'fuzzy') {
@@ -900,13 +966,19 @@ function renderLocSearchResults() {
       const type = row.dataset.type, name = row.dataset.name, district = row.dataset.district, division = row.dataset.division;
       SEL.division = division; SEL.district = district;
       SEL.upazila = type === 'upazila' ? name : '';
-      document.getElementById('loc-row-txt').textContent = type === 'upazila' ? name : `${name} (${district} জেলা জুড়ে)`;
+      document.getElementById('loc-row-txt').textContent = locResultLabel({ name, type, district, division });
       refreshResetLink();
       closeLocSearch();
     });
   });
 }
-document.getElementById('locsearch-input').addEventListener('input', renderLocSearchResults);
+// হালকা debounce — খুব দ্রুত টাইপ করার সময় প্রতিটা অক্ষরে ফলাফল
+// ঝাঁকুনি দিয়ে বদলানো এড়াতে (smoother মনে হয়)
+let locSearchDebounce;
+document.getElementById('locsearch-input').addEventListener('input', () => {
+  clearTimeout(locSearchDebounce);
+  locSearchDebounce = setTimeout(renderLocSearchResults, 120);
+});
 
 
 let CU = null;
