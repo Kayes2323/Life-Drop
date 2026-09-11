@@ -90,7 +90,6 @@
 .locsearch-input-wrap svg{color:#999;flex-shrink:0}
 .locsearch-input-wrap input{flex:1;border:none;background:transparent;padding:12px 0;font-size:14px;outline:none;font-family:'Hind Siliguri',sans-serif}
 .locsearch-results{overflow-y:auto;padding:2px 6px 8px;flex:1}
-.locsearch-hint{text-align:center;color:#bbb;font-size:12.5px;padding:30px 20px;line-height:1.7;font-family:'Hind Siliguri',sans-serif}
 .locsearch-dupe-hd{padding:12px 12px 6px;font-size:12.5px;font-weight:700;color:#222;font-family:'Hind Siliguri',sans-serif}
 .locsearch-group-hd:first-child{margin-top:0}
 .locsearch-row{display:flex;align-items:center;gap:11px;padding:12px;border-radius:12px;cursor:pointer}
@@ -1016,7 +1015,11 @@ function renderLocSearchResults() {
   }).join('');
 
   if (res.kind === 'empty') {
-    box.innerHTML = `<div class="locsearch-hint">টাইপ করা শুরু করুন — এলাকা বা উপজেলার নাম<br>(যেমন: মোহাম্মদপুর, হাজীগঞ্জ, সাভার)<br><br>পুরো বানান মনে না থাকলেও সমস্যা নেই, কাছাকাছি লিখলেই suggestion আসবে</div>`;
+    // UI cleanup: input খালি থাকা অবস্থায় কোনো instructional/explanatory
+    // টেক্সট দেখানো হয় না — placeholder + GPS বাটন + "বিভাগ থেকে ব্রাউজ" এতেই
+    // যথেষ্ট, minimal থাকে। কার্যকারিতা (fuzzy match, বাংলা/Banglish, hierarchy)
+    // অপরিবর্তিত — এটা শুধু "কিছু না লিখলে" দেখানো hint সরানো হলো।
+    box.innerHTML = '';
   } else if (res.kind === 'matches') {
     box.innerHTML = groupsHtml(res.groups, false);
   } else if (res.kind === 'fuzzy') {
