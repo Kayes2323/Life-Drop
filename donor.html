@@ -319,16 +319,55 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db } from './firebase-config.js';
+// পারফরম্যান্স পাইলট (শুধু এই পেজে): auth-only হালকা config — Firestore SDK
+// (সবচেয়ে ভারী মডিউল) এখানে ইম্পোর্ট হয় না, তাই "লগইন করা আছে কিনা" জানতে
+// এটার জন্য অপেক্ষা করতে হয় না। Firestore আসলেই দরকার হলে (নিচে
+// loadFirestoreDeps()) dynamic import()-এ লোড হয়।
+import { auth } from './firebase-config-auth.js';
 import { isValidBdPhone, normalizeBdPhone, initials, isValidFacebookUrl, DIVISIONS, fillDistrictSelect, fillUpazilaSelect } from './app.js';
 import {
   onAuthStateChanged, signInWithPopup, GoogleAuthProvider,
   sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const EMAIL_KEY = 'sondhanDonorEmailForSignIn';
 const RESEND_COOLDOWN_MS = 45000;
+
+// Firestore SDK + db instance — লগইন-অবস্থা resolve হওয়া পর্যন্ত একদম না ছুঁয়ে,
+// প্রথম প্রকৃত প্রয়োজনে (signed-in ইউজার নিশ্চিত হওয়ার পর, বা ফর্ম submit-এ)
+// lazy-load হয়। firebase-config.js (মূল, সব পেজে শেয়ার্ড ফাইল) নিজেই
+// firebase-firestore.js ইম্পোর্ট করে — তাই এখানে সেটা আবার আলাদা করে ইম্পোর্ট
+// করলেও ব্রাউজার একই URL cache থেকে পায়, নতুন নেটওয়ার্ক রিকোয়েস্ট হয় না।
+let _fsDepsPromise = null;
+async function loadFirestoreDeps() {
+  if (!_fsDepsPromise) {
+    // sequential — cfg আগে সম্পূর্ণ লোড হয় (যেটার নিজস্ব static import-এই
+    // firebase-firestore.js ইতিমধ্যে fetch+cache হয়ে যায়), তারপর একই URL-এর
+    // দ্বিতীয় import() ব্রাউজারের module cache থেকে সরাসরি পায় — দুটো import()
+    // একসাথে (Promise.all) ছুঁড়লে একই URL-এর জন্য race condition হতে পারে।
+    //
+    // নিরাপত্তা-জাল (low-bandwidth/অস্থির নেটওয়ার্কের জন্য জরুরি): dynamic
+    // import() নেটওয়ার্কেই নির্ভরশীল একটা fetch — slow/flaky mobile data-এ
+    // এটা ব্যর্থ হতে পারে। ব্যর্থ হলে cache-করা promise-টা রিসেট করে দিই,
+    // যাতে ব্যবহারকারী আবার চেষ্টা করলে (যেমন submit বাটনে আবার চাপলে)
+    // নতুন করে fetch হয় — একবার ব্যর্থ হলে চিরকালের জন্য আটকে না থাকে।
+    _fsDepsPromise = (async () => {
+      try {
+        const cfg = await import('./firebase-config.js');
+        const fs = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        return {
+          db: cfg.db,
+          doc: fs.doc, getDoc: fs.getDoc, setDoc: fs.setDoc,
+          updateDoc: fs.updateDoc, writeBatch: fs.writeBatch, serverTimestamp: fs.serverTimestamp
+        };
+      } catch (e) {
+        _fsDepsPromise = null; // পরের কল-এ আবার নতুন করে চেষ্টা হবে
+        throw e;
+      }
+    })();
+  }
+  return _fsDepsPromise;
+}
 
 function showToast(m) {
   const t = document.getElementById('toast');
@@ -556,6 +595,24 @@ onAuthStateChanged(auth, async user => {
 
   CU = user;
 
+  // এখনই প্রথমবার Firestore SDK লোড হয় — signed-in নিশ্চিত হওয়ার পরই,
+  // intro screen দেখানোর আগে না।
+  // নিরাপত্তা-জাল: dynamic import slow/flaky নেটওয়ার্কে ব্যর্থ হতে পারে —
+  // ব্যর্থ হলে loading spinner-এ চিরকাল আটকে না থেকে স্পষ্ট রিট্রাই বাটন দেখাই
+  // (ঠিক যেভাবে GPS location-এও reload ছাড়া রিট্রাই করা যায়)।
+  let db, doc, getDoc, setDoc, serverTimestamp;
+  try {
+    ({ db, doc, getDoc, setDoc, serverTimestamp } = await loadFirestoreDeps());
+  } catch (e) {
+    console.warn('loadFirestoreDeps failed:', e);
+    document.getElementById('screen-loading').innerHTML = `
+      <div style="text-align:center;padding:30px 10px">
+        <p style="font-size:13px;color:#c0392b;font-family:'Hind Siliguri',sans-serif;margin-bottom:14px">সংযোগ সমস্যা হয়েছে — লোড করা যায়নি।</p>
+        <button class="submit-btn" style="width:auto;padding:11px 22px" onclick="location.reload()">আবার চেষ্টা করুন</button>
+      </div>`;
+    return;
+  }
+
   // Google/email দিয়ে প্রথমবার এলে users ডকুমেন্ট না থাকতে পারে — বানিয়ে রাখি
   try {
     const uref = doc(db, 'users', user.uid);
@@ -674,6 +731,10 @@ window.submitDonor = async () => {
   btn.disabled = true;
 
   try {
+    // ফর্ম এই মুহূর্তে দেখানোই হয়েছে onAuthStateChanged-এর সফল পথ থেকে,
+    // তাই loadFirestoreDeps() ইতিমধ্যে একবার কল হয়ে গেছে — এখানে আবার
+    // কল করলে ক্যাশ থেকে সাথে সাথেই resolve হয়, নতুন import লাগে না।
+    const { db, doc, writeBatch, updateDoc, serverTimestamp } = await loadFirestoreDeps();
     const coords = COORDS[district] || COORDS[division] || COORDS['ঢাকা'];
     // নিরাপত্তা: phone/wa/facebook/email এখানে রাখা হয় না — সব
     // donorsPrivate-এ আলাদা। donors পাবলিকভাবে পড়া যায় (লগইন ছাড়া
