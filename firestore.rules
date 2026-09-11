@@ -55,8 +55,11 @@ service cloud.firestore {
       // list: লগইন ছাড়াই সার্চ করা যায় (প্রোডাক্ট-এর ইচ্ছাকৃত সিদ্ধান্ত),
       // কিন্তু প্রতিবারে সর্বোচ্চ ৩০টা ডকুমেন্ট — নাহলে পুরো collection
       // একসাথে scrape/download করা সম্ভব হতো। অ্যাডমিন প্যানেলের
-      // মাইগ্রেশন/লিস্ট টুলের জন্য অ্যাডমিনের এই সীমা নেই।
-      allow list: if isAdmin() || request.query.limit <= 30;
+      // মাইগ্রেশন/লিস্ট টুলের জন্য অ্যাডমিনের এই সীমা নেই। aggregation query
+      // (count()/sum() — about.html-এর পাবলিক স্ট্যাটের জন্য) সবসময় অনুমোদিত,
+      // কারণ এটা কখনো কোনো ডকুমেন্টের আসল কনটেন্ট client-এ ফেরত দেয় না —
+      // শুধু একটা সংখ্যা, তাই collection যত বড়ই হোক প্রাইভেসি ঝুঁকি নেই।
+      allow list: if isAdmin() || request.query.limit <= 30 || request.query.aggregations.size() > 0;
 
       allow create: if isOwner(donorId)
         && request.resource.data.uid == donorId
@@ -146,10 +149,11 @@ service cloud.firestore {
     // ── users: প্রতিটা ইউজারের নিজস্ব প্রোফাইল ────────────────────
     match /users/{uid} {
       allow get: if isOwner(uid) || isAdmin();
-      // list কখনোই না — এখানে email থাকে, পুরো ইউজার-তালিকা কারো জন্য
-      // পাবলিক হওয়া চলবে না (admin.html শুধু getCountFromServer ব্যবহার
-      // করে, ডকুমেন্টের কনটেন্ট আনে না — তাই count-এর জন্য list লাগে না)।
-      allow list: if false;
+      // list পাবলিকভাবে কখনোই না — এখানে email থাকে। কিন্তু admin.html-এর
+      // getCountFromServer(collection(db,'users')) (শুধু সংখ্যা, কোনো
+      // document content না) কাজ করতে হলে অ্যাডমিনের জন্য list/aggregation
+      // অনুমতি লাগবে — Firestore একই rule দিয়ে count() ও পুরো list যাচাই করে।
+      allow list: if isAdmin();
       allow create: if isOwner(uid);
       // lastRequestAt শুধু request.html-এর rate-limit ব্যাচ-রাইটে বসে,
       // owner নিজেই লেখে — এখানে আলাদা কিছু লাগে না, owner-write যথেষ্ট।

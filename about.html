@@ -188,7 +188,7 @@ window.adminClick = () => {};
 import { auth, db } from './firebase-config.js';
 import { isSuperAdmin } from './app.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, getDoc, setDoc, addDoc, collection, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, addDoc, collection, query, where, serverTimestamp, getAggregateFromServer, sum, count } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 // admin চেক Firestore rules-এর সাথে মিলিয়ে রাখা হয়েছে (শুধু ইমেইল)
 const userIsAdmin = (u) => isSuperAdmin(u);
 
@@ -259,18 +259,25 @@ function setStat(id, val){
 }
 const toBn = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
 
-try {
-  onSnapshot(
-    query(collection(db,'donors'), where('available','==',true)),
-    snap => {
-      setStat('s-donors', toBn(snap.size));
-      let total = 0;
-      snap.forEach(d => total += (d.data().donations||0));
-      setStat('s-donations', toBn(total));
-    },
-    () => { setStat('s-donors','—'); setStat('s-donations','—'); }
-  );
-} catch(e){ setStat('s-donors','—'); setStat('s-donations','—'); }
+// পারফরম্যান্স (মূল ফিক্স): আগে এখানে available donor-দের পুরো collection
+// (নাম, ছবি সহ — ছবি একেকটা ৭০০KB পর্যন্ত হতে পারে) realtime শোনা হতো,
+// শুধু দুইটা সংখ্যা (donor সংখ্যা + মোট donation) দেখানোর জন্য — কোনো
+// limit ছাড়া, আর প্রতিবার কোনো donor available/unavailable হলেই পুরো
+// ডেটা আবার ডাউনলোড হতো। এখন getAggregateFromServer() দিয়ে সরাসরি
+// সার্ভার-সাইডে গণনা হয় — কোনো ডকুমেন্টের কনটেন্ট client-এ আসেই না,
+// শুধু দুইটা সংখ্যা। এটা realtime না (About পেজের স্ট্যাটে সেকেন্ডে-সেকেন্ডে
+// আপডেট হওয়ার দরকার নেই), তাই একবারই লোড হয়।
+(async () => {
+  try {
+    const q = query(collection(db,'donors'), where('available','==',true));
+    const snap = await getAggregateFromServer(q, {
+      totalDonors: count(),
+      totalDonations: sum('donations')
+    });
+    setStat('s-donors', toBn(snap.data().totalDonors));
+    setStat('s-donations', toBn(snap.data().totalDonations || 0));
+  } catch(e){ setStat('s-donors','—'); setStat('s-donations','—'); }
+})();
 
 // ✅ Feedback submit
 window.submitFeedback = async () => {
