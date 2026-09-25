@@ -804,10 +804,20 @@ function groupByName(list) {
 }
 // exact match সর্বোচ্চ priority; না পেলে fuzzy suggestion — সিস্টেম নিজে থেকে
 // কখনো ভুল location বেছে নেয় না, চূড়ান্ত নির্বাচন সবসময় ব্যবহারকারীর ট্যাপে হয়।
-function resolveLocQuery(q) {
+// BUGFIX (GPS ভুল location): আগে GPS থেকে পাওয়া প্রতিটা candidate নাম সবসময়
+// পুরো দেশের ৫৬৫+ এন্ট্রির ইনডেক্সের বিরুদ্ধে fuzzy-match করা হতো, জেলা কোনো
+// সীমাবদ্ধতা ছাড়াই। এতে ঢাকার একটা এলাকার নাম (যেমন "শ্যামলী") ভুলবশত
+// শত শত কিমি দূরের অন্য জেলার উপজেলার (যেমন সাতক্ষীরার "শ্যামনগর") সাথে
+// মিলে যেতে পারতো, নিছক Levenshtein distance কাছাকাছি হওয়ার কারণে।
+// `pool` প্যারামিটার দিয়ে এখন ইচ্ছা করলে খোঁজ একটা নির্দিষ্ট জেলার
+// এন্ট্রিতে সীমাবদ্ধ রাখা যায় (useGpsLocation ব্যবহার করে, district
+// আগে থেকেই নিশ্চিতভাবে জানা থাকলে) — টাইপ-করা সার্চ (pool ছাড়া কল)
+// আগের মতোই পুরো দেশ জুড়ে কাজ করে, কোনো পরিবর্তন নেই।
+function resolveLocQuery(q, pool) {
   q = q.trim();
   if (!q) return { kind: 'empty' };
-  const substr = getLocIndex().filter(l => l.name.includes(q));
+  const idx = pool || getLocIndex();
+  const substr = idx.filter(l => l.name.includes(q));
   if (substr.length) return { kind: 'matches', groups: groupByName(substr) };
   // BUGFIX: থ্রেশহোল্ড আগে অনেক কড়া ছিল (৩ অক্ষরের বেশি হলেও মাত্র ২)।
   // উপজেলার নাম প্রায়ই ৫-১০ অক্ষরের জটিল যুক্তাক্ষরসহ শব্দ — ফোনের কীবোর্ডে
@@ -815,7 +825,7 @@ function resolveLocQuery(q) {
   // চূড়ান্ত নির্বাচন সবসময় ব্যবহারকারীর ট্যাপে হয় বলে এখানে একটু বেশি
   // উদার হলেও ঝুঁকি নেই — ভুল কিছু নিজে থেকে বেছে নেওয়া হয় না।
   const threshold = q.length <= 3 ? 1 : Math.max(2, Math.ceil(q.length * 0.35));
-  const scored = getLocIndex().map(l => ({ loc: l, d: lev(q, l.name) })).sort((a,b) => a.d - b.d);
+  const scored = idx.map(l => ({ loc: l, d: lev(q, l.name) })).sort((a,b) => a.d - b.d);
   const close = scored.filter(s => s.d <= threshold).slice(0, 5);
   if (close.length) return { kind: 'fuzzy', groups: groupByName(close.map(c => c.loc)) };
   return { kind: 'none' };
@@ -859,17 +869,29 @@ function latinToBengaliRough(input) {
 // GPS-এ confirm ধাপ সবসময় বাধ্যতামূলক (ব্যবহারকারী "হ্যাঁ, খুঁজুন" না চাপলে
 // কিছুই সার্চ হয় না) — তাই এখানে টাইপ-করা সার্চের চেয়ে কিছুটা বেশি উদার
 // হলেও নিরাপদ, ভুল suggestion হলেও ব্যবহারকারী "এলাকা পরিবর্তন করুন" চাপতে পারবেন।
-function matchGpsCandidate(str) {
+// opts.pool — শুধু এই এন্ট্রিগুলোর মধ্যে খুঁজবে (জেলা-সীমাবদ্ধ GPS refine-এর জন্য)।
+// opts.preferTypes — একই নামে একাধিক টাইপ (যেমন "ঢাকা" জেলা ও বিভাগ দুটোই)
+// দ্বন্দ্বপূর্ণভাবে মিললে, এই তালিকার টাইপকে অগ্রাধিকার দেয় — আগে এমন
+// দ্বন্দ্ব হলেই পুরো candidate-টা বাতিল হয়ে যেত, এমনকি সঠিক উত্তর জানা
+// থাকলেও (যেমন state_district ফিল্ড থেকে "ঢাকা" পেলে সেটা যে জেলা, বিভাগ
+// নয়, তা নিশ্চিতভাবেই জানা যায়)।
+function matchGpsCandidate(str, opts) {
   if (!str) return null;
+  opts = opts || {};
   const clean = str.replace(/\s*(Upazila|District|উপজেলা|জেলা)\s*$/i, '').trim();
-  const direct = resolveLocQuery(clean);
+  const pool = opts.pool || getLocIndex();
+  const direct = resolveLocQuery(clean, pool);
   if (direct.kind === 'matches' || direct.kind === 'fuzzy') {
-    const flat = direct.groups.flatMap(g => g.items);
+    let flat = direct.groups.flatMap(g => g.items);
+    if (flat.length > 1 && opts.preferTypes) {
+      const preferred = flat.filter(l => opts.preferTypes.includes(l.type));
+      if (preferred.length === 1) flat = preferred;
+    }
     if (flat.length === 1) return flat[0];
   }
   if (/^[a-zA-Z\s.'-]+$/.test(clean)) {
     const translit = latinToBengaliRough(clean);
-    const scored = getLocIndex().map(l => ({ loc: l, d: lev(translit, l.name) })).sort((a,b) => a.d - b.d);
+    const scored = pool.map(l => ({ loc: l, d: lev(translit, l.name) })).sort((a,b) => a.d - b.d);
     if (scored.length && scored[0].d <= 2) return scored[0].loc;
   }
   return null;
@@ -902,9 +924,11 @@ function renderGpsZone() {
       if (SELECTED_GROUP) searchDonors();
     };
     zone.querySelector('[data-gps-no]').onclick = () => { gpsState = { status: 'idle', matched: null }; renderGpsZone(); };
-  } else if (gpsState.status === 'denied' || gpsState.status === 'notfound') {
+  } else if (gpsState.status === 'denied' || gpsState.status === 'notfound' || gpsState.status === 'lowaccuracy') {
     const msg = gpsState.status === 'denied'
-      ? 'লোকেশন অনুমতি পাওয়া যায়নি (বা এই ব্রাউজারে সমর্থিত নয়)। নিচে এলাকার নাম লিখে খুঁজুন।'
+      ? 'আপনার বর্তমান অবস্থান নির্ভুলভাবে পাওয়া যাচ্ছে না। অনুগ্রহ করে location permission চালু করে আবার চেষ্টা করুন।'
+      : gpsState.status === 'lowaccuracy'
+      ? 'আপনার অবস্থান নির্ভুলভাবে শনাক্ত করা যায়নি (GPS সিগন্যাল দুর্বল)। ভুল এলাকা দেখানোর ঝুঁকি এড়াতে অনুগ্রহ করে নিচে এলাকার নাম লিখে নিজে খুঁজুন।'
       : 'আপনার এলাকা সঠিকভাবে শনাক্ত করা যায়নি। নিচে দেওয়া সাজেশন থেকে বেছে নিন, অথবা নিজে লিখে খুঁজুন।';
     zone.innerHTML = `<div class="gps-zone"><div class="gps-denied">${esc(msg)}<div><button data-gps-dismiss>ঠিক আছে</button></div></div></div>`;
     zone.querySelector('[data-gps-dismiss]').onclick = () => { gpsState = { status: 'idle', matched: null }; renderGpsZone(); };
@@ -931,10 +955,80 @@ function renderGpsZone() {
 // অনুরোধের দেরিতে-আসা callback যেন নতুন অনুরোধের অবস্থা ওভাররাইট না করে।
 let gpsRequestToken = 0;
 
-function useGpsLocation() {
+// GPS সিগন্যাল দুর্বল হলে ব্রাউজার/OS নেটওয়ার্ক-ভিত্তিক (WiFi/সেল-টাওয়ার)
+// আনুমানিক অবস্থান দেয়, যার ভুলের পরিসীমা কয়েক কিমি থেকে কয়েক দশ কিমি
+// পর্যন্ত হতে পারে। এত বড় ভুলের পরিসীমা নিয়ে একটা নির্দিষ্ট এলাকা/উপজেলা
+// আত্মবিশ্বাসের সাথে দেখানো বিপজ্জনক — তাই একটা সীমা রাখা হলো।
+const GPS_ACCURACY_THRESHOLD_M = 10000;
+
+// BUGFIX (আসল কারণ — root cause, এম্পিরিক্যালি যাচাই করা):
+// আগে GPS থেকে পাওয়া প্রতিটা candidate নাম (county, suburb ইত্যাদি) কোনো
+// জেলার সীমাবদ্ধতা ছাড়াই পুরো দেশের ৫৬৫+ এন্ট্রির ইনডেক্সের বিরুদ্ধে
+// fuzzy-match করা হতো। ঢাকা শহর যেহেতু কোনো উপজেলায় বিভক্ত নয় (এটা একটা
+// City Corporation/মহানগর), OpenStreetMap-এর county ফিল্ড ঢাকার জন্য
+// "ঢাকা মহানগর" ফেরত দেয় — যা আমাদের ডেটাসেটে নেই, তাই ব্যর্থ হয়। এরপর
+// state_district থেকে পাওয়া "ঢাকা" জেলা/বিভাগ দুই নামেই মিলে যাওয়ায়
+// (দ্বন্দ্ব) আগের কোড সেটাও বাতিল করে দিত, এবং শেষে suburb-এর মতো
+// hyper-local নাম (যেমন "শ্যামলী") পুরো দেশ জুড়ে fuzzy-match করতে গিয়ে
+// সম্পূর্ণ ভিন্ন, বহু দূরের একটা উপজেলার (যেমন সাতক্ষীরার "শ্যামনগর",
+// ভিন্ন বিভাগ, ~৩০০ কিমি দূরে, মাত্র Levenshtein distance ৩ কাছাকাছি
+// বানানের কারণে) সাথে ভুলভাবে মিলে যেত — এটাই "ঢাকায় থেকেও ভুল location"
+// বাগের প্রকৃত, নিশ্চিতভাবে reproduce করা কারণ।
+//
+// ফিক্স: state_district ফিল্ড (বাংলাদেশে সবসময় নির্ভরযোগ্যভাবে জেলার নাম
+// বহন করে, ঢাকা মহানগরেও ব্যতিক্রম নয়) দিয়ে প্রথমে জেলা নিশ্চিত করা হয়।
+// এরপর আরও নির্দিষ্ট এলাকা (উপজেলা/লোকালিটি) খোঁজা হয় শুধুমাত্র সেই
+// জেলার এন্ট্রির মধ্যেই — কখনো জেলার বাইরে না। নির্দিষ্ট কিছু না মিললেও
+// অন্তত নিশ্চিতভাবে সঠিক জেলা-স্তরের ফলাফল (যেমন "ঢাকা জেলা জুড়ে")
+// দেখানো হয়, ভুল/দূরবর্তী কিছু অনুমান করার বদলে।
+function resolveGpsAddress(addr) {
+  const anchor = addr.state_district ? matchGpsCandidate(addr.state_district, { preferTypes: ['district'] }) : null;
+
+  const specificFields = [
+    addr.county, addr.city, addr.suburb, addr.neighbourhood, addr.borough,
+    addr.quarter, addr.town, addr.city_district, addr.municipality, addr.village
+  ].filter(Boolean);
+
+  if (anchor && anchor.type === 'district') {
+    const pool = getLocIndex().filter(l => l.district === anchor.name && (l.type === 'upazila' || l.type === 'locality'));
+    if (pool.length) {
+      for (const c of specificFields) {
+        const specific = matchGpsCandidate(c, { pool });
+        if (specific) return specific; // জেলা + আরও নির্দিষ্ট এলাকা দুটোই নিশ্চিত — সর্বোচ্চ নির্ভুলতা
+      }
+    }
+    return anchor; // জেলা নিশ্চিত, তার চেয়ে নির্দিষ্ট কোনো এলাকা আমাদের তালিকায় নেই — পুরো জেলা জুড়ে খোঁজাই সঠিক ও নিরাপদ
+  }
+
+  // state_district থেকে জেলা নিশ্চিত করা গেল না (বিরল, অসম্পূর্ণ OSM ডেটা) —
+  // শেষ চেষ্টা হিসেবে পুরো দেশ জুড়ে মেলানো, কিন্তু county-কে অগ্রাধিকারের
+  // শুরুতে রাখা হয়নি যেহেতু ঢাকায় সেটাই মূল বিভ্রান্তির উৎস ছিল।
+  for (const c of specificFields) {
+    const m = matchGpsCandidate(c);
+    if (m) return m;
+  }
+  return null;
+}
+
+async function useGpsLocation() {
   if (!navigator.geolocation) { gpsState = { status: 'denied', matched: null }; renderGpsZone(); return; }
   // একই সময়ে একাধিক GPS অনুরোধ (যেমন বাটনে দ্রুত দুইবার ট্যাপ) ঠেকাই
   if (gpsState.status === 'pending') return;
+
+  // আগে থেকেই permission 'denied' থাকলে (ব্রাউজার সেটিংস থেকে ব্লক করা),
+  // getCurrentPosition() কল করে অপ্রয়োজনীয় রাউন্ড-ট্রিপ/অপেক্ষা না করিয়ে
+  // সরাসরি সঠিক বার্তা দেখাই। Permissions API সব ব্রাউজারে (বিশেষত পুরনো
+  // Safari) সমর্থিত নয় বলে try/catch দিয়ে গ্রেসফুলি এড়িয়ে যাই।
+  try {
+    if (navigator.permissions?.query) {
+      const status = await navigator.permissions.query({ name: 'geolocation' });
+      if (status.state === 'denied') {
+        gpsState = { status: 'denied', matched: null };
+        renderGpsZone();
+        return;
+      }
+    }
+  } catch (e) { /* Permissions API সমর্থিত নয় — স্বাভাবিক getCurrentPosition() প্রবাহে এগিয়ে যাই */ }
 
   const myToken = ++gpsRequestToken;
   gpsState = { status: 'pending', matched: null };
@@ -945,34 +1039,35 @@ function useGpsLocation() {
   // না (একটা পরিচিত WebView সীমাবদ্ধতা, বিশেষত একই পেজ-সেশনে দ্বিতীয়বার
   // লোকেশন চাইলে)। তখন UI চিরকাল "শনাক্ত হচ্ছে..." স্পিনারে আটকে থাকতো —
   // এটাই ছিল "page reload ছাড়া আবার ব্যবহার করা যাচ্ছে না" বাগের আসল কারণ।
-  // এই independent সেফটি-টাইমার নিশ্চিত করে native callback না এলেও ১২
-  // সেকেন্ড পর UI নিজে থেকেই মুক্ত হয়ে যায়, পেজ রিলোড লাগে না।
+  // এই independent সেফটি-টাইমার নিশ্চিত করে native callback না এলেও উপযুক্ত
+  // সময় পর UI নিজে থেকেই মুক্ত হয়ে যায়, পেজ রিলোড লাগে না। enableHighAccuracy
+  // চালু থাকায় GPS ফিক্স পেতে কিছুটা বেশি সময় লাগতে পারে বলে টাইমআউট
+  // কিছুটা বাড়ানো হলো (আগে ১০/১২ সেকেন্ড, এখন ১৫/১৭)।
   const safetyTimer = setTimeout(() => {
     if (myToken === gpsRequestToken && gpsState.status === 'pending') {
       gpsState = { status: 'notfound', matched: null, rawGuess: '' };
       renderGpsZone();
     }
-  }, 12000);
+  }, 17000);
 
   navigator.geolocation.getCurrentPosition(async pos => {
     clearTimeout(safetyTimer);
     if (myToken !== gpsRequestToken) return; // ইতিমধ্যে বাতিল হওয়া পুরনো অনুরোধ
     try {
-      const { latitude, longitude } = pos.coords;
+      const { latitude, longitude, accuracy } = pos.coords;
+      // GPS সিগন্যাল দুর্বল হলে (accuracy-এর মান বড়, মিটারে) একটা নির্দিষ্ট
+      // এলাকা আত্মবিশ্বাসের সাথে অনুমান/প্রদর্শন করি না — ব্যবহারকারীকে
+      // সরাসরি জানিয়ে ম্যানুয়াল সার্চের পরামর্শ দিই।
+      if (typeof accuracy === 'number' && accuracy > GPS_ACCURACY_THRESHOLD_M) {
+        gpsState = { status: 'lowaccuracy', matched: null };
+        renderGpsZone();
+        return;
+      }
       const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&addressdetails=1&accept-language=bn,en&zoom=14`);
       if (!resp.ok) throw new Error('geocode failed');
       const data = await resp.json();
       const addr = data.address || {};
-      // BD-তে OpenStreetMap-এর ঠিকানা কাঠামোয় সাধারণত county≈উপজেলা,
-      // state_district≈জেলা, suburb/neighbourhood≈স্থানীয় এলাকা — এই
-      // ক্রমে চেষ্টা করি (প্রশাসনিক স্তর আগে, বেশি নির্ভরযোগ্য), আর
-      // OSM-ভেদে ভিন্ন ভিন্ন ফিল্ড আসতে পারে বলে যতগুলো সম্ভব চেষ্টা করি।
-      const candidates = [
-        addr.county, addr.state_district, addr.suburb, addr.neighbourhood,
-        addr.town, addr.city_district, addr.municipality, addr.village, addr.district
-      ].filter(Boolean);
-      let matched = null;
-      for (const c of candidates) { matched = matchGpsCandidate(c); if (matched) break; }
+      const matched = resolveGpsAddress(addr);
       if (myToken !== gpsRequestToken) return;
       if (matched) {
         gpsState = { status: 'confirm', matched };
@@ -980,22 +1075,28 @@ function useGpsLocation() {
         // পুরোপুরি মেলাতে না পারলেও ব্যবহারকারীকে খালি হাতে ফেরত পাঠাই না —
         // OSM যা বলেছে (হোক বাংলা বা ইংরেজি) সেটা সার্চ-বক্সে বসিয়ে দিই,
         // যাতে ব্যবহারকারী নিজে সেখান থেকে সঠিক suggestion বেছে নিতে পারেন।
-        gpsState = { status: 'notfound', matched: null, rawGuess: candidates[0] || '' };
+        const rawGuess = addr.state_district || addr.county || addr.city || addr.suburb || '';
+        gpsState = { status: 'notfound', matched: null, rawGuess };
       }
     } catch (e) {
       if (myToken !== gpsRequestToken) return;
       gpsState = { status: 'notfound', matched: null, rawGuess: '' };
     }
     renderGpsZone();
-  }, () => {
+  }, err => {
     clearTimeout(safetyTimer);
     if (myToken !== gpsRequestToken) return;
-    gpsState = { status: 'denied', matched: null };
+    // err.code === 1 (PERMISSION_DENIED) হলেই শুধু "permission" বার্তা —
+    // অন্য কারণে (2=POSITION_UNAVAILABLE, 3=TIMEOUT) ব্যর্থ হলে সেটাকে
+    // ভুলভাবে "অনুমতি নেই" বলা হতো, যদিও অনুমতি আসলে দেওয়াই ছিল।
+    gpsState = err && err.code === 1 ? { status: 'denied', matched: null } : { status: 'notfound', matched: null, rawGuess: '' };
     renderGpsZone();
   // BUGFIX: maximumAge আগে ৫ মিনিট ছিল — রিট্রাই করলেও ব্রাউজার পুরনো
   // cached কোঅর্ডিনেট ফেরত দিতে পারতো ("নতুন request → নতুন result" এই
   // প্রত্যাশার বিপরীত)। এখন 0 — প্রতিবার সত্যিকারের তাজা GPS ফিক্স।
-  }, { timeout: 10000, maximumAge: 0 });
+  // enableHighAccuracy: true — device-এর প্রকৃত GPS চিপ ব্যবহার করতে বলে,
+  // যাতে নেটওয়ার্ক/WiFi-ভিত্তিক কম-নির্ভুল ফিক্সের উপর নির্ভর করতে না হয়।
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
 }
 
 function renderLocSearchResults() {
