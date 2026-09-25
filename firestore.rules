@@ -220,6 +220,14 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── settings: সাইট-লেভেল সেটিংস (about.html-এর founder ছবি) ─────
+    // about.html সবাইকে (লগইন ছাড়াও) founder-এর ছবি দেখায়, তাই get
+    // পাবলিক — কিন্তু বদলানো/লেখা শুধু অ্যাডমিন করতে পারবেন।
+    match /settings/{docId} {
+      allow get: if true;
+      allow write: if isAdmin();
+    }
+
     // ── বাকি সবকিছু ডিফল্টভাবে বন্ধ ─────────────────────────────
     match /{document=**} {
       allow read, write: if false;
