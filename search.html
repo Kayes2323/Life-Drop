@@ -126,6 +126,9 @@
 .gps-confirm-btns button{flex:1;height:40px;border-radius:10px;border:none;font-family:'Hind Siliguri',sans-serif;font-weight:700;font-size:12px;cursor:pointer}
 .gps-confirm-btns .yes{background:#c0392b;color:#fff}
 .gps-confirm-btns .no{background:#fff;color:#555;border:1.5px solid #f0e6e1}
+.gps-ambig-btns{display:flex;gap:8px;margin-top:11px}
+.gps-ambig-btns button{flex:1;height:40px;border-radius:10px;border:1.5px solid #f7d9d5;background:#fff;color:#c0392b;font-weight:700;font-size:12.5px;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.gps-ambig-manual{margin-top:9px;text-align:center;font-size:11px;color:#999;background:none;border:none;text-decoration:underline;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
 .gps-denied{background:#fdecea;border-radius:12px;padding:13px;font-size:12px;color:#8a4426;line-height:1.6;font-family:'Hind Siliguri',sans-serif}
 .gps-denied button{margin-top:9px;background:#fff;border:1.5px solid #f7d9d5;color:#8a4426;font-weight:700;font-size:11.5px;padding:8px 14px;border-radius:9px;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
 .search-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:14px;font-weight:700;font-family:'Hind Siliguri',sans-serif;cursor:pointer;background:#eee;color:#bbb;transition:.15s}
@@ -716,11 +719,146 @@ window.resetFilters = () => {
 // UPAZILAS একই app.js ডেটাসেট থেকে — নতুন কোনো ডেটা বানানো হয়নি।
 // ══════════════════════════════════════════════════════════════
 
-// ঢাকা সিটির পরিচিত এলাকা — এগুলো প্রশাসনিক "উপজেলা" নয় (ঢাকা শহর আসলে
-// কোনো উপজেলায় ভাগ হয় না), তাই আলাদাভাবে "locality" হিসেবে রাখা হলো।
-// ডোনার ডেটায় এখনো locality-নির্দিষ্ট কোনো ফিল্ড নেই, তাই এগুলো বাছলে
-// পুরো ঢাকা জেলা জুড়ে খোঁজা হয় — এলাকা-নির্দিষ্ট করে বলা হয় না যা সত্যি নয়।
-const DHAKA_LOCALITIES = ['মোহাম্মদপুর','ফার্মগেট','মিরপুর','ধানমন্ডি','উত্তরা','গুলশান','বনানী','মহাখালী','মতিঝিল','মালিবাগ','তেজগাঁও','বাড্ডা','রামপুরা','যাত্রাবাড়ী'];
+// ── ঢাকা মেট্রোপলিটন লোকালিটি লেয়ার ──────────────────────────────
+// এগুলো প্রশাসনিক "উপজেলা" নয় (ঢাকা শহর আসলে কোনো উপজেলায় ভাগ হয় না) —
+// এটা মূল Division→District→Upazila hierarchy-এর উপর একটা OPTIONAL,
+// আলাদা city-locality লেয়ার (area_type:'locality'), কখনো উপজেলা হিসেবে
+// fake করা হয় না। ডোনার ডেটায় এখনো locality-নির্দিষ্ট কোনো ফিল্ড নেই,
+// তাই এগুলো বাছলে পুরো ঢাকা জেলা জুড়ে খোঁজা হয় (mappedAdministrativeArea
+// = জেলা:ঢাকা, বিভাগ:ঢাকা) — এলাকা-নির্দিষ্ট করে বলা হয় না যা সত্যি নয়।
+//
+// উৎস: Dhaka North City Corporation (৫৪ ওয়ার্ড, ১০ জোন) ও Dhaka South
+// City Corporation (৭৫ ওয়ার্ড)-এর official ward/area কভারেজ (DNCC/DSCC
+// ওয়েবসাইট + en.wikipedia.org/wiki/Dhaka_{North,South}_City_Corporation-এর
+// "Councillors" টেবিলে তালিকাভুক্ত "Locations Covered")। প্রতিটা এলাকার
+// `aliases`-এ বাংলা ভ্যারিয়েন্ট + ইংরেজি নাম রাখা হয়েছে — GPS reverse-geocoding
+// (OpenStreetMap Nominatim) প্রায়ই ইংরেজি নাম ফেরত দেয়, আর alias দিয়ে সরাসরি
+// exact মিল পাওয়া গেলে সেটা loose Levenshtein/transliteration অনুমানের
+// চেয়ে অনেক বেশি নির্ভরযোগ্য।
+const DHAKA_AREAS = [
+  // DNCC উত্তর/উত্তরা-বিমানবন্দর অঞ্চল
+  { name: 'উত্তরা', aliases: ['Uttara','Uttora','উত্তরা মডেল টাউন','Uttara Model Town'] },
+  { name: 'আব্দুল্লাহপুর', aliases: ['Abdullahpur'] },
+  { name: 'আজমপুর', aliases: ['Azampur'] },
+  { name: 'বিমানবন্দর', aliases: ['Airport','Bimanbandar','Kurmitola Airport','Hazrat Shahjalal Airport','Shahjalal Airport'] },
+  { name: 'খিলক্ষেত', aliases: ['Khilkhet'] },
+  { name: 'কুড়িল', aliases: ['Kuril','কুড়িল বিশ্বরোড','Kuril Bishwaroad'] },
+  { name: 'কুর্মিটোলা', aliases: ['Kurmitola'] },
+  { name: 'বসুন্ধরা', aliases: ['Bashundhara','Bosundhara'] },
+  { name: 'বারিধারা', aliases: ['Baridhara'] },
+  { name: 'শাহজাদপুর', aliases: ['Shahjadpur'] },
+  { name: 'ভাটারা', aliases: ['Bhatara','Vatara'] },
+  { name: 'উত্তরখান', aliases: ['Uttarkhan'] },
+  { name: 'দক্ষিণখান', aliases: ['Dakshinkhan'] },
+  { name: 'আশকোনা', aliases: ['Ashkona'] },
+  { name: 'কাওলা', aliases: ['Kaola'] },
+  { name: 'ডুমনি', aliases: ['Dumni'] },
+  { name: 'বেরাইদ', aliases: ['Beraid'] },
+  { name: 'দিয়াবাড়ী', aliases: ['Diyabari'] },
+  // DNCC মিরপুর-মোহাম্মদপুর অঞ্চল
+  { name: 'মিরপুর', aliases: ['Mirpur'] },
+  { name: 'পল্লবী', aliases: ['Pallabi'] },
+  { name: 'রূপনগর', aliases: ['Rupnagar'] },
+  { name: 'কালশী', aliases: ['Kalshi'] },
+  { name: 'ইসিবি চত্বর', aliases: ['ECB','ECB Chattar'] },
+  { name: 'দুয়ারীপাড়া', aliases: ['Duaripara'] },
+  { name: 'শাহআলী', aliases: ['Shah Ali','Shahali'] },
+  { name: 'দারুস সালাম', aliases: ['Darus Salam','Darussalam'] },
+  { name: 'কাফরুল', aliases: ['Kafrul'] },
+  { name: 'ইব্রাহিমপুর', aliases: ['Ibrahimpur'] },
+  { name: 'কাজীপাড়া', aliases: ['Kazipara'] },
+  { name: 'শেওড়াপাড়া', aliases: ['Sheorapara','Shewrapara'] },
+  { name: 'ভাষানটেক', aliases: ['Bhashantek'] },
+  { name: 'গাবতলী', aliases: ['Gabtoli'] },
+  { name: 'আমিনবাজার', aliases: ['Amin Bazaar','Aminbazar'] },
+  { name: 'কল্যাণপুর', aliases: ['Kalyanpur'] },
+  { name: 'আগারগাঁও', aliases: ['Agargaon'] },
+  { name: 'শ্যামলী', aliases: ['Shyamoli','Shamoli'] },
+  { name: 'শের-ই-বাংলা নগর', aliases: ['Sher-e-Bangla Nagar','Sher-e Bangla Nagar'] },
+  { name: 'তেজতুরী বাজার', aliases: ['Tejturi Bazar'] },
+  { name: 'মোহাম্মদপুর', aliases: ['Mohammadpur'] },
+  { name: 'আদাবর', aliases: ['Adabor'] },
+  { name: 'শেখেরটেক', aliases: ['Shekhertek'] },
+  { name: 'লালমাটিয়া', aliases: ['Lalmatia'] },
+  { name: 'বসিলা', aliases: ['Bosila'] },
+  { name: 'রায়েরবাজার', aliases: ['Rayer Bazar'] },
+  // ধানমন্ডি-ফার্মগেট-তেজগাঁও-গুলশান অঞ্চল
+  { name: 'ধানমন্ডি', aliases: ['Dhanmondi','Dhanmandi','জিগাতলা','Jigatola','পশ্চিম ধানমন্ডি','West Dhanmondi'] },
+  { name: 'কলাবাগান', aliases: ['Kalabagan'] },
+  { name: 'নিউ মার্কেট', aliases: ['New Market','Newmarket'] },
+  { name: 'আজিমপুর', aliases: ['Azimpur'] },
+  { name: 'নীলক্ষেত', aliases: ['Nilkhet'] },
+  { name: 'ফার্মগেট', aliases: ['Farmgate'] },
+  { name: 'তেজগাঁও', aliases: ['Tejgaon'] },
+  { name: 'কারওয়ান বাজার', aliases: ['Karwan Bazar','Kawran Bazar'] },
+  { name: 'নাখালপাড়া', aliases: ['Nakhalpara'] },
+  { name: 'মহাখালী', aliases: ['Mohakhali'] },
+  { name: 'নিকেতন', aliases: ['Niketan'] },
+  { name: 'বনানী', aliases: ['Banani'] },
+  { name: 'গুলশান', aliases: ['Gulshan'] },
+  { name: 'কড়াইল', aliases: ['Korail'] },
+  { name: 'বাড্ডা', aliases: ['Badda'] },
+  { name: 'মেরুল বাড্ডা', aliases: ['Merul Badda'] },
+  { name: 'রামপুরা', aliases: ['Rampura'] },
+  { name: 'মালিবাগ', aliases: ['Malibagh','Malibag'] },
+  { name: 'খিলগাঁও', aliases: ['Khilgaon'] },
+  { name: 'বাসাবো', aliases: ['Bashabo'] },
+  { name: 'মগবাজার', aliases: ['Moghbazar','Mogbazar'] },
+  { name: 'এসকাটন', aliases: ['Eskaton'] },
+  { name: 'সিদ্ধেশ্বরী', aliases: ['Siddheshwari'] },
+  // পুরান/মধ্য ঢাকা — শাহবাগ, রমনা, মতিঝিল, পুরান ঢাকা অঞ্চল
+  { name: 'শাহবাগ', aliases: ['Shahbag','Shahbagh'] },
+  { name: 'ঢাকা বিশ্ববিদ্যালয় এলাকা', aliases: ['Dhaka University','DU Area','Dhaka University Area'] },
+  { name: 'রমনা', aliases: ['Ramna'] },
+  { name: 'কাকরাইল', aliases: ['Kakrail'] },
+  { name: 'শান্তিনগর', aliases: ['Shantinagar'] },
+  { name: 'পল্টন', aliases: ['Paltan'] },
+  { name: 'ফকিরাপুল', aliases: ['Fakirapool'] },
+  { name: 'আরামবাগ', aliases: ['Arambagh'] },
+  { name: 'সেগুনবাগিচা', aliases: ['Segunbagicha'] },
+  { name: 'মতিঝিল', aliases: ['Motijheel','Motijhil'] },
+  { name: 'গুলিস্তান', aliases: ['Gulistan'] },
+  { name: 'সবুজবাগ', aliases: ['Sabujbagh'] },
+  { name: 'মুগদা', aliases: ['Mugda'] },
+  { name: 'মাদারটেক', aliases: ['Madartek'] },
+  { name: 'শাহজাহানপুর', aliases: ['Shahjahanpur'] },
+  { name: 'হাতিরঝিল', aliases: ['Hatirjheel'] },
+  { name: 'গোপীবাগ', aliases: ['Gopibagh'] },
+  { name: 'ওয়ারী', aliases: ['Wari'] },
+  { name: 'টিকাটুলি', aliases: ['Tikatuli'] },
+  { name: 'দয়াগঞ্জ', aliases: ['Dayaganj'] },
+  { name: 'নারিন্দা', aliases: ['Narinda'] },
+  { name: 'ইংলিশ রোড', aliases: ['English Road'] },
+  { name: 'নবাবপুর', aliases: ['Nawabpur'] },
+  { name: 'জনসন রোড', aliases: ['Johnson Road'] },
+  { name: 'পুরান ঢাকা', aliases: ['Old Dhaka','Purana Dhaka'] },
+  { name: 'লালবাগ', aliases: ['Lalbagh'] },
+  { name: 'চকবাজার', aliases: ['Chawkbazar','Chalk Bazar'] },
+  { name: 'বকশীবাজার', aliases: ['Bakshibazar'] },
+  { name: 'সদরঘাট', aliases: ['Sadarghat'] },
+  { name: 'ওয়াইজঘাট', aliases: ['Wiseghat'] },
+  { name: 'ফরাশগঞ্জ', aliases: ['Farashganj'] },
+  { name: 'মিটফোর্ড', aliases: ['Mitford'] },
+  { name: 'বাবুবাজার', aliases: ['Babubazar'] },
+  { name: 'হাজারীবাগ', aliases: ['Hazaribagh'] },
+  { name: 'কামরাঙ্গীরচর', aliases: ['Kamrangirchar'] },
+  { name: 'বংশাল', aliases: ['Bangshal'] },
+  { name: 'কোতোয়ালী', aliases: ['Kotwali'] },
+  { name: 'সূত্রাপুর', aliases: ['Sutrapur'] },
+  { name: 'গেন্ডারিয়া', aliases: ['Gandaria'] },
+  // যাত্রাবাড়ী-ডেমরা অঞ্চল (DSCC পূর্বাংশ)
+  { name: 'যাত্রাবাড়ী', aliases: ['Jatrabari'] },
+  { name: 'ধলপুর', aliases: ['Dhalpur'] },
+  { name: 'সায়েদাবাদ', aliases: ['Sayedabad','সায়দাবাদ'] },
+  { name: 'শ্যামপুর', aliases: ['Shyampur'] },
+  { name: 'কদমতলী', aliases: ['Kadamtali'] },
+  { name: 'পোস্তগোলা', aliases: ['Postogola'] },
+  { name: 'জুরাইন', aliases: ['Jurain'] },
+  { name: 'দনিয়া', aliases: ['Donia'] },
+  { name: 'ডেমরা', aliases: ['Demra'] },
+  { name: 'সারুলিয়া', aliases: ['Sarulia'] },
+  { name: 'মাতুয়াইল', aliases: ['Matuail'] },
+];
 
 function findDivision(district) {
   for (const div of DIVISIONS) if ((DISTRICTS[div] || []).includes(district)) return div;
@@ -748,17 +886,17 @@ function dedupeLocations(list) {
 // না, কিন্তু জেলা জানেন), আগে কোনো ফলাফলই আসতো না, এমনকি বানান হুবহু
 // ঠিক থাকলেও। এখন জেলা ও বিভাগও সার্চযোগ্য — বাছলে পুরো জেলা/বিভাগ
 // জুড়ে খোঁজা হয়, "locality"-এর মতোই।
-// পারফরম্যান্স: ৫৬৫+ এন্ট্রি (৪৯৪ উপজেলা + ১৪ এলাকা + ৬৪ জেলা + ৮ বিভাগ)
-// map/flatMap/dedupe করে বানানো এই ইনডেক্সটা আগে module load-এর সাথে সাথেই
-// তৈরি হতো — সার্চ পেজে ঢুকলেই, এলাকা-সার্চ কখনো ব্যবহার না করলেও এই কাজটা
-// হয়ে যেত, যা প্রথম রেন্ডার/interactive হওয়ার সময় (TTI) বাড়াতো, বিশেষত
-// কম শক্তিশালী ফোনে। এখন lazy — প্রথমবার সত্যিই দরকার হলে (টাইপ করা বা GPS
-// ব্যবহার করলে) তৈরি হয়, তারপর ক্যাশ থাকে।
+// পারফরম্যান্স: ৬৭০+ এন্ট্রি (৪৯৪ উপজেলা + ১১৮ ঢাকা লোকালিটি + ৬৪ জেলা +
+// ৮ বিভাগ) map/flatMap/dedupe করে বানানো এই ইনডেক্সটা আগে module load-এর
+// সাথে সাথেই তৈরি হতো — সার্চ পেজে ঢুকলেই, এলাকা-সার্চ কখনো ব্যবহার না
+// করলেও এই কাজটা হয়ে যেত, যা প্রথম রেন্ডার/interactive হওয়ার সময় (TTI)
+// বাড়াতো, বিশেষত কম শক্তিশালী ফোনে। এখন lazy — প্রথমবার সত্যিই দরকার
+// হলে (টাইপ করা বা GPS ব্যবহার করলে) তৈরি হয়, তারপর ক্যাশ থাকে।
 let _locIndexCache = null;
 function getLocIndex() {
   if (_locIndexCache) return _locIndexCache;
   _locIndexCache = dedupeLocations([
-    ...DHAKA_LOCALITIES.map(name => ({ name: name.trim(), type: 'locality', district: 'ঢাকা', division: 'ঢাকা' })),
+    ...DHAKA_AREAS.map(a => ({ name: a.name.trim(), type: 'locality', district: 'ঢাকা', division: 'ঢাকা', aliases: a.aliases })),
     ...Object.entries(UPAZILAS).flatMap(([dist, ups]) =>
       ups.map(u => ({ name: u.trim(), type: 'upazila', district: dist, division: findDivision(dist) }))
     ),
@@ -837,7 +975,7 @@ function resolveLocQuery(q, pool) {
 // coordinates → এলাকার নাম বের করে, আমাদের নিজস্ব LOC_INDEX-এর সাথে মেলায়।
 // কোনো coordinate কখনো সংরক্ষণ বা অন্য কারো কাছে দেখানো হয় না — শুধু এই
 // একবারের reverse-geocode কলে ব্যবহার হয়, মেমোরিতেই থেকে যায়।
-let gpsState = { status: 'idle', matched: null }; // idle | pending | confirm | denied | notfound
+let gpsState = { status: 'idle', matched: null }; // idle | pending | confirm | ambiguous | denied | notfound | lowaccuracy
 
 // GPS থেকে পাওয়া ইংরেজি নাম বাংলার সাথে মেলানোর জন্য — এটা সাধারণ
 // Banglish টাইপিং সার্চের জন্য যথেষ্ট নির্ভরযোগ্য নয় বলে বাদ দেওয়া হয়েছে
@@ -880,6 +1018,33 @@ function matchGpsCandidate(str, opts) {
   opts = opts || {};
   const clean = str.replace(/\s*(Upazila|District|উপজেলা|জেলা)\s*$/i, '').trim();
   const pool = opts.pool || getLocIndex();
+
+  // ধাপ ০ (সর্বোচ্চ অগ্রাধিকার, সবচেয়ে নির্ভুল): curated `aliases`-এর সাথে
+  // exact (case-insensitive) মিল। Nominatim প্রায়ই ইংরেজি নামে এলাকা ফেরত
+  // দেয় (যেমন "Shyamoli") — আগে এটা শুধু ঢিলেঢালা Levenshtein/rough-
+  // transliteration দিয়ে অনুমান করা হতো (self-documented ~৬৩% নির্ভুলতা)।
+  // aliases দিয়ে সরাসরি ও নির্ভুলভাবে মেলানো যায়, অনুমানের দরকার হয় না।
+  const aliasHit = pool.filter(l => l.aliases && l.aliases.some(a => a.toLowerCase() === clean.toLowerCase()));
+  if (aliasHit.length === 1) return aliasHit[0];
+
+  // ধাপ ১: pool-এর কোনো এন্ট্রির নামের সাথে হুবহু (exact) মিল — এটা
+  // resolveLocQuery-এর সাধারণ substring-ম্যাচের আগেই আলাদাভাবে চেক করা
+  // হয়। BUGFIX (এম্পিরিক্যালি ধরা পড়া): নইলে "বাড্ডা" নিজেই "মেরুল বাড্ডা"
+  // নামের ভেতরেও substring হিসেবে ধরা পড়ে, ফলে হুবহু-মেলা একটা নামও
+  // ভুয়া "দ্বন্দ্ব" (২টা candidate) হিসেবে বাতিল হয়ে যেত।
+  const exactHit = pool.filter(l => l.name === clean);
+  if (exactHit.length === 1) return exactHit[0];
+
+  // strict মোডে (GPS-এর locality-tier ফিল্ডের জন্য ব্যবহৃত) এখানেই থেমে
+  // যাই — ঢিলেঢালা substring/Levenshtein/transliteration অনুমান করি না।
+  // কারণ: OSM-এর quarter/neighbourhood প্রায়ই পুরান ঢাকার এমন সব
+  // hyperlocal মহল্লার নাম দেয় যা আমাদের curated তালিকায় নেই, আর সেগুলোর
+  // সাথে জোর করে "কাছাকাছি" কিছু একটা মেলাতে গেলে ভুল এলাকা suggest হওয়ার
+  // ঝুঁকি থাকে (এম্পিরিক্যালি ধরা পড়েছে: "এনায়েতগঞ্জ" ভুলভাবে "ফরাশগঞ্জ"-এর
+  // সাথে মিলে যেত নিছক বানানের কাছাকাছি হওয়ায়)। না মেলা মানেই honest
+  // "নির্দিষ্ট কিছু পাওয়া যায়নি", অনুমান নয়।
+  if (opts.strict) return null;
+
   const direct = resolveLocQuery(clean, pool);
   if (direct.kind === 'matches' || direct.kind === 'fuzzy') {
     let flat = direct.groups.flatMap(g => g.items);
@@ -924,6 +1089,34 @@ function renderGpsZone() {
       if (SELECTED_GROUP) searchDonors();
     };
     zone.querySelector('[data-gps-no]').onclick = () => { gpsState = { status: 'idle', matched: null }; renderGpsZone(); };
+  } else if (gpsState.status === 'ambiguous' && gpsState.candidates && gpsState.candidates.length >= 2) {
+    // BOUNDARY-এর কাছাকাছি অবস্থানে দুটো এলাকাই যুক্তিসঙ্গত হতে পারে —
+    // একটাকে ভুলভাবে "নিশ্চিত সঠিক" দাবি না করে honest ambiguous choice
+    // দেখানো হয়, ব্যবহারকারী নিজে বেছে নেন। ("Accuracy rule" অনুযায়ী।)
+    const cands = gpsState.candidates.slice(0, 2);
+    zone.innerHTML = `
+      <div class="gps-zone">
+        <div class="gps-card">
+          <div class="gps-pin-line"><svg class="ic ic-sm"><use href="#i-pin"/></svg>আপনার অবস্থান ${esc(cands.map(c => c.name).join('/'))} এলাকার কাছাকাছি হতে পারে</div>
+          <div class="gps-attrib">অবস্থান তথ্য: © OpenStreetMap contributors</div>
+          <div class="gps-q">কোন এলাকা দিয়ে রক্তদাতা খুঁজবেন?</div>
+          <div class="gps-ambig-btns">
+            ${cands.map((c, i) => `<button data-gps-pick="${i}">${esc(c.name)}</button>`).join('')}
+          </div>
+          <button class="gps-ambig-manual" data-gps-manual>নিজে এলাকার নাম লিখে খুঁজুন</button>
+        </div>
+      </div>
+      <div class="gps-or">অথবা</div>`;
+    cands.forEach((c, i) => {
+      zone.querySelector(`[data-gps-pick="${i}"]`).onclick = () => {
+        SEL.division = c.division; SEL.district = c.district; SEL.upazila = c.type === 'upazila' ? c.name : '';
+        SEL_TYPE = c.type;
+        gpsState = { status: 'idle', matched: null };
+        renderLocResolved();
+        if (SELECTED_GROUP) searchDonors();
+      };
+    });
+    zone.querySelector('[data-gps-manual]').onclick = () => { gpsState = { status: 'idle', matched: null }; renderGpsZone(); };
   } else if (gpsState.status === 'denied' || gpsState.status === 'notfound' || gpsState.status === 'lowaccuracy') {
     const msg = gpsState.status === 'denied'
       ? 'আপনার বর্তমান অবস্থান নির্ভুলভাবে পাওয়া যাচ্ছে না। অনুগ্রহ করে location permission চালু করে আবার চেষ্টা করুন।'
@@ -984,30 +1177,80 @@ const GPS_ACCURACY_THRESHOLD_M = 10000;
 function resolveGpsAddress(addr) {
   const anchor = addr.state_district ? matchGpsCandidate(addr.state_district, { preferTypes: ['district'] }) : null;
 
-  const specificFields = [
-    addr.county, addr.city, addr.suburb, addr.neighbourhood, addr.borough,
-    addr.quarter, addr.town, addr.city_district, addr.municipality, addr.village
+  // BUGFIX (এম্পিরিক্যালি ধরা পড়া দ্বিতীয় collision): county ফিল্ড
+  // নির্ভরযোগ্যভাবে "<উপজেলার নাম> উপজেলা" প্যাটার্নে আসে (সাভার/ধামরাই/
+  // কেরানীগঞ্জ/দোহার/নবাবগঞ্জ-এর মতো ঢাকা জেলার প্রকৃত গ্রামীণ উপজেলার
+  // জন্য যাচাই করা)। কিন্তু suburb/quarter/neighbourhood-এর মতো hyperlocal
+  // ফিল্ড পুরান ঢাকার ছোট ছোট মহল্লার নাম দেয় — যেগুলো মাঝেমধ্যে কাকতালীয়ভাবে
+  // দূরের কোনো উপজেলার নামের সাথে হুবহু মিলে যায় (যেমন ঢাকা বিশ্ববিদ্যালয়/
+  // লালবাগ এলাকার একটা মহল্লার নাম "নবাবগঞ্জ" — যা ঢাকা জেলার প্রকৃত,
+  // প্রায় ৩০ কিমি দূরের নবাবগঞ্জ উপজেলারও নাম!)। তাই locality-tier
+  // ফিল্ডগুলো শুধু আমাদের curated locality এন্ট্রির সাথেই মেলানো হয়,
+  // উপজেলার সাথে না — ভুলবশত দূরের উপজেলায় পাঠিয়ে দেওয়া ঠেকাতে।
+  const adminTierField = addr.county;
+  // OSM-এর address hierarchy-তে neighbourhood/quarter সাধারণত suburb/
+  // borough-এর চেয়ে বেশি নির্দিষ্ট (finer-grained) — তাই এগুলোকে আলাদা
+  // "granular" tier হিসেবে আগে চেক করা হয়, আর মিলে গেলে সাথে সাথেই সেটা
+  // ব্যবহার করা হয় (broader suburb-এর সাথে "দ্বন্দ্ব" হিসেবে ধরা হয় না —
+  // BUGFIX: আগে ফার্মগেট (quarter) বনাম তেজগাঁও (suburb, ফার্মগেটকে ঘিরে
+  // থাকা বৃহত্তর এলাকা) — দুটো ভিন্ন granularity-এর ফিল্ড ভুলভাবে "ambiguous"
+  // হিসেবে দেখানো হতো, যদিও আসলে quarter-টাই বেশি নির্ভুল উত্তর)।
+  // suburb/borough/town-ইত্যাদি "area" tier হিসেবে পরে চেক হয় — এই tier-এর
+  // মধ্যে দুটো ভিন্ন ফিল্ড সত্যিই ভিন্ন এলাকা নির্দেশ করলে (যেমন বাড্ডা
+  // সীমানায় suburb=গুলশান কিন্তু borough=বাড্ডা) সেটা genuine ambiguity।
+  const granularTierFields = [addr.neighbourhood, addr.quarter].filter(Boolean);
+  const areaTierFields = [
+    addr.city, addr.suburb, addr.borough, addr.town, addr.city_district, addr.municipality, addr.village
   ].filter(Boolean);
 
   if (anchor && anchor.type === 'district') {
-    const pool = getLocIndex().filter(l => l.district === anchor.name && (l.type === 'upazila' || l.type === 'locality'));
-    if (pool.length) {
-      for (const c of specificFields) {
-        const specific = matchGpsCandidate(c, { pool });
-        if (specific) return specific; // জেলা + আরও নির্দিষ্ট এলাকা দুটোই নিশ্চিত — সর্বোচ্চ নির্ভুলতা
+    const fullPool = getLocIndex().filter(l => l.district === anchor.name && (l.type === 'upazila' || l.type === 'locality'));
+    const localityPool = fullPool.filter(l => l.type === 'locality');
+    if (fullPool.length) {
+      // BUGFIX (এম্পিরিক্যালি ধরা পড়া দ্বিতীয় collision): county ফিল্ড
+      // নির্ভরযোগ্যভাবে "<উপজেলার নাম> উপজেলা" প্যাটার্নে আসে (সাভার/ধামরাই/
+      // কেরানীগঞ্জ/দোহার/নবাবগঞ্জ-এর মতো ঢাকা জেলার প্রকৃত গ্রামীণ উপজেলার
+      // জন্য যাচাই করা)। কিন্তু suburb/quarter/neighbourhood-এর মতো hyperlocal
+      // ফিল্ড পুরান ঢাকার ছোট মহল্লার নাম দেয় — যেগুলো মাঝেমধ্যে কাকতালীয়ভাবে
+      // দূরের কোনো উপজেলার নামের সাথে হুবহু মিলে যায় (যেমন ঢাকা বিশ্ববিদ্যালয়/
+      // লালবাগ এলাকার একটা মহল্লার নাম "নবাবগঞ্জ" — যা ঢাকা জেলার প্রকৃত,
+      // প্রায় ৩০ কিমি দূরের নবাবগঞ্জ উপজেলারও নাম!)। তাই granular/area
+      // tier শুধু আমাদের curated locality এন্ট্রির সাথেই (strict, অনুমান
+      // ছাড়া) মেলানো হয়, উপজেলার সাথে না — ভুলবশত দূরের উপজেলায় পাঠিয়ে
+      // দেওয়া ঠেকাতে।
+      if (adminTierField) {
+        const m = matchGpsCandidate(adminTierField, { pool: fullPool });
+        if (m) return { matched: m, ambiguous: null };
       }
+      for (const c of granularTierFields) {
+        const m = matchGpsCandidate(c, { pool: localityPool, strict: true });
+        if (m) return { matched: m, ambiguous: null };
+      }
+      // একাধিক area-tier ফিল্ড থেকে distinct এলাকা সংগ্রহ করি, প্রথমটা
+      // পেয়েই থেমে যাই না — boundary-ঘেঁষা অবস্থানে ভিন্ন ভিন্ন ফিল্ড সত্যিই
+      // ভিন্ন এলাকা নির্দেশ করতে পারে। তখন একটাকে "নিশ্চিত সঠিক" ধরে নেওয়ার
+      // বদলে honest ambiguous choice দেখানো হয় — ভুলভাবে exact locality
+      // claim করার চেয়ে এটা নিরাপদ।
+      const distinct = [];
+      for (const c of areaTierFields) {
+        if (distinct.length >= 2) break;
+        const m = matchGpsCandidate(c, { pool: localityPool, strict: true });
+        if (m && !distinct.some(d => d.name === m.name)) distinct.push(m);
+      }
+      if (distinct.length === 1) return { matched: distinct[0], ambiguous: null };
+      if (distinct.length >= 2) return { matched: null, ambiguous: distinct.slice(0, 2) };
     }
-    return anchor; // জেলা নিশ্চিত, তার চেয়ে নির্দিষ্ট কোনো এলাকা আমাদের তালিকায় নেই — পুরো জেলা জুড়ে খোঁজাই সঠিক ও নিরাপদ
+    return { matched: anchor, ambiguous: null }; // জেলা নিশ্চিত, তার চেয়ে নির্দিষ্ট কোনো এলাকা নির্ভরযোগ্যভাবে মেলেনি — পুরো জেলা জুড়ে খোঁজাই সঠিক ও নিরাপদ
   }
 
   // state_district থেকে জেলা নিশ্চিত করা গেল না (বিরল, অসম্পূর্ণ OSM ডেটা) —
   // শেষ চেষ্টা হিসেবে পুরো দেশ জুড়ে মেলানো, কিন্তু county-কে অগ্রাধিকারের
   // শুরুতে রাখা হয়নি যেহেতু ঢাকায় সেটাই মূল বিভ্রান্তির উৎস ছিল।
-  for (const c of specificFields) {
+  for (const c of [adminTierField, ...granularTierFields, ...areaTierFields].filter(Boolean)) {
     const m = matchGpsCandidate(c);
-    if (m) return m;
+    if (m) return { matched: m, ambiguous: null };
   }
-  return null;
+  return { matched: null, ambiguous: null };
 }
 
 async function useGpsLocation() {
@@ -1067,10 +1310,12 @@ async function useGpsLocation() {
       if (!resp.ok) throw new Error('geocode failed');
       const data = await resp.json();
       const addr = data.address || {};
-      const matched = resolveGpsAddress(addr);
+      const { matched, ambiguous } = resolveGpsAddress(addr);
       if (myToken !== gpsRequestToken) return;
       if (matched) {
         gpsState = { status: 'confirm', matched };
+      } else if (ambiguous && ambiguous.length >= 2) {
+        gpsState = { status: 'ambiguous', candidates: ambiguous };
       } else {
         // পুরোপুরি মেলাতে না পারলেও ব্যবহারকারীকে খালি হাতে ফেরত পাঠাই না —
         // OSM যা বলেছে (হোক বাংলা বা ইংরেজি) সেটা সার্চ-বক্সে বসিয়ে দিই,
