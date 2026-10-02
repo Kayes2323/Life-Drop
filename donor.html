@@ -809,5 +809,30 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+<script>
+// BUGFIX (রিয়েল বাগ রিপোর্ট — Facebook in-app browser-এ "লোড হচ্ছে..."
+// চিরকাল আটকে থাকা): উপরের মূল <script type="module"> ব্লকটা
+// firebase-config-auth.js আর gstatic.com থেকে firebase-auth.js স্ট্যাটিকভাবে
+// import করে। কিছু in-app WebView-তে (বিশেষত Facebook/Instagram browser,
+// যেগুলো প্রায়ই third-party storage/script সীমিত করে) এই cross-origin
+// module import নীরবে ব্যর্থ হতে পারে — ব্যর্থ হলে পুরো module script-টাই
+// কখনো চলে না, ফলে onAuthStateChanged কখনো কল হয় না এবং screen-loading
+// স্পিনারে ব্যবহারকারী চিরকাল আটকে থাকেন, কোনো error বা retry পথ ছাড়াই
+// (index.html-এর auth-timeout-এর মতো এখানে আগে কোনো সেফটি-নেট ছিল না)।
+// এই স্বতন্ত্র, non-module script সবসময় চলে — মূল module ব্যর্থ হলেও —
+// তাই একটা যুক্তিসঙ্গত সময় পরেও এখনো loading স্ক্রিনে আটকে থাকলে
+// ব্যবহারকারীকে একটা স্পষ্ট retry বাটন দেখানো হয়, পেজ রিলোড করলে যা
+// সাধারণত ঠিক করে দেয় (ব্রাউজারের module cache/নেটওয়ার্ক অবস্থা বদলে যায়)।
+setTimeout(() => {
+  const loadingScreen = document.getElementById('screen-loading');
+  if (loadingScreen && loadingScreen.classList.contains('active')) {
+    loadingScreen.innerHTML = `
+      <div style="text-align:center;padding:30px 10px">
+        <p style="font-size:13px;color:#c0392b;font-family:'Hind Siliguri',sans-serif;margin-bottom:14px">সংযোগে সমস্যা হচ্ছে — লোড করা যাচ্ছে না।<br>এই ব্রাউজারে মাঝেমধ্যে এমন হতে পারে।</p>
+        <button class="submit-btn" style="width:auto;padding:11px 22px" onclick="location.reload()">আবার চেষ্টা করুন</button>
+      </div>`;
+  }
+}, 8000);
+</script>
 </body>
 </html>
