@@ -91,6 +91,9 @@ showInAppBrowserPrompt();
 import { auth, db } from './firebase-config.js';
 import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// এই imports সফল হলেই শুধু এখানে পৌঁছায় — নিচের fallback script এটা
+// চেক করে বোঝে যে এই module আদৌ চলেছে কিনা।
+window.__sondhanAuthModuleReady = true;
 // Redirect if already logged in
 onAuthStateChanged(auth, u => {
   if(u) window.location.replace('index.html');
@@ -260,6 +263,32 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW register failed:', err));
   });
 }
+</script>
+<script>
+// BUGFIX (donor.html/login.html-এর একই ক্লাসের বাগ, এখানেও প্রযোজ্য):
+// নির্দিষ্ট অ্যাপ চেনার চেষ্টা না করে শুধু "module সত্যিই চলেছে কিনা"
+// (window.__sondhanAuthModuleReady) যাচাই করে — UA-sniffing অনির্ভরযোগ্য
+// প্রমাণিত হলেও এটা কখনো মিস করে না।
+setTimeout(() => {
+  if (window.__sondhanAuthModuleReady) return;
+  const ua = navigator.userAgent || '';
+  const isAndroid = /Android/i.test(ua);
+  const url = location.href;
+  const el = document.getElementById('err');
+  if (!el) return;
+  el.style.display = 'block';
+  el.innerHTML = `এই পেজের সাইন-আপ বাটন ঠিকমতো লোড হয়নি — এই ব্রাউজারে সমস্যা হতে পারে।<br>
+    <button id="fallback-open-btn" style="margin-top:9px;padding:9px 16px;background:#c0392b;color:#fff;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif">${isAndroid ? 'Chrome-এ খুলুন' : 'লিংক কপি করুন'}</button>`;
+  document.getElementById('fallback-open-btn').onclick = () => {
+    if (isAndroid) {
+      const u = new URL(url);
+      window.location.href = `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=com.android.chrome;end`;
+    } else {
+      navigator.clipboard?.writeText(url).catch(() => {});
+      document.getElementById('fallback-open-btn').textContent = '✅ কপি হয়েছে';
+    }
+  };
+}, 5000);
 </script>
 </body>
 </html>

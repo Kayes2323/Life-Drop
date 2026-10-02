@@ -147,6 +147,10 @@ import { auth, db } from './firebase-config.js';
 import { normalizeBdPhone, safeRedirect } from './app.js';
 import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// এই imports সফল হলেই শুধু এখানে পৌঁছায় — নিচের fallback script এটা
+// চেক করে বোঝে যে এই module আদৌ চলেছে কিনা (in-app browser-এ এই
+// gstatic.com import ব্যর্থ হতে পারে, তখন নিচের বাটনগুলো কোনো কাজই করত না)।
+window.__sondhanAuthModuleReady = true;
 // নিরাপত্তা: ?redirect= থেকে আসা মান বাইরের ডোমেইনে হতে পারে (open redirect /
 // ফিশিং ঝুঁকি) — তাই সরাসরি ব্যবহার না করে safeRedirect() দিয়ে যাচাই করা হয়,
 // শুধু এই সাইটের নিজস্ব .html পেজেই রিডাইরেক্ট করার অনুমতি দেয়।
@@ -427,6 +431,37 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW register failed:', err));
   });
 }
+</script>
+<script>
+// BUGFIX (donor.html-এর একই ক্লাসের বাগ, এখানেও প্রযোজ্য): উপরের মূল
+// module script যদি gstatic.com import ব্যর্থ হওয়ায় কখনো না চলে, তাহলে
+// window.loginGoogle/loginEmail/sendOTP ইত্যাদি কখনো define-ই হয় না —
+// ব্যবহারকারী বাটনে চাপলে কিছুই হয় না, কোনো দৃশ্যমান error ছাড়াই। এই
+// স্বতন্ত্র non-module script সবসময় চলে, আর কোনো নির্দিষ্ট অ্যাপ (Facebook
+// ইত্যাদি) চেনার চেষ্টা না করে শুধু "module সত্যিই চলেছে কিনা" (উপরের
+// window.__sondhanAuthModuleReady ফ্ল্যাগ) যাচাই করে — তাই UA-sniffing
+// অনির্ভরযোগ্য প্রমাণিত হলেও (দেখুন app.js-এর detectInAppBrowser কমেন্ট)
+// এটা কখনো মিস করে না।
+setTimeout(() => {
+  if (window.__sondhanAuthModuleReady) return;
+  const ua = navigator.userAgent || '';
+  const isAndroid = /Android/i.test(ua);
+  const url = location.href;
+  const el = document.getElementById('err');
+  if (!el) return;
+  el.style.display = 'block';
+  el.innerHTML = `এই পেজের সাইন-ইন বাটন ঠিকমতো লোড হয়নি — এই ব্রাউজারে সমস্যা হতে পারে।<br>
+    <button id="fallback-open-btn" style="margin-top:9px;padding:9px 16px;background:#c0392b;color:#fff;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif">${isAndroid ? 'Chrome-এ খুলুন' : 'লিংক কপি করুন'}</button>`;
+  document.getElementById('fallback-open-btn').onclick = () => {
+    if (isAndroid) {
+      const u = new URL(url);
+      window.location.href = `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=com.android.chrome;end`;
+    } else {
+      navigator.clipboard?.writeText(url).catch(() => {});
+      document.getElementById('fallback-open-btn').textContent = '✅ কপি হয়েছে';
+    }
+  };
+}, 5000);
 </script>
 </body>
 </html>

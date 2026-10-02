@@ -833,16 +833,41 @@ if ('serviceWorker' in navigator) {
 // তাই একটা যুক্তিসঙ্গত সময় পরেও এখনো loading স্ক্রিনে আটকে থাকলে
 // ব্যবহারকারীকে একটা স্পষ্ট retry বাটন দেখানো হয়, পেজ রিলোড করলে যা
 // সাধারণত ঠিক করে দেয় (ব্রাউজারের module cache/নেটওয়ার্ক অবস্থা বদলে যায়)।
+// BUGFIX (আসল ব্যবহারকারীর রিপোর্টে ধরা পড়েছে): app.js-এর
+// detectInAppBrowser()-এর UA প্যাটার্ন-ম্যাচিং (FBAN/FBAV/FB_IAB ইত্যাদি)
+// সব Facebook in-app browser সংস্করণে কাজ করে না — অ্যাপের নতুন ভার্সনে
+// UA স্ট্রিং বদলে যেতে পারে, তাই নির্দিষ্ট অ্যাপ চেনার উপর নির্ভর করা
+// অনির্ভরযোগ্য প্রমাণিত হয়েছে (proactive prompt আসেনি, কিন্তু আসলে এটা
+// in-app browser-ই ছিল)। তাই এই fallback আর "এটা কি Facebook কিনা" অনুমান
+// করে না — শুধু এই সত্যের উপর ভিত্তি করে কাজ করে যে "স্বাভাবিক সময়ের
+// (৫ সেকেন্ড) মধ্যে লোড হয়নি", যা নিজেই যথেষ্ট প্রমাণ যে কিছু একটা ভুল —
+// আর সমাধান হিসেবে সরাসরি Android/iOS-ভিত্তিক ব্রাউজার-পরিবর্তনের উপায়
+// দেখায়, নিছক "আবার চেষ্টা করুন" (যা একই ভাঙা ব্রাউজারে আবার চেষ্টা করাতো,
+// এবং স্থায়ী নীতিগত ব্লক হলে কখনোই কাজ করতো না) তার বদলে।
 setTimeout(() => {
   const loadingScreen = document.getElementById('screen-loading');
-  if (loadingScreen && loadingScreen.classList.contains('active')) {
-    loadingScreen.innerHTML = `
-      <div style="text-align:center;padding:30px 10px">
-        <p style="font-size:13px;color:#c0392b;font-family:'Hind Siliguri',sans-serif;margin-bottom:14px">সংযোগে সমস্যা হচ্ছে — লোড করা যাচ্ছে না।<br>এই ব্রাউজারে মাঝেমধ্যে এমন হতে পারে।</p>
-        <button class="submit-btn" style="width:auto;padding:11px 22px" onclick="location.reload()">আবার চেষ্টা করুন</button>
-      </div>`;
-  }
-}, 8000);
+  if (!loadingScreen || !loadingScreen.classList.contains('active')) return;
+  const ua = navigator.userAgent || '';
+  const isAndroid = /Android/i.test(ua);
+  const url = location.href;
+  loadingScreen.innerHTML = `
+    <div style="text-align:center;padding:30px 14px">
+      <p style="font-size:13px;color:#c0392b;font-family:'Hind Siliguri',sans-serif;margin-bottom:14px;line-height:1.6">লোড হতে স্বাভাবিকের চেয়ে বেশি সময় লাগছে — এই ব্রাউজারে কিছু ফিচার (যেমন Google সাইন-ইন) কাজ নাও করতে পারে।<br>Chrome বা Safari-এ খোলার চেষ্টা করুন।</p>
+      <button id="fallback-open-btn" class="submit-btn" style="width:auto;padding:11px 22px;margin-bottom:10px">${isAndroid ? 'Chrome-এ খুলুন' : 'লিংক কপি করুন'}</button>
+      ${!isAndroid ? '<div style="font-size:11px;color:#aaa;margin-bottom:12px;line-height:1.6">তারপর উপরের মেনু (⋯) থেকে "Safari-এ খুলুন" বেছে নিন</div>' : ''}
+      <div><button id="fallback-retry-btn" style="background:none;border:none;color:#bbb;font-size:12px;cursor:pointer;font-family:'Hind Siliguri',sans-serif">অথবা, এই ব্রাউজারেই আবার চেষ্টা করুন</button></div>
+    </div>`;
+  document.getElementById('fallback-open-btn').onclick = () => {
+    if (isAndroid) {
+      const u = new URL(url);
+      window.location.href = `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=com.android.chrome;end`;
+    } else {
+      navigator.clipboard?.writeText(url).catch(() => {});
+      document.getElementById('fallback-open-btn').textContent = '✅ কপি হয়েছে';
+    }
+  };
+  document.getElementById('fallback-retry-btn').onclick = () => location.reload();
+}, 5000);
 </script>
 </body>
 </html>
