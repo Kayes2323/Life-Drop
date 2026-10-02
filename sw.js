@@ -7,7 +7,7 @@
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন,
 // নাহলে ইউজাররা পুরনো ক্যাশ করা ফাইল দেখতে থাকবে।
-const CACHE_VERSION = 'sondhan-v38';
+const CACHE_VERSION = 'sondhan-v39';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -81,6 +81,24 @@ self.addEventListener('activate', event => {
   );
 });
 
+// BUGFIX (reload-এ অনির্দিষ্টকালের জন্য spinner আটকে থাকা — root cause-এর
+// একটা অংশ): plain fetch()-এর নিজস্ব কোনো timeout নেই। কোনো network
+// request যদি পরিষ্কারভাবে fail না করে বরং ঝুলে থাকে (কিছু ফিল্টার-করা
+// নেটওয়ার্ক/in-app browser-এ connection নীরবে স্থির হয়ে যেতে পারে, কখনো
+// resolve বা reject হয় না) — তাহলে নিচের .catch() ফ্যালব্যাকগুলো কখনোই চালু
+// হয় না, কারণ promise-টাই কখনো settle হয় না। বিশেষত navigation fetch
+// (পুরো পেজ লোড) আটকে গেলে HTML parse হওয়ার আগেই সবকিছু থেমে যায় — পেজের
+// নিজস্ব কোনো JS/timeout তখন চালুই হয় না এটা ঠিক করতে। তাই এখানে একটা
+// সুনির্দিষ্ট সময়সীমা বেঁধে দেওয়া হলো, যাতে "ঝুলে থাকা" network request-ও
+// একটা নির্দিষ্ট সময় পর নিশ্চিতভাবে ব্যর্থ ধরে নিয়ে cache/offline fallback-এ
+// যায় — "কখনো resolve না হওয়া" অবস্থা দূর করতে।
+function fetchWithTimeout(req, ms) {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error('sw-fetch-timeout')), ms);
+    fetch(req).then(res => { clearTimeout(t); resolve(res); }, err => { clearTimeout(t); reject(err); });
+  });
+}
+
 self.addEventListener('fetch', event => {
   const req = event.request;
 
@@ -90,7 +108,10 @@ self.addEventListener('fetch', event => {
   if (req.method === 'GET' && FIREBASE_SDK_URLS.includes(req.url)) {
     event.respondWith(
       caches.match(req).then(cached => {
-        const network = fetch(req)
+        // cached থাকলে network আপডেট ব্যাকগ্রাউন্ডে চলে, response আটকায় না —
+        // timeout এখানে শুধু matter করে প্রথমবার (cache খালি) যখন network-ই
+        // একমাত্র ভরসা, আর সেটা ঝুলে গেলে যেন ব্যবহারকারী চিরকাল অপেক্ষা না করেন।
+        const network = fetchWithTimeout(req, 8000)
           .then(res => {
             if (res && res.ok) {
               const copy = res.clone();
@@ -112,10 +133,12 @@ self.addEventListener('fetch', event => {
   }
 
   // পেজ navigation (কেউ URL খুলছে/লিংকে ক্লিক করছে)
-  // → নেটওয়ার্ক আগে চেষ্টা, না পেলে ক্যাশ, তাও না পেলে offline.html
+  // → নেটওয়ার্ক আগে চেষ্টা, না পেলে ক্যাশ, তাও না পেলে offline.html।
+  // timeout সহ — এটাই সবচেয়ে গুরুত্বপূর্ণ জায়গা, কারণ এটা ঝুলে গেলে
+  // পুরো পেজই কখনো দেখা যায় না, পেজের ভেতরের কোনো সেফটি-নেট চালুই হয় না।
   if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(req)
+      fetchWithTimeout(req, 6000)
         .then(res => {
           const copy = res.clone();
           caches.open(CACHE_VERSION).then(c => c.put(req, copy));

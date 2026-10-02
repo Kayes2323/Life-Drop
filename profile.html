@@ -225,7 +225,7 @@ body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-
   </div>
 
   <div class="scr" id="profile-content">
-    <div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;flex-direction:column;gap:12px">
+    <div id="profile-initial-spinner" style="display:flex;align-items:center;justify-content:center;padding:60px 20px;flex-direction:column;gap:12px">
       <div class="spinner"></div>
       <p style="color:#bbb;font-family:'Hind Siliguri',sans-serif;font-size:13px">লোড হচ্ছে...</p>
     </div>
@@ -731,6 +731,43 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW register failed:', err));
   });
 }
+</script>
+<script>
+// BUGFIX (রিলায়েবিলিটি অডিটে ধরা পড়েছে — donor.html-এর একই ক্লাসের বাগ,
+// এখানে সুরক্ষা ছিল না): #profile-content শুরুতে শুধু "লোড হচ্ছে..."
+// স্পিনার দেখায়, আসল কন্টেন্ট বসে শুধু render()-এ, যেটা চলে শুধু
+// onAuthStateChanged সফল হলে। উপরের মূল module script gstatic.com থেকে
+// Firebase import করে — এই import ব্যর্থ বা ঝুলে গেলে (restrictive
+// নেটওয়ার্ক/browser) পুরো module কখনো চলে না, render() কখনো কল হয় না,
+// আর ব্যবহারকারী "লোড হচ্ছে..."-তে চিরকাল আটকে থাকেন। এই স্বতন্ত্র
+// non-module script "render() আদৌ স্পিনারটা সরিয়েছে কিনা" (নির্দিষ্ট কোনো
+// অ্যাপ/ব্রাউজার চেনার চেষ্টা না করেই) যাচাই করে একটা যুক্তিসঙ্গত সময় পর —
+// render() সবসময় #profile-content-এর পুরো innerHTML বদলে দেয় (সফল বা
+// "ডোনার না" দুই অবস্থাতেই), তাই স্পিনারটা তখনো DOM-এ থাকা মানেই render()
+// কখনো চলেইনি।
+setTimeout(() => {
+  if (!document.getElementById('profile-initial-spinner')) return;
+  const ua = navigator.userAgent || '';
+  const isAndroid = /Android/i.test(ua);
+  const url = location.href;
+  const el = document.getElementById('profile-content');
+  el.innerHTML = `
+    <div style="text-align:center;padding:50px 20px">
+      <p style="font-size:13px;color:#c0392b;font-family:'Hind Siliguri',sans-serif;margin-bottom:14px;line-height:1.6">লোড হতে স্বাভাবিকের চেয়ে বেশি সময় লাগছে — এই ব্রাউজারে সমস্যা হতে পারে।</p>
+      <button id="fallback-open-btn" class="nd-btn" style="display:inline-flex;margin-bottom:10px">${isAndroid ? 'Chrome-এ খুলুন' : 'লিংক কপি করুন'}</button>
+      <div><button id="fallback-retry-btn" style="background:none;border:none;color:#bbb;font-size:12px;cursor:pointer;font-family:'Hind Siliguri',sans-serif">অথবা, আবার চেষ্টা করুন</button></div>
+    </div>`;
+  document.getElementById('fallback-open-btn').onclick = () => {
+    if (isAndroid) {
+      const u = new URL(url);
+      window.location.href = `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=com.android.chrome;end`;
+    } else {
+      navigator.clipboard?.writeText(url).catch(() => {});
+      document.getElementById('fallback-open-btn').textContent = '✅ কপি হয়েছে';
+    }
+  };
+  document.getElementById('fallback-retry-btn').onclick = () => location.reload();
+}, 6000);
 </script>
 </body>
 </html>
