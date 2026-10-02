@@ -319,6 +319,16 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 <div class="toast" id="toast"></div>
 
 <script type="module">
+// in-app browser (Facebook/Instagram ইত্যাদি) সতর্কবার্তা — একদম আলাদা,
+// স্বতন্ত্র module script হিসেবে, যাতে নিচের মূল module script (যেটা
+// gstatic.com থেকে Firebase import করে, আর ঠিক এই in-app browser-গুলোতেই
+// ব্যর্থ হতে পারে) ব্যর্থ হলেও এই সতর্কবার্তা ঠিকই, সাথে সাথেই দেখা যায় —
+// পুরো "লোড হচ্ছে..." স্পিনার দেখানোর আগেই, ৮ সেকেন্ড অপেক্ষা না করিয়ে।
+import { showInAppBrowserPrompt } from './app.js';
+showInAppBrowserPrompt();
+</script>
+
+<script type="module">
 // পারফরম্যান্স পাইলট (শুধু এই পেজে): auth-only হালকা config — Firestore SDK
 // (সবচেয়ে ভারী মডিউল) এখানে ইম্পোর্ট হয় না, তাই "লগইন করা আছে কিনা" জানতে
 // এটার জন্য অপেক্ষা করতে হয় না। Firestore আসলেই দরকার হলে (নিচে

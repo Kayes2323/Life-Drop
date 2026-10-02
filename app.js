@@ -299,6 +299,72 @@ export function isSuperAdmin(user) {
   return !!user && (user.email || '').toLowerCase() === SUPER_ADMIN_EMAIL;
 }
 
+/* ── in-app browser (Facebook/Instagram/Messenger/TikTok ইত্যাদি) শনাক্তকরণ ──
+   এই WebView-গুলো প্রায়ই Google OAuth ব্লক করে (Google-এর নিজস্ব নীতি,
+   "disallowed_useragent" — আমাদের কোড দিয়ে ঠিক করার উপায় নেই) এবং
+   gstatic.com-এর মতো third-party script/storage সীমিত করতে পারে, যার
+   ফলে donor.html-এ রিপোর্ট হওয়া "লোড হচ্ছে..."-তে চিরকাল আটকে থাকার
+   বাগ হয়েছিল। root cause ফিক্স করা সম্ভব না যেহেতু এটা ওই অ্যাপগুলোর/
+   Google-এর নিজস্ব সীমাবদ্ধতা — তাই সবচেয়ে নির্ভরযোগ্য সমাধান হলো
+   ব্যবহারকারীকে আগে থেকেই জানিয়ে দেওয়া এবং সিস্টেম ব্রাউজারে (Chrome/
+   Safari) খোলার সহজ উপায় দেওয়া, flow ভেঙে যাওয়ার আগেই। */
+export function detectInAppBrowser() {
+  const ua = navigator.userAgent || '';
+  const patterns = [
+    [/FBAN|FBAV|FB_IAB|FBIOS/i, 'Facebook'],
+    [/Instagram/i, 'Instagram'],
+    [/Line\//i, 'LINE'],
+    [/MicroMessenger/i, 'WeChat'],
+    [/BytedanceWebview|TikTok/i, 'TikTok'],
+    [/Twitter/i, 'Twitter/X'],
+  ];
+  const match = patterns.find(([re]) => re.test(ua));
+  return {
+    isInApp: !!match,
+    name: match ? match[1] : null,
+    platform: /Android/i.test(ua) ? 'android' : /iPhone|iPad|iPod/i.test(ua) ? 'ios' : 'other',
+  };
+}
+
+/* ইন-অ্যাপ ব্রাউজার শনাক্ত হলে একটা ফুল-স্ক্রিন প্রম্পট দেখায় — সাইন-ইন/
+   ফর্ম চেষ্টা করার আগেই, যাতে ব্যবহারকারী বিভ্রান্ত হয়ে না আটকে যান।
+   হার্ড-ব্লক করা হয় না — "এখানেই চালিয়ে যান" দিয়ে এড়িয়ে যাওয়া যায়,
+   কারণ শনাক্তকরণ ভুলও হতে পারে বা কোনো কোনো সংস্করণে আসলে কাজ করে। */
+export function showInAppBrowserPrompt() {
+  const info = detectInAppBrowser();
+  if (!info.isInApp) return info;
+  if (sessionStorage.getItem('sondhan-inapp-dismissed') === '1') return info;
+
+  const url = location.href;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:"Hind Siliguri",sans-serif';
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:18px;padding:24px 20px;max-width:340px;width:100%;text-align:center">
+      <div style="font-size:38px;margin-bottom:10px">🌐</div>
+      <div style="font-size:14.5px;font-weight:700;color:#222;margin-bottom:8px;line-height:1.5">${esc(info.name)}-এর ব্রাউজারে কিছু ফিচার (যেমন Google দিয়ে সাইন-ইন) কাজ নাও করতে পারে</div>
+      <div style="font-size:12px;color:#888;margin-bottom:18px;line-height:1.6">সবচেয়ে ভালো অভিজ্ঞতার জন্য Chrome বা Safari-এ খুলুন</div>
+      <button id="iab-open-btn" style="width:100%;padding:13px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:12px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:9px">${info.platform === 'android' ? 'Chrome-এ খুলুন' : 'লিংক কপি করুন'}</button>
+      ${info.platform !== 'android' ? '<div style="font-size:11px;color:#aaa;margin-bottom:14px;line-height:1.6">তারপর উপরের মেনু (⋯) থেকে "Safari-এ খুলুন" বেছে নিন</div>' : ''}
+      <button id="iab-dismiss-btn" style="background:none;border:none;color:#bbb;font-size:12px;cursor:pointer;font-family:inherit">এখানেই চালিয়ে যান</button>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  overlay.querySelector('#iab-open-btn').onclick = () => {
+    if (info.platform === 'android') {
+      const u = new URL(url);
+      window.location.href = `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=com.android.chrome;end`;
+    } else {
+      navigator.clipboard?.writeText(url).catch(() => {});
+      overlay.querySelector('#iab-open-btn').textContent = '✅ কপি হয়েছে';
+    }
+  };
+  overlay.querySelector('#iab-dismiss-btn').onclick = () => {
+    sessionStorage.setItem('sondhan-inapp-dismissed', '1');
+    overlay.remove();
+  };
+  return info;
+}
+
 /* ── মোবাইল কীবোর্ড input ঢেকে ফেলা এড়ানো ──────────────────
    কীবোর্ড খুললে কিছু ব্রাউজারে (iOS Safari, কিছু Android WebView)
    viewport ঠিকমতো resize হয় না, ফলে যে input-এ টাইপ করা হচ্ছে
