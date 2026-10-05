@@ -369,7 +369,17 @@
            GPS সবার আগে দেখানো হয়, তারপর "অথবা" দিয়ে টাইপ-করা অপশন — একই
            পেজে থেকেই ইউজার যেটাতে স্বাচ্ছন্দ্য বোধ করেন সেটা বেছে নিতে পারেন। -->
       <div class="loc-picker-wrap" id="loc-picker-wrap">
-        <div id="locsearch-gps-zone"></div>
+        <!-- Static idle GPS UI so the control is visible even if the module is still loading.
+             Module renderGpsZone() replaces this once ready. GPS is enhancement — never a blocker. -->
+        <div id="locsearch-gps-zone">
+          <div class="gps-zone">
+            <button class="gps-btn" type="button" onclick="if(window.useGpsLocation){window.useGpsLocation();}else{var t=document.getElementById('toast');if(t){t.textContent='একটু অপেক্ষা করুন...';t.classList.add('show');}}">
+              <div class="gps-btn-ico"><svg class="ic ic-sm"><use href="#i-crosshair"/></svg></div>
+              <div class="gps-btn-main"><div class="gps-btn-t">বর্তমান অবস্থান ব্যবহার করুন</div><div class="gps-btn-s">আপনার এলাকা স্বয়ংক্রিয়ভাবে শনাক্ত করুন</div></div>
+            </button>
+          </div>
+          <div class="gps-or">অথবা</div>
+        </div>
         <div class="locsearch-input-row">
           <div class="locsearch-input-wrap">
             <svg class="ic ic-sm"><use href="#i-search"/></svg>
@@ -510,10 +520,35 @@ function stopLoadingMsgs(){ clearInterval(_loadTimer); }
 </script>
 
 <script type="module">
-import { auth, db } from './firebase-config.js';
-import { esc, initials, waLink, telLink, isValidBdPhone, isValidFacebookUrl, DIVISIONS, DISTRICTS, UPAZILAS } from './app.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+// Dynamic imports + try/catch: a failed/stale module must not leave Search blank.
+// Manual location browse + blood-group UI still need these; GPS remains optional.
+let auth, db, esc, initials, waLink, telLink, isValidBdPhone, isValidFacebookUrl, DIVISIONS, DISTRICTS, UPAZILAS;
+let onAuthStateChanged, collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp, runTransaction;
+
+try {
+  ({ auth, db } = await import('./firebase-config.js'));
+  ({ esc, initials, waLink, telLink, isValidBdPhone, isValidFacebookUrl, DIVISIONS, DISTRICTS, UPAZILAS } = await import('./app.js'));
+  ({ onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"));
+  ({ collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp, runTransaction } =
+    await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"));
+} catch (bootErr) {
+  console.warn('[search] module boot failed:', bootErr);
+  const zone = document.getElementById('locsearch-gps-zone');
+  if (zone) {
+    zone.innerHTML = `<div class="gps-zone"><div class="gps-denied">সার্চ লোড করতে সমস্যা হয়েছে। ইন্টারনেট দেখে আবার চেষ্টা করুন।<div><button type="button" onclick="location.reload()">আবার চেষ্টা করুন</button></div></div></div>`;
+  }
+  const results = document.getElementById('results-list');
+  if (results) {
+    results.innerHTML = `<div class="hint-box"><p style="color:#c0392b">পেজের স্ক্রিপ্ট লোড হয়নি। Hard refresh (Ctrl+Shift+R) করে আবার চেষ্টা করুন।</p></div>`;
+  }
+  window.openLocModal = () => showToast('পেজ এখনো প্রস্তুত নয় — আবার চেষ্টা করুন');
+  window.searchDonors = () => showToast('পেজ এখনো প্রস্তুত নয় — আবার চেষ্টা করুন');
+  window.resetFilters = () => {};
+  // Stop further init — functions below are not defined in this failure path
+  throw bootErr;
+}
+
+window._searchReady = true;
 
 // ── রক্তের গ্রুপ গ্রিড — সিলেক্ট করলে হাইলাইট + সার্চ বাটন সক্রিয় ──
 let SELECTED_GROUP = null;
@@ -1343,6 +1378,7 @@ async function useGpsLocation() {
   // যাতে নেটওয়ার্ক/WiFi-ভিত্তিক কম-নির্ভুল ফিক্সের উপর নির্ভর করতে না হয়।
   }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
 }
+window.useGpsLocation = useGpsLocation;
 
 function renderLocSearchResults() {
   const box = document.getElementById('locsearch-results');
@@ -1837,9 +1873,24 @@ window.submitReq = async () => {
 
 // এলাকা (GPS+সার্চ) UI পেজ লোড হওয়ার সাথে সাথেই রেডি থাকে — আলাদা কোনো
 // মডালে ট্যাপ করে ঢুকতে হয় না, রক্তের গ্রুপের ঠিক নিচেই দৃশ্যমান।
-renderGpsZone();
-renderLocSearchResults();
-renderLocResolved();
+try {
+  renderGpsZone();
+  renderLocSearchResults();
+  renderLocResolved();
+} catch (uiErr) {
+  console.warn('[search] UI init error (non-fatal for blood-group/browse):', uiErr);
+}
+</script>
+<script>
+// Module boot safety: if dynamic imports hang/fail without painting UI, surface a retry.
+setTimeout(() => {
+  if (window._searchReady) return;
+  const zone = document.getElementById('locsearch-gps-zone');
+  if (!zone) return;
+  // Still showing static idle button with no module — leave browse/search inputs usable
+  // but warn that GPS/script may not be fully ready.
+  console.warn('[search] module not ready after timeout');
+}, 8000);
 </script>
 <div class="install-banner" id="install-banner">
   <div class="install-modal">

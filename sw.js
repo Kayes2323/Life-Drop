@@ -7,7 +7,7 @@
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন,
 // নাহলে ইউজাররা পুরনো ক্যাশ করা ফাইল দেখতে থাকবে।
-const CACHE_VERSION = 'sondhan-v39';
+const CACHE_VERSION = 'sondhan-v40-runtime-recovery';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -27,13 +27,35 @@ const APP_SHELL = [
   './style.css',
   './app.js',
   './firebase-config.js',
+  './firebase-config-auth.js',
   './auth-guard.js',
   './manifest.json',
   './sondhan-logo.png',
+  './sondhan-logo-white.png',
   './logo.jpeg',
   './icon-192.png',
   './icon-512.png'
 ];
+
+// Critical runtime — stale copies of these break navigation/search/auth
+// (mixed-version ES module failures look like "dead buttons").
+// Serve network-first with cache fallback; do NOT leave them cache-first.
+const CRITICAL_RUNTIME = [
+  'app.js',
+  'firebase-config.js',
+  'firebase-config-auth.js',
+  'auth-guard.js',
+  'style.css'
+];
+
+function isCriticalRuntime(url) {
+  try {
+    const path = new URL(url).pathname;
+    return CRITICAL_RUNTIME.some(f => path.endsWith('/' + f) || path === '/' + f);
+  } catch (_) {
+    return false;
+  }
+}
 
 // BUGFIX (৫ সেকেন্ডের লগইন-ফ্ল্যাশ): Firebase SDK (auth/firestore/app)
 // gstatic.com থেকে আমদানি হয়, আর নিচের fetch handler cross-origin
@@ -45,6 +67,8 @@ const APP_SHELL = [
 // শুধু এগুলোই cache করছি (fonts/অন্য কিছু ছোঁয়া হচ্ছে না) —
 // এগুলো Firebase নিজেই CORS-enabled রাখে (ESM import সমর্থনের জন্য),
 // তাই আগের cross-origin ক্যাশিং বাগের ঝুঁকি এখানে নেই।
+// IMPORTANT: Firebase SDK URLs are NOT cache-busted — module imports
+// must keep exact version paths.
 const FIREBASE_SDK_URLS = [
   'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js',
   'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js',
@@ -99,6 +123,18 @@ function fetchWithTimeout(req, ms) {
   });
 }
 
+function networkFirst(req, timeoutMs) {
+  return fetchWithTimeout(req, timeoutMs)
+    .then(res => {
+      if (res && res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE_VERSION).then(c => c.put(req, copy));
+      }
+      return res;
+    })
+    .catch(() => caches.match(req));
+}
+
 self.addEventListener('fetch', event => {
   const req = event.request;
 
@@ -140,8 +176,10 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       fetchWithTimeout(req, 6000)
         .then(res => {
-          const copy = res.clone();
-          caches.open(CACHE_VERSION).then(c => c.put(req, copy));
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE_VERSION).then(c => c.put(req, copy));
+          }
           return res;
         })
         .catch(() =>
@@ -151,7 +189,16 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // static asset (css/js/image) → cache-first, ব্যাকগ্রাউন্ডে আপডেট করে রাখে
+  // Critical runtime (JS/CSS that powers navigation + page init)
+  // → network-first with cache fallback so deploys cannot leave mixed versions.
+  if (isCriticalRuntime(req.url)) {
+    event.respondWith(
+      networkFirst(req, 8000).then(res => res || caches.match('./offline.html'))
+    );
+    return;
+  }
+
+  // অন্য static asset (image/font/manifest) → cache-first, ব্যাকগ্রাউন্ডে আপডেট
   event.respondWith(
     caches.match(req).then(cached => {
       const network = fetch(req)

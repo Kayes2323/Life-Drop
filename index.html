@@ -544,18 +544,14 @@ function _navigate(page) {
   if (window._loggedIn) {
     window.location.href = page;
   } else {
-    document.getElementById('lr-btn').href = 'login.html?redirect=' + page;
-    document.getElementById('lr-overlay').classList.add('show');
+    // Auth failed/pending as logged-out → show existing login UI (never silently no-op)
+    const btn = document.getElementById('lr-btn');
+    if (btn) btn.href = 'login.html?redirect=' + encodeURIComponent(page);
+    const overlay = document.getElementById('lr-overlay');
+    if (overlay) overlay.classList.add('show');
+    else window.location.href = 'login.html?redirect=' + encodeURIComponent(page);
   }
 }
-
-window.goGuarded = (page) => {
-  // BUGFIX: আগে auth লোড হওয়ার আগে ক্লিক করলে লগইন করা ইউজারকেও
-  // "লগইন প্রয়োজন" দেখাতো। এখন auth-এর জবাবের জন্য অপেক্ষা করে।
-  if (window._authReady) { _navigate(page); return; }
-  window._pendingPage = page;
-  showToast('একটু অপেক্ষা করুন...');
-};
 
 // auth রেজলভ হলে জমে থাকা ক্লিকটা চালু করে
 window._onAuthResolved = () => {
@@ -565,6 +561,37 @@ window._onAuthResolved = () => {
     _navigate(p);
   }
 };
+
+// Single place that flips ready + flushes pending navigation.
+// BUGFIX: আগে timeout শুধু _authReady=true করতো, _onAuthResolved কল করতো না —
+// প্রথম ক্লিক "মরে" থাকতো। Module load ব্যর্থ হলেও _authReady কখনো true
+// হতো না → Profile/Request বাটন চিরকাল dead।
+window._markAuthReady = (loggedIn) => {
+  if (typeof loggedIn === 'boolean') window._loggedIn = loggedIn;
+  window._authReady = true;
+  window._onAuthResolved?.();
+};
+
+window.goGuarded = (page) => {
+  // BUGFIX: আগে auth লোড হওয়ার আগে ক্লিক করলে লগইন করা ইউজারকেও
+  // "লগইন প্রয়োজন" দেখাতো। এখন auth-এর জবাবের জন্য অপেক্ষা করে।
+  if (window._authReady) { _navigate(page); return; }
+  window._pendingPage = page;
+  showToast('একটু অপেক্ষা করুন...');
+};
+
+// Safety net OUTSIDE the module — module import fail হলেও বাটন মরে না।
+/* Timeout must NOT flush pending as "logged out" — that wrongly shows the
+   login overlay to slow-but-logged-in users. Unlock clicks; ask for a re-tap. */
+window._authSafetyTimer = setTimeout(() => {
+  if (window._authReady) return;
+  console.warn('[auth] Firebase auth wait timed out — unlocking navigation');
+  window._authReady = true;
+  if (window._pendingPage) {
+    window._pendingPage = null;
+    showToast('সংযোগ ধীর — আবার ট্যাপ করুন');
+  }
+}, 8000);
 
 function showToast(m) {
   const t = document.getElementById('toast');
@@ -624,47 +651,50 @@ if (document.readyState !== 'loading') hideSplash();
 
 <!-- Firebase loads AFTER page is visible — non-blocking -->
 <script type="module">
-import { auth, db } from './firebase-config.js';
-import { esc } from './app.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+try {
+  const { auth, db } = await import('./firebase-config.js');
+  const { esc } = await import('./app.js');
+  const { onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+  const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
-if(auth) {
-  // Timeout: if Firebase takes > 5s, give up waiting
-  const authTimeout = setTimeout(() => {
-    window._authReady = true;
-  }, 5000);
+  if (!auth) {
+    console.warn('[auth] Firebase auth unavailable');
+    window._markAuthReady?.(false);
+  } else {
+    onAuthStateChanged(auth, user => {
+      clearTimeout(window._authSafetyTimer);
+      window._markAuthReady?.(!!user);
 
-  onAuthStateChanged(auth, user => {
-    clearTimeout(authTimeout);
-    window._authReady = true;
-    window._loggedIn  = !!user;
+      const el = document.getElementById('auth-btn');
+      if (user && el) {
+        const photo = user.photoURL || '';
+        const name  = (user.displayName || '').split(' ')[0] || 'Profile';
+        el.innerHTML = `
+          <a href="profile.html" style="display:flex;align-items:center;gap:6px;text-decoration:none">
+            <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">
+              ${photo
+                ? `<img src="${esc(photo)}" style="width:100%;height:100%;object-fit:cover" alt=""/>`
+                : `<span>${esc(name[0].toUpperCase())}</span>`}
+            </div>
+            <span style="font-size:11px;color:#fff;font-weight:600;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Hind Siliguri',sans-serif">${esc(name)}</span>
+          </a>`;
+      }
+      // লগইন না থাকলে HTML-এর default "লগইন করুন" বাটনই থেকে যায়
 
-    const el = document.getElementById('auth-btn');
-    if(user && el) {
-      const photo = user.photoURL || '';
-      const name  = (user.displayName || '').split(' ')[0] || 'Profile';
-      el.innerHTML = `
-        <a href="profile.html" style="display:flex;align-items:center;gap:6px;text-decoration:none">
-          <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">
-            ${photo
-              ? `<img src="${esc(photo)}" style="width:100%;height:100%;object-fit:cover" alt=""/>`
-              : `<span>${esc(name[0].toUpperCase())}</span>`}
-          </div>
-          <span style="font-size:11px;color:#fff;font-weight:600;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Hind Siliguri',sans-serif">${esc(name)}</span>
-        </a>`;
-    }
-    // লগইন না থাকলে HTML-এর default "লগইন করুন" বাটনই থেকে যায়
-
-    // ইতিমধ্যে Donor কিনা চেক করি — হলে donor-prompt আর দেখাবো না
-    if (user && db) {
-      getDoc(doc(db, 'donors', user.uid))
-        .then(snap => { window._userIsDonor = snap.exists(); })
-        .catch(() => {});
-    }
-
-    window._onAuthResolved?.();   // অপেক্ষায় থাকা ক্লিক থাকলে সেটা চালাও
-  });
+      // ইতিমধ্যে Donor কিনা চেক করি — হলে donor-prompt আর দেখাবো না
+      // Optional: donor check must not block navigation if it fails
+      if (user && db) {
+        getDoc(doc(db, 'donors', user.uid))
+          .then(snap => { window._userIsDonor = snap.exists(); })
+          .catch(err => console.warn('[auth] donor check failed:', err));
+      }
+    });
+  }
+} catch (err) {
+  console.warn('[auth] module init failed — unlocking navigation:', err);
+  clearTimeout(window._authSafetyTimer);
+  // True failure (not slow auth): treat as logged out and flush pending to login UI
+  window._markAuthReady?.(false);
 }
 </script>
 <div class="install-banner" id="install-banner">
@@ -738,20 +768,18 @@ if(auth) {
 </script>
 <script>
 if ('serviceWorker' in navigator) {
-  // BUGFIX (বারবার পুরনো cache আটকে থাকা): আগে নতুন deploy-এর পর
-  // ইউজারকে ম্যানুয়ালি ট্যাব বন্ধ করে আবার খুলতে হতো, নাহলে নতুন
-  // service worker থাকা সত্ত্বেও পুরনো cache করা CSS/HTML দেখাতো
-  // (এই কথোপকথনেই দুইবার এই একই ধরনের বাগ হয়েছে)। এখন নতুন SW
-  // control নেওয়া মাত্র (activate()-এর clients.claim() চলার পর)
-  // পেজ নিজে থেকেই একবার reload হবে — ইউজারকে কিছু করতে হবে না।
-  let swRefreshed = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (swRefreshed) return; // একবারই reload — লুপ এড়াতে
-    swRefreshed = true;
-    window.location.reload();
-  });
+  // BUGFIX (runtime recovery): আগে controllerchange → window.location.reload()
+  // থাকায় নতুন SW activate হলেই পুরো অ্যাপ জোর করে রিলোড হতো — Blood Bank /
+  // Profile / Registration নেভিগেশন "শুধু reload" মনে হতো, আর কখনো কখনো
+  // reload loop তৈরি হতো। এখন update quiet-ভাবে নতুন পেজ লোডে নেওয়া হয়;
+  // SW update কখনোই unexpected full-app reload করে না।
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW register failed:', err));
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => {
+        // Background update check — no forced reload
+        try { reg.update(); } catch (_) {}
+      })
+      .catch(err => console.warn('SW register failed:', err));
   });
 }
 </script>
