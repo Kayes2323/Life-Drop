@@ -7,7 +7,7 @@
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন,
 // নাহলে ইউজাররা পুরনো ক্যাশ করা ফাইল দেখতে থাকবে।
-const CACHE_VERSION = 'sondhan-v40-runtime-recovery';
+const CACHE_VERSION = 'sondhan-v41-sw-mime-fix';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -123,16 +123,39 @@ function fetchWithTimeout(req, ms) {
   });
 }
 
-function networkFirst(req, timeoutMs) {
-  return fetchWithTimeout(req, timeoutMs)
-    .then(res => {
-      if (res && res.ok) {
-        const copy = res.clone();
-        caches.open(CACHE_VERSION).then(c => c.put(req, copy));
-      }
-      return res;
-    })
-    .catch(() => caches.match(req));
+// BUGFIX (production incident — একসাথে Search/GPS/Blood Bank/Profile/
+// Registration সব ভেঙে যাওয়া): আগের networkFirst() ধীর/অনির্ভরযোগ্য
+// নেটওয়ার্কে (৮ সেকেন্ডের বেশি) timeout হলে, আর ওই নির্দিষ্ট ফাইলটা cache-এ
+// না থাকলে (নতুন deploy-এর পরের race, বা install-এ fail), শেষে
+// caches.match('./offline.html') ফেরত দিতো — offline.html একটা HTML পেজ,
+// কিন্তু app.js/firebase-config.js/style.css-এর মতো critical runtime
+// ফাইলের জন্য সেটা "text/html" রেসপন্স হিসেবে চলে যেতো যেখানে ব্রাউজার
+// JS module/CSS আশা করছিল। ব্রাউজার তখন সরাসরি ছুঁড়ে দেয়: "Failed to load
+// module script: Expected a JavaScript-or-Wasm module script but the
+// server responded with a MIME type of text/html" — আর app.js প্রায়
+// প্রতিটা পেজের মূল module script-এ import হয়, তাই একটামাত্র ধীর নেটওয়ার্ক
+// মুহূর্তে Search, GPS, Blood Bank, Profile, Registration — সবগুলো একসাথে
+// ভেঙে যায়, কারণ সবগুলোই একই ফাইলের উপর নির্ভরশীল। (Playwright দিয়ে
+// পুনরুৎপাদন করে নিশ্চিত করা হয়েছে।)
+// সমাধান: stale-while-revalidate — cache-এ থাকলে সেটাই সাথে সাথে দিই (০ms
+// অপেক্ষা), ব্যাকগ্রাউন্ডে নেটওয়ার্ক থেকে আপডেট করে রাখি (তাই নতুন deploy-ও
+// ধরা পড়ে)। cache-এ না থাকলে নেটওয়ার্ক-ই একমাত্র ভরসা — কিন্তু সেটা ব্যর্থ
+// হলে offline.html নয়, একটা আসল নেটওয়ার্ক-এরর রেসপন্স ফেরত দিই, যাতে
+// ব্রাউজার সঠিকভাবে বুঝতে পারে fetch ব্যর্থ হয়েছে (তখন প্রতিটা পেজের নিজস্ব
+// reactive fallback — যা আগেই যাচাই করা আছে — ঠিকভাবে কাজ করে)।
+function staleWhileRevalidate(req, timeoutMs) {
+  return caches.match(req).then(cached => {
+    const network = fetchWithTimeout(req, timeoutMs)
+      .then(res => {
+        if (res && res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE_VERSION).then(c => c.put(req, copy));
+        }
+        return res;
+      })
+      .catch(() => cached || Response.error());
+    return cached || network;
+  });
 }
 
 self.addEventListener('fetch', event => {
@@ -141,24 +164,15 @@ self.addEventListener('fetch', event => {
   // Firebase SDK (auth/firestore/app) — সুনির্দিষ্ট এই ৩টা URL-ই
   // cache-first, ব্যাকগ্রাউন্ডে আপডেট করে রাখে। এর ফলে onAuthStateChanged
   // চালু হতে নেটওয়ার্কের অপেক্ষা করতে হয় না, লগইন অবস্থা সাথে সাথে বোঝা যায়।
+  // BUGFIX (code-review ধরা পড়েছে): আগে cache miss + network ব্যর্থ হলে
+  // .catch(() => cached) একটা undefined ফেরত দিতো (cached নিজেই undefined
+  // থাকলে) — event.respondWith(undefined) ব্রাউজারে একটা অপ্রত্যাশিত/অস্পষ্ট
+  // network error তৈরি করে, যা প্রথম ভিজিটে ধীর নেটওয়ার্কে (Firebase SDK
+  // install-এ cache করতে না পারলে) auth/firestore import পুরোপুরি ভেঙে দিতে
+  // পারতো। staleWhileRevalidate() এখন Response.error() দিয়ে স্পষ্ট,
+  // catch-যোগ্য network error ফেরত দেয়।
   if (req.method === 'GET' && FIREBASE_SDK_URLS.includes(req.url)) {
-    event.respondWith(
-      caches.match(req).then(cached => {
-        // cached থাকলে network আপডেট ব্যাকগ্রাউন্ডে চলে, response আটকায় না —
-        // timeout এখানে শুধু matter করে প্রথমবার (cache খালি) যখন network-ই
-        // একমাত্র ভরসা, আর সেটা ঝুলে গেলে যেন ব্যবহারকারী চিরকাল অপেক্ষা না করেন।
-        const network = fetchWithTimeout(req, 8000)
-          .then(res => {
-            if (res && res.ok) {
-              const copy = res.clone();
-              caches.open(CACHE_VERSION).then(c => c.put(req, copy));
-            }
-            return res;
-          })
-          .catch(() => cached);
-        return cached || network;
-      })
-    );
+    event.respondWith(staleWhileRevalidate(req, 8000));
     return;
   }
 
@@ -190,11 +204,10 @@ self.addEventListener('fetch', event => {
   }
 
   // Critical runtime (JS/CSS that powers navigation + page init)
-  // → network-first with cache fallback so deploys cannot leave mixed versions.
+  // → stale-while-revalidate: cache থাকলে তাৎক্ষণিক, ব্যাকগ্রাউন্ডে আপডেট —
+  // কখনো offline.html-কে JS/CSS-এর জায়গায় ফেরত দেওয়া হয় না (দেখুন উপরের BUGFIX)।
   if (isCriticalRuntime(req.url)) {
-    event.respondWith(
-      networkFirst(req, 8000).then(res => res || caches.match('./offline.html'))
-    );
+    event.respondWith(staleWhileRevalidate(req, 8000));
     return;
   }
 
