@@ -768,15 +768,23 @@ try {
 </script>
 <script>
 if ('serviceWorker' in navigator) {
-  // BUGFIX (runtime recovery): আগে controllerchange → window.location.reload()
-  // থাকায় নতুন SW activate হলেই পুরো অ্যাপ জোর করে রিলোড হতো — Blood Bank /
-  // Profile / Registration নেভিগেশন "শুধু reload" মনে হতো, আর কখনো কখনো
-  // reload loop তৈরি হতো। এখন update quiet-ভাবে নতুন পেজ লোডে নেওয়া হয়;
-  // SW update কখনোই unexpected full-app reload করে না।
+  // BUGFIX (production incident): আগের কমিট controllerchange reload পুরোপুরি
+  // সরিয়ে দিয়েছিল, এই ধারণায় যে সেটাই "reload loop"-এর কারণ ছিল। আসল কারণ
+  // ছিল sw.js-এর একটা ভিন্ন বাগ (offline.html-কে app.js হিসেবে ফেরত দেওয়া,
+  // এখন fix করা হয়েছে) — কিন্তু reload সরিয়ে দেওয়ায় একটা নতুন, আরও খারাপ
+  // সমস্যা হয়েছিল: নতুন SW activate হয়ে গেলেও চলমান পেজ পুরনো কোডেই আটকে
+  // থাকতো, তাই deploy হওয়া fix ব্যবহারকারীর কাছে কখনো পৌঁছাতোই না যতক্ষণ না
+  // ব্রাউজার সম্পূর্ণ বন্ধ করা হতো। swRefreshed flag আগের মতোই একবারের বেশি
+  // reload আটকায় (তাই loop হওয়ার সুযোগ নেই)।
+  let swRefreshed = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (swRefreshed) return;
+    swRefreshed = true;
+    window.location.reload();
+  });
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
       .then(reg => {
-        // Background update check — no forced reload
         try { reg.update(); } catch (_) {}
       })
       .catch(err => console.warn('SW register failed:', err));

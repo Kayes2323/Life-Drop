@@ -276,6 +276,17 @@ window.addAmbulance = async () => {
 </script>
 <script>
 if ('serviceWorker' in navigator) {
+  // BUGFIX (production incident): কোনো পেজেই আগে controllerchange শোনা হতো
+  // না, তাই নতুন SW activate হয়ে গেলেও চলমান পেজ পুরনো, সম্ভবত ভাঙা কোডেই
+  // আটকে থাকতো — ব্যবহারকারী বারবার reload/tab বদল করলেও নতুন fix কখনো
+  // কার্যকর হতো না যতক্ষণ না ব্রাউজার সম্পূর্ণ বন্ধ করা হতো। swRefreshed flag
+  // দিয়ে একবারের বেশি reload আটকানো হয়েছে (reload loop এড়াতে)।
+  let swRefreshed = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (swRefreshed) return;
+    swRefreshed = true;
+    window.location.reload();
+  });
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW register failed:', err));
   });
