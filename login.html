@@ -432,9 +432,11 @@ if ('serviceWorker' in navigator) {
   // আটকে থাকতো — ব্যবহারকারী বারবার reload/tab বদল করলেও নতুন fix কখনো
   // কার্যকর হতো না যতক্ষণ না ব্রাউজার সম্পূর্ণ বন্ধ করা হতো। swRefreshed flag
   // দিয়ে একবারের বেশি reload আটকানো হয়েছে (reload loop এড়াতে)।
+  // শুধু আগে থেকে SW-নিয়ন্ত্রিত পেজ reload হবে (নতুন ভিজিটরের প্রথম SW install-এ নয়)
+  const hadController = !!navigator.serviceWorker.controller;
   let swRefreshed = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (swRefreshed) return;
+    if (swRefreshed || !hadController) return;
     swRefreshed = true;
     window.location.reload();
   });

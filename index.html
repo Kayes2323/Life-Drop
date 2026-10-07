@@ -776,9 +776,11 @@ if ('serviceWorker' in navigator) {
   // থাকতো, তাই deploy হওয়া fix ব্যবহারকারীর কাছে কখনো পৌঁছাতোই না যতক্ষণ না
   // ব্রাউজার সম্পূর্ণ বন্ধ করা হতো। swRefreshed flag আগের মতোই একবারের বেশি
   // reload আটকায় (তাই loop হওয়ার সুযোগ নেই)।
+  // শুধু আগে থেকে SW-নিয়ন্ত্রিত পেজ reload হবে (নতুন ভিজিটরের প্রথম SW install-এ নয়)
+  const hadController = !!navigator.serviceWorker.controller;
   let swRefreshed = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (swRefreshed) return;
+    if (swRefreshed || !hadController) return;
     swRefreshed = true;
     window.location.reload();
   });
