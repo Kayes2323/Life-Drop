@@ -7,7 +7,7 @@
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন,
 // নাহলে ইউজাররা পুরনো ক্যাশ করা ফাইল দেখতে থাকবে।
-const CACHE_VERSION = 'sondhan-v42-no-store-fetch';
+const CACHE_VERSION = 'sondhan-v45-simple-with-timeout';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -37,26 +37,6 @@ const APP_SHELL = [
   './icon-512.png'
 ];
 
-// Critical runtime — stale copies of these break navigation/search/auth
-// (mixed-version ES module failures look like "dead buttons").
-// Serve network-first with cache fallback; do NOT leave them cache-first.
-const CRITICAL_RUNTIME = [
-  'app.js',
-  'firebase-config.js',
-  'firebase-config-auth.js',
-  'auth-guard.js',
-  'style.css'
-];
-
-function isCriticalRuntime(url) {
-  try {
-    const path = new URL(url).pathname;
-    return CRITICAL_RUNTIME.some(f => path.endsWith('/' + f) || path === '/' + f);
-  } catch (_) {
-    return false;
-  }
-}
-
 // BUGFIX (৫ সেকেন্ডের লগইন-ফ্ল্যাশ): Firebase SDK (auth/firestore/app)
 // gstatic.com থেকে আমদানি হয়, আর নিচের fetch handler cross-origin
 // রিকোয়েস্ট এড়িয়ে যায় (ভালো কারণেই — fonts/অন্য cross-origin
@@ -67,8 +47,6 @@ function isCriticalRuntime(url) {
 // শুধু এগুলোই cache করছি (fonts/অন্য কিছু ছোঁয়া হচ্ছে না) —
 // এগুলো Firebase নিজেই CORS-enabled রাখে (ESM import সমর্থনের জন্য),
 // তাই আগের cross-origin ক্যাশিং বাগের ঝুঁকি এখানে নেই।
-// IMPORTANT: Firebase SDK URLs are NOT cache-busted — module imports
-// must keep exact version paths.
 const FIREBASE_SDK_URLS = [
   'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js',
   'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js',
@@ -116,71 +94,51 @@ self.addEventListener('activate', event => {
 // সুনির্দিষ্ট সময়সীমা বেঁধে দেওয়া হলো, যাতে "ঝুলে থাকা" network request-ও
 // একটা নির্দিষ্ট সময় পর নিশ্চিতভাবে ব্যর্থ ধরে নিয়ে cache/offline fallback-এ
 // যায় — "কখনো resolve না হওয়া" অবস্থা দূর করতে।
-// BUGFIX (production incident, continued — deploy হওয়া fix বারবার ব্যবহারকারীর
-// কাছে পৌঁছাতে ব্যর্থ হচ্ছিল): plain fetch(req) ব্রাউজারের নিজস্ব HTTP cache
-// মেনে চলে — তাই SW নিজে "network" থেকে আনছে বলে মনে করলেও, কোনো পুরনো
-// intermediate cache entry (browser HTTP cache/CDN edge) থাকলে সেটাই ফেরত
-// আসতে পারে, আসল origin-এ নাও পৌঁছাতে পারে। { cache: 'no-store' } দিয়ে এই
-// SW-এর নিজের fetch()-গুলো জোর করে সবসময় origin-এ পৌঁছায়, কোনো intermediate
-// cache এড়িয়ে — SW-এর নিজস্ব Cache Storage versioning (CACHE_VERSION) এখনো
-// ঠিকই কাজ করে, এটা শুধু network-fetch ধাপটাকেই সত্যিকারের fresh করে।
 function fetchWithTimeout(req, ms) {
   return new Promise((resolve, reject) => {
     const t = setTimeout(() => reject(new Error('sw-fetch-timeout')), ms);
-    fetch(req, { cache: 'no-store' }).then(res => { clearTimeout(t); resolve(res); }, err => { clearTimeout(t); reject(err); });
+    fetch(req).then(res => { clearTimeout(t); resolve(res); }, err => { clearTimeout(t); reject(err); });
   });
 }
 
-// BUGFIX (production incident — একসাথে Search/GPS/Blood Bank/Profile/
-// Registration সব ভেঙে যাওয়া): আগের networkFirst() ধীর/অনির্ভরযোগ্য
-// নেটওয়ার্কে (৮ সেকেন্ডের বেশি) timeout হলে, আর ওই নির্দিষ্ট ফাইলটা cache-এ
-// না থাকলে (নতুন deploy-এর পরের race, বা install-এ fail), শেষে
-// caches.match('./offline.html') ফেরত দিতো — offline.html একটা HTML পেজ,
-// কিন্তু app.js/firebase-config.js/style.css-এর মতো critical runtime
-// ফাইলের জন্য সেটা "text/html" রেসপন্স হিসেবে চলে যেতো যেখানে ব্রাউজার
-// JS module/CSS আশা করছিল। ব্রাউজার তখন সরাসরি ছুঁড়ে দেয়: "Failed to load
-// module script: Expected a JavaScript-or-Wasm module script but the
-// server responded with a MIME type of text/html" — আর app.js প্রায়
-// প্রতিটা পেজের মূল module script-এ import হয়, তাই একটামাত্র ধীর নেটওয়ার্ক
-// মুহূর্তে Search, GPS, Blood Bank, Profile, Registration — সবগুলো একসাথে
-// ভেঙে যায়, কারণ সবগুলোই একই ফাইলের উপর নির্ভরশীল। (Playwright দিয়ে
-// পুনরুৎপাদন করে নিশ্চিত করা হয়েছে।)
-// সমাধান: stale-while-revalidate — cache-এ থাকলে সেটাই সাথে সাথে দিই (০ms
-// অপেক্ষা), ব্যাকগ্রাউন্ডে নেটওয়ার্ক থেকে আপডেট করে রাখি (তাই নতুন deploy-ও
-// ধরা পড়ে)। cache-এ না থাকলে নেটওয়ার্ক-ই একমাত্র ভরসা — কিন্তু সেটা ব্যর্থ
-// হলে offline.html নয়, একটা আসল নেটওয়ার্ক-এরর রেসপন্স ফেরত দিই, যাতে
-// ব্রাউজার সঠিকভাবে বুঝতে পারে fetch ব্যর্থ হয়েছে (তখন প্রতিটা পেজের নিজস্ব
-// reactive fallback — যা আগেই যাচাই করা আছে — ঠিকভাবে কাজ করে)।
-function staleWhileRevalidate(req, timeoutMs) {
-  return caches.match(req).then(cached => {
-    const network = fetchWithTimeout(req, timeoutMs)
-      .then(res => {
-        if (res && res.ok) {
-          const copy = res.clone();
-          caches.open(CACHE_VERSION).then(c => c.put(req, copy));
-        }
-        return res;
-      })
-      .catch(() => cached || Response.error());
-    return cached || network;
-  });
-}
-
+// REVERT (production incident — কয়েক রাউন্ড ফিক্সের পরও একই ধরনের ব্যর্থতা
+// থেকে যাচ্ছিল): ৫ অক্টোবরের একটা কমিট app.js/firebase-config.js ইত্যাদির
+// জন্য একটা আলাদা "critical runtime" network-first পথ যোগ করেছিল, যেটা
+// পরে offline.html-কে JS হিসেবে ফেরত দেওয়ার বাগ তৈরি করে (ফিক্স হয়েছিল),
+// তারপর সেই ফিক্সে no-store fetch() যোগ করায় লাইভ সাইটে ১৩ms-এই
+// "Failed to fetch dynamically imported module" এরর দেখা যাচ্ছিল — আসল
+// কারণ এই sandbox থেকে নিশ্চিতভাবে পুনরুৎপাদন/যাচাই করা যায়নি।
+//
+// প্রতিটা নতুন ফিক্স নতুন অনিশ্চয়তা যোগ করছিল, কোনোটাই নিশ্চিতভাবে প্রমাণ
+// করা যায়নি। তাই এখন পুরো "critical runtime" বিশেষ-ব্যবস্থাটাই সরিয়ে
+// ফেলা হলো — app.js/firebase-config.js/firebase-config-auth.js/
+// auth-guard.js/style.css এখন ঠিক অন্য সব static asset-এর মতোই সাধারণ
+// cache-first + ব্যাকগ্রাউন্ড-আপডেট পথ ব্যবহার করে (নিচে), ঠিক যেমনটা এই
+// ইনসিডেন্ট শুরু হওয়ার আগে বহুদিন স্থিতিশীলভাবে কাজ করেছে। এই পথের
+// .catch(() => cached) কখনো offline.html (HTML) ফেরত দেয় না — cache না
+// থাকলে ও network ব্যর্থ হলে প্রকৃত network error-ই ফেরত যায়, যা ব্রাউজার
+// সঠিকভাবে ধরতে পারে। কম জটিলতা, কম অনিশ্চিত edge case।
 self.addEventListener('fetch', event => {
   const req = event.request;
 
-  // Firebase SDK (auth/firestore/app) — সুনির্দিষ্ট এই ৩টা URL-ই
-  // cache-first, ব্যাকগ্রাউন্ডে আপডেট করে রাখে। এর ফলে onAuthStateChanged
-  // চালু হতে নেটওয়ার্কের অপেক্ষা করতে হয় না, লগইন অবস্থা সাথে সাথে বোঝা যায়।
-  // BUGFIX (code-review ধরা পড়েছে): আগে cache miss + network ব্যর্থ হলে
-  // .catch(() => cached) একটা undefined ফেরত দিতো (cached নিজেই undefined
-  // থাকলে) — event.respondWith(undefined) ব্রাউজারে একটা অপ্রত্যাশিত/অস্পষ্ট
-  // network error তৈরি করে, যা প্রথম ভিজিটে ধীর নেটওয়ার্কে (Firebase SDK
-  // install-এ cache করতে না পারলে) auth/firestore import পুরোপুরি ভেঙে দিতে
-  // পারতো। staleWhileRevalidate() এখন Response.error() দিয়ে স্পষ্ট,
-  // catch-যোগ্য network error ফেরত দেয়।
+  // Firebase SDK (auth/firestore/app) + app.js/firebase-config.js ইত্যাদি —
+  // cache-first, ব্যাকগ্রাউন্ডে আপডেট। onAuthStateChanged নেটওয়ার্কের জন্য
+  // অপেক্ষা করে না, লগইন অবস্থা সাথে সাথে বোঝা যায়।
   if (req.method === 'GET' && FIREBASE_SDK_URLS.includes(req.url)) {
-    event.respondWith(staleWhileRevalidate(req, 8000));
+    event.respondWith(
+      caches.match(req).then(cached => {
+        const network = fetchWithTimeout(req, 8000)
+          .then(res => {
+            if (res && res.ok) {
+              const copy = res.clone();
+              caches.open(CACHE_VERSION).then(c => c.put(req, copy));
+            }
+            return res;
+          })
+          .catch(() => cached);
+        return cached || network;
+      })
+    );
     return;
   }
 
@@ -211,18 +169,20 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Critical runtime (JS/CSS that powers navigation + page init)
-  // → stale-while-revalidate: cache থাকলে তাৎক্ষণিক, ব্যাকগ্রাউন্ডে আপডেট —
-  // কখনো offline.html-কে JS/CSS-এর জায়গায় ফেরত দেওয়া হয় না (দেখুন উপরের BUGFIX)।
-  if (isCriticalRuntime(req.url)) {
-    event.respondWith(staleWhileRevalidate(req, 8000));
-    return;
-  }
+  // app.js/firebase-config.js/firebase-config-auth.js/auth-guard.js/
+  // style.css — এগুলো প্রায় প্রতিটা পেজের মূল module script-এ import হয়,
+  // তাই এখানে একটা ঝুলে-থাকা fetch (hang, timeout নয়) পুরো পেজকে নীরবে
+  // মৃত করে দিতে পারে (কোনো error না, শুধু চিরকাল অপেক্ষা) — তাই cache-first
+  // হলেও network অংশে timeout থাকা দরকার। অন্য static asset (image/font/
+  // manifest)-এর জন্য timeout জরুরি নয়, সেগুলো plain fetch()-ই যথেষ্ট।
+  const CRITICAL = ['app.js', 'firebase-config.js', 'firebase-config-auth.js', 'auth-guard.js', 'style.css'];
+  let isCritical = false;
+  try { const p = new URL(req.url).pathname; isCritical = CRITICAL.some(f => p === '/' + f); } catch (_) {}
 
-  // অন্য static asset (image/font/manifest) → cache-first, ব্যাকগ্রাউন্ডে আপডেট
   event.respondWith(
     caches.match(req).then(cached => {
-      const network = fetch(req)
+      const networkFetch = isCritical ? fetchWithTimeout(req, 8000) : fetch(req);
+      const network = networkFetch
         .then(res => {
           if (res && res.ok) {
             const copy = res.clone();
@@ -230,7 +190,7 @@ self.addEventListener('fetch', event => {
           }
           return res;
         })
-        .catch(() => cached); // অফলাইনে network fail করলে cache-ই ফেরত
+        .catch(() => cached); // network ব্যর্থ/timeout হলে cache-ই ফেরত (undefined হলে স্বাভাবিক network error)
       return cached || network;
     })
   );
