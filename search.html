@@ -525,21 +525,33 @@ function stopLoadingMsgs(){ clearInterval(_loadTimer); }
 let auth, db, esc, initials, waLink, telLink, isValidBdPhone, isValidFacebookUrl, DIVISIONS, DISTRICTS, UPAZILAS;
 let onAuthStateChanged, collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp, runTransaction;
 
+// TEMP DIAGNOSTIC (production incident — ঠিক কোন import ব্যর্থ হচ্ছে এবং কেন,
+// সেটা এখনো অজানা; screenshot থেকে এতদূর শুধু "ব্যর্থ হয়েছে" দেখা যাচ্ছে, "কেন"
+// দেখা যাচ্ছে না। এই ব্লক আসল error name/message/ধাপ/সময় সরাসরি স্ক্রিনে
+// দেখায় — যাতে পরের রিপোর্ট থেকে প্রকৃত কারণ ধরা যায়। স্থায়ী নয়, root cause
+// নিশ্চিত হলে এই ভার্বোজ ডায়াগনস্টিক সরিয়ে ফেলা হবে।)
+const _bootT0 = Date.now();
+let _bootStep = 'firebase-config.js';
 try {
   ({ auth, db } = await import('./firebase-config.js'));
+  _bootStep = 'app.js';
   ({ esc, initials, waLink, telLink, isValidBdPhone, isValidFacebookUrl, DIVISIONS, DISTRICTS, UPAZILAS } = await import('./app.js'));
+  _bootStep = 'gstatic firebase-auth.js';
   ({ onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"));
+  _bootStep = 'gstatic firebase-firestore.js';
   ({ collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp, runTransaction } =
     await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"));
 } catch (bootErr) {
-  console.warn('[search] module boot failed:', bootErr);
+  const elapsed = Date.now() - _bootT0;
+  const diag = `[${_bootStep}] ${bootErr && bootErr.name || '?'}: ${bootErr && bootErr.message || bootErr}  (${elapsed}ms)`;
+  console.warn('[search] module boot failed:', _bootStep, bootErr);
   const zone = document.getElementById('locsearch-gps-zone');
   if (zone) {
-    zone.innerHTML = `<div class="gps-zone"><div class="gps-denied">সার্চ লোড করতে সমস্যা হয়েছে। ইন্টারনেট দেখে আবার চেষ্টা করুন।<div><button type="button" onclick="location.reload()">আবার চেষ্টা করুন</button></div></div></div>`;
+    zone.innerHTML = `<div class="gps-zone"><div class="gps-denied">সার্চ লোড করতে সমস্যা হয়েছে। ইন্টারনেট দেখে আবার চেষ্টা করুন।<div style="margin-top:8px;font-size:10.5px;color:#999;font-family:monospace;word-break:break-all;user-select:text">${diag.replace(/</g,'&lt;')}</div><div><button type="button" onclick="location.reload()">আবার চেষ্টা করুন</button></div></div></div>`;
   }
   const results = document.getElementById('results-list');
   if (results) {
-    results.innerHTML = `<div class="hint-box"><p style="color:#c0392b">পেজের স্ক্রিপ্ট লোড হয়নি। Hard refresh (Ctrl+Shift+R) করে আবার চেষ্টা করুন।</p></div>`;
+    results.innerHTML = `<div class="hint-box"><p style="color:#c0392b">পেজের স্ক্রিপ্ট লোড হয়নি। Hard refresh (Ctrl+Shift+R) করে আবার চেষ্টা করুন।</p><p style="font-size:10.5px;color:#999;font-family:monospace;word-break:break-all;user-select:text">${diag.replace(/</g,'&lt;')}</p></div>`;
   }
   window.openLocModal = () => showToast('পেজ এখনো প্রস্তুত নয় — আবার চেষ্টা করুন');
   window.searchDonors = () => showToast('পেজ এখনো প্রস্তুত নয় — আবার চেষ্টা করুন');
