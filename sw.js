@@ -7,7 +7,7 @@
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন,
 // নাহলে ইউজাররা পুরনো ক্যাশ করা ফাইল দেখতে থাকবে।
-const CACHE_VERSION = 'sondhan-v41-sw-mime-fix';
+const CACHE_VERSION = 'sondhan-v42-no-store-fetch';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -116,10 +116,18 @@ self.addEventListener('activate', event => {
 // সুনির্দিষ্ট সময়সীমা বেঁধে দেওয়া হলো, যাতে "ঝুলে থাকা" network request-ও
 // একটা নির্দিষ্ট সময় পর নিশ্চিতভাবে ব্যর্থ ধরে নিয়ে cache/offline fallback-এ
 // যায় — "কখনো resolve না হওয়া" অবস্থা দূর করতে।
+// BUGFIX (production incident, continued — deploy হওয়া fix বারবার ব্যবহারকারীর
+// কাছে পৌঁছাতে ব্যর্থ হচ্ছিল): plain fetch(req) ব্রাউজারের নিজস্ব HTTP cache
+// মেনে চলে — তাই SW নিজে "network" থেকে আনছে বলে মনে করলেও, কোনো পুরনো
+// intermediate cache entry (browser HTTP cache/CDN edge) থাকলে সেটাই ফেরত
+// আসতে পারে, আসল origin-এ নাও পৌঁছাতে পারে। { cache: 'no-store' } দিয়ে এই
+// SW-এর নিজের fetch()-গুলো জোর করে সবসময় origin-এ পৌঁছায়, কোনো intermediate
+// cache এড়িয়ে — SW-এর নিজস্ব Cache Storage versioning (CACHE_VERSION) এখনো
+// ঠিকই কাজ করে, এটা শুধু network-fetch ধাপটাকেই সত্যিকারের fresh করে।
 function fetchWithTimeout(req, ms) {
   return new Promise((resolve, reject) => {
     const t = setTimeout(() => reject(new Error('sw-fetch-timeout')), ms);
-    fetch(req).then(res => { clearTimeout(t); resolve(res); }, err => { clearTimeout(t); reject(err); });
+    fetch(req, { cache: 'no-store' }).then(res => { clearTimeout(t); resolve(res); }, err => { clearTimeout(t); reject(err); });
   });
 }
 
