@@ -54,7 +54,7 @@ for (const u of locs) {
   if (!/<meta name="description" content="[^"]{50,}/.test(h)) probs.push('description missing/short');
   if (title.length < 10 || title.trim() === 'Sondhan') probs.push('weak title');
   if (/name="robots"[^>]*noindex/.test(h)) probs.push('noindex page in sitemap');
-  for (const m of h.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) { try { JSON.parse(m[1]); } catch { probs.push('invalid JSON-LD'); } }
+  for (const m of h.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) { try { const j = JSON.parse(m[1]); const bad = JSON.stringify(j).match(/"(?:name|headline)":"([^"]{0,400})/g) || []; if (/<[a-z][^>]*>/i.test(JSON.stringify(j.itemListElement || []))) probs.push('HTML inside breadcrumb JSON-LD'); for (const n of (j.itemListElement || [])) if ((n.name || '').length > 80) probs.push('breadcrumb name too long'); } catch { probs.push('invalid JSON-LD'); } }
   if (fileFor(u).startsWith('guides/') && /<script(?![^>]*ld\+json)/.test(h)) probs.push('guide contains executable script');
   if (/&lt;(?:div|p|table|ul|h2|a)[\s>]/.test(h)) probs.push('escaped HTML shown as text');
   if (fileFor(u).startsWith('guides/') && /(?:\+?88)?01[3-9]\d{8}/.test(h.replace(/<[^>]+>/g, ' '))) probs.push('phone-like number in guide');
