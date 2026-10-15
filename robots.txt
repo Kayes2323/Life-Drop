@@ -1,0 +1,8 @@
+# Sondhan — https://www.sondhan.org
+# সার্চ ইঞ্জিন ও AI-সার্চ ক্রলার পাবলিক পেজ দেখতে পারবে। ব্যক্তিগত/লগইন পেজ
+# robots.txt-এ ব্লক করা হয়নি (ব্লক করলে noindex দেখা যায় না) — সেগুলোতে
+# <meta name="robots" content="noindex"> ও X-Robots-Tag আছে।
+User-agent: *
+Allow: /
+
+Sitemap: https://www.sondhan.org/sitemap.xml

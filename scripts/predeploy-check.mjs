@@ -38,6 +38,31 @@ const csp = vj.headers[0].headers.find(h => h.key === 'Content-Security-Policy')
 check(/script-src[^;]*https:\/\/www\.gstatic\.com/.test(csp), 'CSP script-src allows www.gstatic.com');
 check(/connect-src[^;]*firestore\.googleapis\.com/.test(csp) && /connect-src[^;]*identitytoolkit\.googleapis\.com/.test(csp), 'CSP connect-src allows Firestore + Auth');
 
+console.log('[1b] SEO checks');
+const sm = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');
+const locs = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
+check(locs.length > 0 && locs.every(u => u.startsWith('https://www.sondhan.org/')), `sitemap has ${locs.length} URLs, all on https://www.sondhan.org`);
+const fileFor = (u) => { const p = new URL(u).pathname; return p === '/donor' ? 'donor.html' : p.endsWith('/') ? p.slice(1) + 'index.html' : p.slice(1); };
+for (const u of locs) {
+  const f = path.join(ROOT, fileFor(u));
+  if (!fs.existsSync(f)) { bad(`sitemap URL has no file: ${u}`); continue; }
+  const h = fs.readFileSync(f, 'utf8');
+  const can = (h.match(/<link rel="canonical" href="([^"]+)"/) || [])[1];
+  const title = (h.match(/<title>([^<]*)<\/title>/) || [])[1] || '';
+  const probs = [];
+  if (can !== u) probs.push(`canonical=${can}`);
+  if (!/<meta name="description" content="[^"]{50,}/.test(h)) probs.push('description missing/short');
+  if (title.length < 10 || title.trim() === 'Sondhan') probs.push('weak title');
+  if (/name="robots"[^>]*noindex/.test(h)) probs.push('noindex page in sitemap');
+  for (const m of h.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) { try { JSON.parse(m[1]); } catch { probs.push('invalid JSON-LD'); } }
+  if (fileFor(u).startsWith('guides/') && /<script(?![^>]*ld\+json)/.test(h)) probs.push('guide contains executable script');
+  if (fileFor(u).startsWith('guides/') && /(?:\+?88)?01[3-9]\d{8}/.test(h.replace(/<[^>]+>/g, ' '))) probs.push('phone-like number in guide');
+  check(probs.length === 0, `SEO ${new URL(u).pathname}${probs.length ? ' — ' + probs.join('; ') : ''}`);
+}
+for (const f of ['login', 'signup', 'register', 'profile', 'request', 'admin', 'offline']) check(/name="robots" content="noindex/.test(fs.readFileSync(path.join(ROOT, f + '.html'), 'utf8')), `${f}.html is noindex`);
+const rb = fs.readFileSync(path.join(ROOT, 'robots.txt'), 'utf8');
+check(/Sitemap: https:\/\/www\.sondhan\.org\/sitemap\.xml/.test(rb) && !/^Disallow:\s*\/\s*$/m.test(rb), 'robots.txt references sitemap and does not block the site');
+
 console.log('[2] browser check (real sw.js + real CSP)');
 let chromium;
 try { chromium = createRequire(path.join(execFileSync('npm', ['root', '-g']).toString().trim(), '/'))('playwright').chromium; } catch { try { chromium = createRequire(ROOT + '/')('playwright').chromium; } catch {} }
