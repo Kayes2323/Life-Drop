@@ -3,6 +3,50 @@
     {
       "source": "/donor",
       "destination": "/donor.html"
+    },
+    {
+      "source": "/search",
+      "destination": "/search.html"
+    },
+    {
+      "source": "/bloodbank",
+      "destination": "/bloodbank.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/signup.html"
+    },
+    {
+      "source": "/profile",
+      "destination": "/profile.html"
+    },
+    {
+      "source": "/request",
+      "destination": "/request.html"
+    },
+    {
+      "source": "/ambulance",
+      "destination": "/ambulance.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
     }
   ],
   "headers": [
@@ -89,6 +133,81 @@
     {
       "source": "/register.html",
       "destination": "/donor",
+      "permanent": true
+    },
+    {
+      "source": "/donor/",
+      "destination": "/donor",
+      "permanent": true
+    },
+    {
+      "source": "/search/",
+      "destination": "/search",
+      "permanent": true
+    },
+    {
+      "source": "/bloodbank/",
+      "destination": "/bloodbank",
+      "permanent": true
+    },
+    {
+      "source": "/about/",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/privacy/",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/terms/",
+      "destination": "/terms",
+      "permanent": true
+    },
+    {
+      "source": "/login/",
+      "destination": "/login",
+      "permanent": true
+    },
+    {
+      "source": "/signup/",
+      "destination": "/signup",
+      "permanent": true
+    },
+    {
+      "source": "/profile/",
+      "destination": "/profile",
+      "permanent": true
+    },
+    {
+      "source": "/request/",
+      "destination": "/request",
+      "permanent": true
+    },
+    {
+      "source": "/ambulance/",
+      "destination": "/ambulance",
+      "permanent": true
+    },
+    {
+      "source": "/admin/",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/register",
+      "destination": "/donor",
+      "permanent": true
+    },
+    {
+      "source": "/register/",
+      "destination": "/donor",
+      "permanent": true
+    },
+    {
+      "source": "/guides",
+      "destination": "/guides/",
       "permanent": true
     }
   ]

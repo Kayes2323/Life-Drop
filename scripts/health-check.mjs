@@ -7,7 +7,7 @@ const BASE = (process.argv[2] || 'https://sondhan.org').replace(/\/$/, '');
 const PROJECT = 'life-drop-d4784', KEY = 'AIzaSyBpw6cXNgXNxnWNOn2IQ0IhfXzQv2Qoqxk'; // public web config (same as firebase-config.js)
 let failed = 0; const t = async (name, fn) => { try { const r = await fn(); console.log('PASS', name, r ? '— ' + r : ''); } catch (e) { failed++; console.log('FAIL', name, '—', e.message); } };
 const get = async (u, o) => { const r = await fetch(u, { signal: AbortSignal.timeout(15000), ...o }); return r; };
-for (const p of ['/', '/search.html', '/bloodbank.html', '/donor', '/profile.html', '/login.html'])
+for (const p of ['/', '/search.html', '/bloodbank.html', '/donor', '/profile.html', '/login.html', '/donor/', '/donor?fbclid=test', '/search', '/search/', '/bloodbank', '/about', '/privacy', '/terms', '/guides/'])
   await t('page ' + p, async () => { const r = await get(BASE + p); if (!r.ok) throw new Error('HTTP ' + r.status); if (!/html/.test(r.headers.get('content-type'))) throw new Error('not html'); });
 for (const p of ['/app.js', '/firebase-config.js', '/firebase-config-auth.js', '/auth-guard.js'])
   await t('module ' + p, async () => { const r = await get(BASE + p); if (!r.ok) throw new Error('HTTP ' + r.status); if (!/javascript/.test(r.headers.get('content-type'))) throw new Error('wrong MIME ' + r.headers.get('content-type')); });
