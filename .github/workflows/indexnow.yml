@@ -1,0 +1,23 @@
+# After a push to main (= Vercel production deploy), wait for the deploy, then notify IndexNow.
+# Never blocks or fails a deploy: it runs after the push, and errors are tolerated.
+name: IndexNow ping
+on:
+  push:
+    branches: [main]
+    paths: ['**/*.html', 'sitemap.xml']
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Wait for the Vercel deploy
+        run: sleep 150
+      - name: Verify the key file is live, then submit
+        run: |
+          KEY_FILE=$(ls | grep -E '^[0-9a-f]{32}\.txt$' | head -1)
+          curl -fsS "https://www.sondhan.org/$KEY_FILE" | grep -q "${KEY_FILE%.txt}"
+          node scripts/indexnow.mjs

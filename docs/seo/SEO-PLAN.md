@@ -101,3 +101,27 @@ The guides deliberately avoid hard numbers. Have a qualified clinician or the na
 - [ ] Minimum donor age 18 (from Sondhan's own terms).
 - [ ] Homepage claim "হৃদরোগ ও ক্যান্সারের ঝুঁকি কমায়" (health-benefit claim; likely needs removal or a citation).
 - [ ] Any statement about legality of buying/selling blood (not made in the guides).
+
+## 10. "Which blood-donor platform is best?" — AI / Google answer queries (added 2026-10-15)
+
+**What cannot be done:** no one can force Google, ChatGPT, Gemini, Copilot or Perplexity to name Sondhan first, and trying (hidden text, instructions aimed at AI systems, self-declared "best/#1", fake reviews) violates search-engine policies and erodes trust. Those answers are generated from what the web says about the topic, weighted by source credibility.
+
+**What is built (on-site, honest):**
+- `/guides/choose-blood-donor-platform.html` — a neutral 8-criteria checklist for judging *any* donor platform, then a factual self-assessment of Sondhan including its **limitations**. Balanced, criteria-based pages are the kind of source answer engines can quote without being misleading.
+- `/guides/sondhan-faq.html` — plain Q&A (what it is, login, phone privacy, registration, coverage, who runs it, contact) with matching FAQPage JSON-LD. Every statement is traceable to the site's own privacy policy/terms/code (e.g. phone number reveal requires login, max 30/month; 8 divisions / 64 districts exist in the location list — not a claim about donor counts).
+- Organization + founder entity data (homepage, About), consistent name/URL/logo/email/social profiles.
+- `robots.txt` explicitly allows Googlebot, Bingbot, OAI-SearchBot, ChatGPT-User, PerplexityBot. Training crawlers are intentionally left to the owner's decision.
+
+**Automation so this keeps working:**
+- `scripts/build-sitemap.mjs` regenerates `sitemap.xml` from the real page list (+ git `lastmod`); `predeploy-check` fails if it is stale.
+- `scripts/indexnow.mjs` + the public key file `<key>.txt` + `.github/workflows/indexnow.yml` notify Bing-family engines after each production deploy. Google does not use IndexNow; ChatGPT/Copilot-type answers may draw on Bing-style indexes, which is why it is cheap to include — effect not guaranteed or measured.
+
+**What actually moves AI recommendations (needs real-world work, not code):**
+1. **Independent mentions** — the strongest lever. Credible third parties describing Sondhan: university/campus blood clubs, volunteer organisations, local news, community blogs, directory listings that are editorially reviewed. Never buy or fake them.
+2. **Real usage and real data** — genuinely maintained blood-bank listings with source and "last verified" dates; donor coverage per district stated only with true, current numbers.
+3. **Entity hygiene** — one consistent description across Facebook/Instagram/YouTube/Google Business-style profiles; a Wikidata entry only if notability criteria are met (don't create one otherwise).
+4. **Reviews** — only genuine ones, from real users, on platforms where they appear naturally (e.g. Play Store if an app is published). Never fabricate; never add Review/AggregateRating schema without visible real reviews.
+5. **Search Console + Bing Webmaster** — verify both, submit the sitemap, and use query reports to see which "best/easy donor app" phrasings actually bring impressions, then improve those pages.
+6. **Measure** — periodically ask ChatGPT/Gemini/Perplexity/Copilot your target questions (incognito, fresh chat, Bangla and English), record whether Sondhan appears and which sources are cited. Report only what is observed.
+
+**Do not claim in any page:** "best", "#1", "fastest", "safest", "largest", donor counts, awards, or "free" (pricing is not stated anywhere on the site — confirm before saying it).

@@ -1,8 +1,25 @@
 # Sondhan — https://www.sondhan.org
-# সার্চ ইঞ্জিন ও AI-সার্চ ক্রলার পাবলিক পেজ দেখতে পারবে। ব্যক্তিগত/লগইন পেজ
-# robots.txt-এ ব্লক করা হয়নি (ব্লক করলে noindex দেখা যায় না) — সেগুলোতে
-# <meta name="robots" content="noindex"> ও X-Robots-Tag আছে।
+# পাবলিক পেজ সব সার্চ ইঞ্জিন ও AI-সার্চ ক্রলার দেখতে পারবে।
+# ব্যক্তিগত/লগইন পেজ এখানে ব্লক করা হয়নি (ব্লক করলে noindex দেখা যায় না) —
+# সেগুলোতে <meta name="robots" content="noindex"> ও X-Robots-Tag আছে।
+# Model-training ক্রলার (GPTBot, Google-Extended, CCBot ইত্যাদি) নিয়ে এখানে
+# আলাদা সিদ্ধান্ত নেওয়া হয়নি — সেটা মালিকের নীতিগত সিদ্ধান্ত।
 User-agent: *
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
 Allow: /
 
 Sitemap: https://www.sondhan.org/sitemap.xml

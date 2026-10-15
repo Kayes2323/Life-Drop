@@ -56,11 +56,16 @@ for (const u of locs) {
   if (/name="robots"[^>]*noindex/.test(h)) probs.push('noindex page in sitemap');
   for (const m of h.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) { try { JSON.parse(m[1]); } catch { probs.push('invalid JSON-LD'); } }
   if (fileFor(u).startsWith('guides/') && /<script(?![^>]*ld\+json)/.test(h)) probs.push('guide contains executable script');
+  if (/&lt;(?:div|p|table|ul|h2|a)[\s>]/.test(h)) probs.push('escaped HTML shown as text');
   if (fileFor(u).startsWith('guides/') && /(?:\+?88)?01[3-9]\d{8}/.test(h.replace(/<[^>]+>/g, ' '))) probs.push('phone-like number in guide');
   check(probs.length === 0, `SEO ${new URL(u).pathname}${probs.length ? ' — ' + probs.join('; ') : ''}`);
 }
 for (const f of ['login', 'signup', 'register', 'profile', 'request', 'admin', 'offline']) check(/name="robots" content="noindex/.test(fs.readFileSync(path.join(ROOT, f + '.html'), 'utf8')), `${f}.html is noindex`);
 const rb = fs.readFileSync(path.join(ROOT, 'robots.txt'), 'utf8');
+try { execFileSync('node', [path.join(ROOT, 'scripts/build-sitemap.mjs'), '--check'], { stdio: 'pipe' }); ok('sitemap.xml lists exactly the public pages + guides (scripts/build-sitemap.mjs)'); }
+catch { bad('sitemap.xml is out of date — run: node scripts/build-sitemap.mjs'); }
+const inKey = fs.readdirSync(ROOT).filter(f => /^[0-9a-f]{32}\.txt$/.test(f));
+check(inKey.length === 1 && fs.readFileSync(path.join(ROOT, inKey[0]), 'utf8').trim() === inKey[0].replace('.txt', ''), 'IndexNow key file present and its content matches its name');
 check(/Sitemap: https:\/\/www\.sondhan\.org\/sitemap\.xml/.test(rb) && !/^Disallow:\s*\/\s*$/m.test(rb), 'robots.txt references sitemap and does not block the site');
 
 console.log('[2] browser check (real sw.js + real CSP)');
