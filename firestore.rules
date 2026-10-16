@@ -98,7 +98,12 @@ service cloud.firestore {
       // donor-এর জন্য আলাদা করে বৈধ reveal লাগবে, তাই স্ক্রিপ্ট দিয়ে
       // সবার নম্বর একসাথে টেনে নেওয়া (scraping) আর সম্ভব না।
       allow get: if isOwner(donorId) || isAdmin()
-        || (isSignedIn() && exists(/databases/$(database)/documents/reveals/$(request.auth.uid + '_' + donorId)));
+        || (isSignedIn() && exists(/databases/$(database)/documents/reveals/$(request.auth.uid + '_' + donorId)))
+        // সম্মতিভিত্তিক: দাতা নিজে এই সিকারের অনুরোধ "রাজি" (accepted) করলে
+        // সিকার দাতার যোগাযোগ দেখতে পারবেন — quota লাগবে না।
+        || (isSignedIn()
+            && exists(/databases/$(database)/documents/donorRequests/$(request.auth.uid + '_' + donorId))
+            && get(/databases/$(database)/documents/donorRequests/$(request.auth.uid + '_' + donorId)).data.status == 'accepted');
 
       allow write: if isOwner(donorId) || isAdmin();
     }
@@ -218,6 +223,102 @@ service cloud.firestore {
     match /ambulances/{id} {
       allow get, list: if true;
       allow write: if isAdmin();
+    }
+
+    // ── donorRequests: সিকার → দাতাকে সরাসরি রক্তের অনুরোধ ─────────
+    // doc id = সিকারUID_দাতাUID (একই জোড়ায় ডুপ্লিকেট হয় না)। শুধু ঐ দুজন পড়তে
+    // পারেন। দাতা শুধু pending→accepted/declined করতে পারেন; সিকার pending
+    // বাতিল করতে, বা ২৪ ঘণ্টা পর নতুন করে (renew) পাঠাতে পারেন।
+    // নোটিফিকেশন পাঠায় সার্ভার (api/notify.js) — ক্লায়েন্ট অন্যকে সরাসরি
+    // পুশ পাঠাতে পারে না, আর এখানে কোনো ফোন নম্বর নেই।
+    match /donorRequests/{reqId} {
+      allow get: if isAdmin() || (isSignedIn()
+        && (resource.data.donorId == request.auth.uid || resource.data.seekerUid == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && request.query.limit <= 50
+        && (resource.data.donorId == request.auth.uid || resource.data.seekerUid == request.auth.uid));
+
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly(['donorId','seekerUid','seekerName','msg','status','createdAt'])
+        && request.resource.data.donorId is string
+        && request.resource.data.donorId != request.auth.uid
+        && reqId == request.auth.uid + '_' + request.resource.data.donorId
+        && request.resource.data.seekerUid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.seekerName is string
+        && request.resource.data.seekerName.size() >= 1 && request.resource.data.seekerName.size() <= 60
+        && request.resource.data.msg is string
+        && request.resource.data.msg.size() >= 1 && request.resource.data.msg.size() <= 500
+        && request.resource.data.createdAt == request.time
+        && exists(/databases/$(database)/documents/donors/$(request.resource.data.donorId))
+        && (
+          !exists(/databases/$(database)/documents/users/$(request.auth.uid))
+          || !('lastDonorRequestAt' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data)
+          || request.time > get(/databases/$(database)/documents/users/$(request.auth.uid)).data.lastDonorRequestAt + duration.value(10, 's')
+        );
+
+      allow update: if isSignedIn() && (
+        // (১) দাতা সাড়া দেন
+        (resource.data.donorId == request.auth.uid
+          && resource.data.status == 'pending'
+          && request.resource.data.status in ['accepted','declined']
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','respondedAt'])
+          && request.resource.data.respondedAt == request.time)
+        ||
+        // (২) সিকার pending অনুরোধ বাতিল করেন
+        (resource.data.seekerUid == request.auth.uid
+          && resource.data.status == 'pending'
+          && request.resource.data.status == 'cancelled'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+        ||
+        // (৩) সিকার ২৪ ঘণ্টা পর নতুন করে পাঠান (পুরনো সাড়া মুছে pending)
+        (resource.data.seekerUid == request.auth.uid
+          && resource.data.status != 'pending'
+          && request.time > resource.data.createdAt + duration.value(1, 'd')
+          && request.resource.data.keys().hasOnly(['donorId','seekerUid','seekerName','msg','status','createdAt'])
+          && request.resource.data.donorId == resource.data.donorId
+          && request.resource.data.seekerUid == request.auth.uid
+          && request.resource.data.status == 'pending'
+          && request.resource.data.seekerName is string
+          && request.resource.data.seekerName.size() >= 1 && request.resource.data.seekerName.size() <= 60
+          && request.resource.data.msg is string
+          && request.resource.data.msg.size() >= 1 && request.resource.data.msg.size() <= 500
+          && request.resource.data.createdAt == request.time
+          && (
+            !exists(/databases/$(database)/documents/users/$(request.auth.uid))
+            || !('lastDonorRequestAt' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data)
+            || request.time > get(/databases/$(database)/documents/users/$(request.auth.uid)).data.lastDonorRequestAt + duration.value(10, 's')
+          ))
+      ) || isAdmin();
+
+      allow delete: if isAdmin();
+
+      // সিকারের ফোন — সিকার লেখেন; দাতা শুধু "accepted" হলে পড়তে পারেন
+      match /contact/{docId} {
+        allow list: if false;
+        allow get: if isSignedIn() && docId == 'phone' && (
+          get(/databases/$(database)/documents/donorRequests/$(reqId)).data.seekerUid == request.auth.uid
+          || (get(/databases/$(database)/documents/donorRequests/$(reqId)).data.donorId == request.auth.uid
+              && get(/databases/$(database)/documents/donorRequests/$(reqId)).data.status == 'accepted')
+        ) || isAdmin();
+        allow create, update: if isSignedIn() && docId == 'phone'
+          && getAfter(/databases/$(database)/documents/donorRequests/$(reqId)).data.seekerUid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['phone'])
+          && request.resource.data.phone is string
+          && request.resource.data.phone.size() >= 11 && request.resource.data.phone.size() <= 14;
+        allow delete: if isAdmin();
+      }
+    }
+
+    // ── fcmTokens: পুশ নোটিফিকেশনের ডিভাইস টোকেন (ব্যক্তিগত) ──────────
+    // শুধু মালিক নিজের টোকেন লিখতে/পড়তে পারেন। সার্ভার (Admin SDK) rules
+    // এড়িয়ে পড়ে। সর্বোচ্চ ৫টি ডিভাইস।
+    match /fcmTokens/{uid} {
+      allow list: if false;
+      allow get, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['tokens','updatedAt'])
+        && request.resource.data.tokens is list
+        && request.resource.data.tokens.size() <= 5;
     }
 
     // ── settings: সাইট-লেভেল সেটিংস (about.html-এর founder ছবি) ─────

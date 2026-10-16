@@ -1,0 +1,7 @@
+{
+  "name": "sondhan",
+  "private": true,
+  "description": "Static site + one serverless function (api/notify.js) for push notifications.",
+  "engines": { "node": ">=20" },
+  "dependencies": { "firebase-admin": "^13.0.0" }
+}

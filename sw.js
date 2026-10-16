@@ -6,7 +6,7 @@
 // ══════════════════════════════════════════════════════════
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন।
-const CACHE_VERSION = 'sondhan-v46-no-cross-origin';
+const CACHE_VERSION = 'sondhan-v47-push';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -22,12 +22,14 @@ const APP_SHELL = [
   './admin.html',
   './ambulance.html',
   './bloodbank.html',
+  './inbox.html',
   './offline.html',
   './style.css',
   './app.js',
   './firebase-config.js',
   './firebase-config-auth.js',
   './auth-guard.js',
+  './notify.js',
   './manifest.json',
   './sondhan-logo.png',
   './sondhan-logo-white.png',
@@ -127,4 +129,44 @@ self.addEventListener('fetch', event => {
       return fetch(req).then(res => { putInCache(req, res); return res; });
     })
   );
+});
+
+// ══════════════════════════════════════════════════════════
+// পুশ নোটিফিকেশন (শুধু data-only বার্তা — FCM থেকে আসে)।
+// fetch/cache লজিকে কোনো পরিবর্তন নেই। payload-এ ফোন নম্বর/ব্যক্তিগত তথ্য
+// কখনো থাকে না; শুধু শিরোনাম, সংক্ষিপ্ত লেখা আর অ্যাপের ভেতরের লিংক।
+// ══════════════════════════════════════════════════════════
+self.addEventListener('push', event => {
+  let d = {};
+  try {
+    const p = event.data ? event.data.json() : {};
+    d = p.data || p.notification || p;      // FCM data-only: { data: {...} }
+  } catch (_) {}
+  const title = String(d.title || 'Sondhan').slice(0, 80);
+  const body = String(d.body || '').slice(0, 180);
+  // শুধু নিজেদের origin-এর ভেতরের পাথ খোলা হবে
+  const url = (typeof d.url === 'string' && d.url.startsWith('/') && !d.url.startsWith('//')) ? d.url : '/inbox.html';
+  event.waitUntil(self.registration.showNotification(title, {
+    body,
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: d.tag || 'sondhan',         // একই অনুরোধের একাধিক পুশ একটাতে মিশে যায়
+    renotify: true,
+    requireInteraction: false,
+    data: { url }
+  }));
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const target = new URL((event.notification.data && event.notification.data.url) || '/inbox.html', self.location.origin).href;
+  event.waitUntil((async () => {
+    const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const w of wins) {
+      if (w.url.startsWith(self.location.origin)) {
+        try { await w.focus(); if ('navigate' in w) await w.navigate(target); return; } catch (_) {}
+      }
+    }
+    await self.clients.openWindow(target);
+  })());
 });

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#c0392b"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>আমার অনুরোধ — Sondhan</title>
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding-bottom:76px}
+.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
+.back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header h1{color:#fff;font-size:16px;font-weight:800;font-family:'Hind Siliguri',sans-serif}
+.scr{flex:1;padding:12px;display:flex;flex-direction:column;gap:12px;font-family:'Hind Siliguri',sans-serif}
+
+/* পুশ কার্ড */
+.push{border-radius:16px;padding:14px;display:flex;gap:12px;align-items:flex-start;background:linear-gradient(135deg,#fff,#fdf1ef);border:1px solid #f3d9d5;box-shadow:0 1px 8px rgba(0,0,0,.05)}
+.push.ok{background:linear-gradient(135deg,#fff,#eef8f0);border-color:#cfe9d6}
+.push.warn{background:#fff8e6;border-color:#f1d58a}
+.push-ic{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.push.ok .push-ic{background:linear-gradient(135deg,#27ae60,#2ecc71)}
+.push.warn .push-ic{background:#e6a817}
+.push-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.push h2{font-size:14.5px;font-weight:700;color:#222;line-height:1.5}
+.push p{font-size:12.5px;color:#666;line-height:1.7;margin-top:2px}
+.push .btn{margin-top:10px;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:0 18px;border:0;border-radius:12px;background:#c0392b;color:#fff;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(192,57,43,.25)}
+.push .btn:disabled{opacity:.6}
+.push .link{background:none;border:0;color:#888;font-family:inherit;font-size:12px;text-decoration:underline;cursor:pointer;margin-top:6px;padding:4px 0}
+
+/* ট্যাব */
+.tabs{display:flex;background:#fff;border-radius:14px;padding:4px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.tab{flex:1;border:0;background:none;padding:10px 6px;border-radius:11px;font-family:inherit;font-size:13.5px;font-weight:600;color:#777;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.tab[aria-selected="true"]{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;box-shadow:0 3px 10px rgba(192,57,43,.28)}
+.tab .n{min-width:20px;height:20px;border-radius:10px;padding:0 6px;background:#c0392b;color:#fff;font-size:11px;font-weight:700;display:none;align-items:center;justify-content:center}
+.tab .n.show{display:inline-flex}
+.tab[aria-selected="true"] .n{background:#fff;color:#c0392b}
+.tab:focus-visible,.btn:focus-visible,.act:focus-visible,.link:focus-visible{outline:3px solid #8e44ad;outline-offset:2px}
+
+/* অনুরোধ কার্ড */
+.list{display:flex;flex-direction:column;gap:10px}
+.card{background:#fff;border-radius:16px;padding:14px;box-shadow:0 1px 8px rgba(0,0,0,.06);border-left:4px solid #e0e0e0}
+.card.pending{border-left-color:#e6a817}
+.card.accepted{border-left-color:#27ae60}
+.card.new{animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.97);box-shadow:0 0 0 0 rgba(192,57,43,.35)}100%{transform:scale(1);box-shadow:0 1px 8px rgba(0,0,0,.06)}}
+.row{display:flex;align-items:center;gap:10px}
+.av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#fdecea,#fde);border:2px solid #f3d9d5;color:#c0392b;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:15px}
+.av img{width:100%;height:100%;object-fit:cover}
+.who{flex:1;min-width:0}
+.who b{display:block;font-size:14.5px;color:#222;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who span{font-size:11.5px;color:#999}
+.chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.chip.pending{background:#fff4d6;color:#9a6b00}.chip.accepted{background:#dff5e6;color:#1e7a3c}.chip.declined,.chip.cancelled{background:#eee;color:#777}
+.msg{margin-top:10px;background:#faf6f5;border-radius:12px;padding:10px 12px;font-size:13px;color:#444;line-height:1.75;word-break:break-word;white-space:pre-wrap}
+.acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.act{flex:1;min-width:120px;min-height:44px;border:0;border-radius:12px;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.act.yes{background:#27ae60;color:#fff;box-shadow:0 4px 12px rgba(39,174,96,.25)}
+.act.no{background:#f1f1f1;color:#555}
+.act.call{background:#c0392b;color:#fff}
+.act.wa{background:#25D366;color:#fff}
+.act.fb{background:#1877f2;color:#fff}
+.act.ghost{background:#fff;color:#c0392b;border:1.5px solid #f3d9d5}
+.act:disabled{opacity:.55;cursor:default}
+.note{font-size:12px;color:#777;margin-top:8px;line-height:1.7}
+
+/* অবস্থা: লোডিং / খালি / ত্রুটি / লগইন */
+.state{text-align:center;padding:36px 18px;color:#777}
+.state .ico{width:64px;height:64px;border-radius:50%;background:#fdecea;color:#c0392b;margin:0 auto 14px;display:flex;align-items:center;justify-content:center}
+.state .ico svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.state h3{font-size:15.5px;color:#333;margin-bottom:4px}
+.state p{font-size:13px;line-height:1.75}
+.state a.btn,.state button.btn{margin-top:14px;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px;border-radius:12px;background:#c0392b;color:#fff;font-family:inherit;font-size:14px;font-weight:700;text-decoration:none;border:0;cursor:pointer}
+.spin{width:34px;height:34px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 12px}
+@keyframes sp{to{transform:rotate(360deg)}}
+[hidden]{display:none!important}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;max-width:88vw;text-align:center}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html" class="back" aria-label="হোমে ফিরুন">←</a>
+  <div class="sondhan-logo sondhan-logo--navbar-crop">
+    <img src="sondhan-logo.png" alt="Sondhan" decoding="async"/>
+  </div>
+  <h1>আমার অনুরোধ</h1>
+</div>
+
+<div class="scr">
+  <div id="push-card" hidden></div>
+
+  <div class="tabs" role="tablist" aria-label="অনুরোধের ধরন">
+    <button class="tab" role="tab" id="tab-recv" aria-selected="true" aria-controls="list-recv">পাওয়া অনুরোধ <span class="n" id="n-recv"></span></button>
+    <button class="tab" role="tab" id="tab-sent" aria-selected="false" aria-controls="list-sent">পাঠানো অনুরোধ</button>
+  </div>
+
+  <div id="state-loading" class="state"><div class="spin"></div><p>লোড হচ্ছে...</p></div>
+  <div id="state-login" class="state" hidden>
+    <div class="ico"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+    <h3>অনুরোধ দেখতে লগইন করুন</h3><p>আপনার পাওয়া ও পাঠানো রক্তের অনুরোধ এখানে দেখা যাবে।</p>
+    <a class="btn" id="login-btn" href="login.html?redirect=inbox.html">লগইন করুন</a>
+  </div>
+  <div id="state-error" class="state" hidden>
+    <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div>
+    <h3>লোড করা যায়নি</h3><p id="error-msg">ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।</p>
+    <button class="btn" onclick="location.reload()">আবার চেষ্টা করুন</button>
+  </div>
+
+  <div id="list-recv" class="list" role="tabpanel" aria-labelledby="tab-recv" hidden></div>
+  <div id="list-sent" class="list" role="tabpanel" aria-labelledby="tab-sent" hidden></div>
+</div>
+
+<div class="bnav">
+    <a class="bnav-item bnav-item--home" href="index.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V21H15V15H9V21H3V12Z"/></svg></span><span class="bl">হোম</span></a>
+    <a class="bnav-item bnav-item--search" href="search.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></span><span class="bl">খুঁজুন</span></a>
+    <a class="bnav-center" href="request.html"><div class="bc-btn"><svg class="bnav-svg bnav-svg--drop" viewBox="0 0 24 24"><path d="M12 21.5c4.5 0 7.5-3.5 7.5-7.5c0-5-7.5-12-7.5-12S4.5 9 4.5 14c0 4 3 7.5 7.5 7.5z"/></svg></div><span class="bl">অনুরোধ</span></a>
+    <a class="bnav-item bnav-item--bloodbank" href="bloodbank.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><path d="M12 13.2c1.4 0 2.4-1.1 2.4-2.4c0-1.6-2.4-3.8-2.4-3.8s-2.4 2.2-2.4 3.8c0 1.3 1 2.4 2.4 2.4z" fill="currentColor" stroke="none"/></svg></span><span class="bl">ব্লাড ব্যাংক</span></a>
+    <a class="bnav-item bnav-item--profile" href="profile.html"><span class="bnav-pill"><svg class="bnav-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3 3.6-6 8-6s8 3 8 6"/></svg></span><span class="bl">প্রোফাইল</span></a>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { esc, initials, timeAgo, telLink, waLink, toBn } from './app.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, query, where, limit, onSnapshot, doc, getDoc, updateDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { pushSupport, pushEnabledHere, enablePush, disablePush, refreshPushToken, notifyServer } from './notify.js';
+
+const $ = id => document.getElementById(id);
+const show = (id, on = true) => { $(id).hidden = !on; };
+const toast = m => { const t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(window._tt); window._tt = setTimeout(() => t.classList.remove('show'), 2800); };
+const ICON = {
+  bell: '<svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg>',
+  info: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".6" fill="currentColor"/></svg>',
+  inbox: '<svg viewBox="0 0 24 24"><path d="M4 13v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><path d="M4 13 6.5 5.5A2 2 0 0 1 8.4 4h7.2a2 2 0 0 1 1.9 1.5L20 13h-5a3 3 0 0 1-6 0H4z"/></svg>',
+  send: '<svg viewBox="0 0 24 24"><path d="M21 3 10 14"/><path d="M21 3l-7 18-4-7-7-4 18-7z"/></svg>'
+};
+const STATUS_RECV = { pending: 'নতুন', accepted: 'আপনি রাজি', declined: 'আপনি অপারগ', cancelled: 'বাতিল' };
+const STATUS_SENT = { pending: 'অপেক্ষায়', accepted: 'রাজি হয়েছেন', declined: 'পারছেন না', cancelled: 'বাতিল করা' };
+
+let me = null, unsubs = [], recv = [], sent = [], first = { recv: true, sent: true };
+const donorCache = new Map();
+
+/* ── ট্যাব ── */
+function selectTab(which) {
+  const r = which === 'recv';
+  $('tab-recv').setAttribute('aria-selected', r); $('tab-sent').setAttribute('aria-selected', !r);
+  show('list-recv', r); show('list-sent', !r);
+  history.replaceState(null, '', r ? 'inbox.html' : 'inbox.html?tab=sent');
+}
+$('tab-recv').onclick = () => selectTab('recv'); $('tab-sent').onclick = () => selectTab('sent');
+
+/* ── পুশ কার্ড ── */
+function pushCard() {
+  const el = $('push-card'); const s = pushSupport();
+  const card = (cls, ico, h, p, extra = '') => { el.className = 'push ' + cls; el.innerHTML = `<div class="push-ic">${ico}</div><div><h2>${h}</h2><p>${p}</p>${extra}</div>`; el.hidden = false; };
+  if (pushEnabledHere()) {
+    card('ok', ICON.check, 'নোটিফিকেশন চালু আছে', 'নতুন অনুরোধ এলে এই ফোনে সাথে সাথে জানানো হবে।', '<button class="link" id="push-off">এই ডিভাইসে বন্ধ করুন</button>');
+    $('push-off').onclick = async () => { await disablePush(); toast('নোটিফিকেশন বন্ধ করা হয়েছে'); pushCard(); };
+  } else if (s.ok) {
+    card('', ICON.bell, 'নতুন অনুরোধ সাথে সাথে জানতে চান?', 'কেউ আপনার কাছে রক্ত চাইলে ফোনে নোটিফিকেশন আসবে — অ্যাপ খোলা না থাকলেও।', '<button class="btn" id="push-on">নোটিফিকেশন চালু করুন</button>');
+    $('push-on').onclick = async (e) => {
+      const b = e.currentTarget; b.disabled = true; b.textContent = 'চালু হচ্ছে...';
+      const r = await enablePush();
+      if (r.ok) toast('নোটিফিকেশন চালু হয়েছে ✓');
+      else if (r.reason === 'denied') toast('ব্রাউজারে অনুমতি বন্ধ — সেটিংস থেকে চালু করুন');
+      else if (r.reason !== 'dismissed') toast('এখন চালু করা যায়নি — পরে আবার চেষ্টা করুন');
+      pushCard();
+    };
+  } else if (s.reason === 'ios-install') {
+    card('warn', ICON.info, 'iPhone-এ নোটিফিকেশন পেতে', 'Safari-এর শেয়ার বাটন (⬆) চেপে <b>“Add to Home Screen”</b> দিন, তারপর হোম স্ক্রিনের Sondhan আইকন থেকে খুলুন।');
+  } else if (s.reason === 'in-app') {
+    card('warn', ICON.info, 'নোটিফিকেশনের জন্য Chrome/Safari-এ খুলুন', 'Facebook/Instagram-এর ভেতরের ব্রাউজারে নোটিফিকেশন কাজ করে না। মেনু থেকে “ব্রাউজারে খুলুন” দিন।');
+  } else if (s.reason === 'denied') {
+    card('warn', ICON.info, 'নোটিফিকেশনের অনুমতি বন্ধ আছে', 'ব্রাউজারের সাইট সেটিংস থেকে Sondhan-এর নোটিফিকেশন “Allow” করুন।');
+  } else { el.hidden = true; }   // unsupported / not-configured: ইনবক্স আগের মতোই চলে
+}
+
+/* ── কার্ড রেন্ডার ── */
+function emptyState(kind) {
+  return `<div class="state"><div class="ico">${kind === 'recv' ? ICON.inbox : ICON.send}</div>` + (kind === 'recv'
+    ? '<h3>এখনো কোনো অনুরোধ আসেনি</h3><p>কেউ আপনার কাছে রক্ত চাইলে এখানে দেখা যাবে।<br>দাতা হিসেবে নিবন্ধন না করে থাকলে <a href="donor.html" style="color:#c0392b;font-weight:700">নিবন্ধন করুন</a>।</p>'
+    : '<h3>আপনি এখনো কাউকে অনুরোধ পাঠাননি</h3><p>রক্তদাতা খুঁজে “অনুরোধ পাঠান” চাপুন।</p><a class="btn" href="search.html">রক্তদাতা খুঁজুন</a>') + '</div>';
+}
+const ms = r => (r.createdAt && r.createdAt.toMillis) ? r.createdAt.toMillis() : 0;
+
+function renderRecv(fresh = new Set()) {
+  const box = $('list-recv'); const items = [...recv].sort((a, b) => ms(b) - ms(a));
+  const pending = items.filter(r => r.status === 'pending').length;
+  const n = $('n-recv'); n.textContent = toBn(pending); n.classList.toggle('show', pending > 0);
+  document.title = (pending ? `(${toBn(pending)}) ` : '') + 'আমার অনুরোধ — Sondhan';
+  if (!items.length) { box.innerHTML = emptyState('recv'); return; }
+  box.innerHTML = items.map(r => `
+    <div class="card ${esc(r.status)}${fresh.has(r.id) ? ' new' : ''}" data-id="${esc(r.id)}">
+      <div class="row"><div class="av">${esc(initials(r.seekerName))}</div>
+        <div class="who"><b>${esc(r.seekerName)}</b><span>${esc(timeAgo(r.createdAt))}</span></div>
+        <span class="chip ${esc(r.status)}">${esc(STATUS_RECV[r.status] || r.status)}</span></div>
+      <div class="msg">${esc(r.msg)}</div>
+      ${r.status === 'pending' ? `<div class="acts">
+          <button class="act yes" data-a="accept">রাজি আছি</button>
+          <button class="act no" data-a="decline">এখন পারছি না</button></div>
+        <p class="note">“রাজি” চাপলে সিকারের ফোন নম্বর আপনি দেখতে পাবেন, আর আপনার যোগাযোগও তাঁকে দেখানো হবে।</p>` : ''}
+      ${r.status === 'accepted' ? `<div class="acts" data-contact="seeker"><button class="act ghost" data-a="seeker-contact">সিকারের যোগাযোগ দেখুন</button></div>` : ''}
+    </div>`).join('');
+}
+
+async function donorInfo(id) {
+  if (donorCache.has(id)) return donorCache.get(id);
+  let v = { name: 'দাতা', photo: '' };
+  try { const s = await getDoc(doc(db, 'donors', id)); if (s.exists()) v = { name: s.data().name || 'দাতা', photo: s.data().photo || '' }; } catch (_) {}
+  donorCache.set(id, v); return v;
+}
+async function renderSent() {
+  const box = $('list-sent'); const items = [...sent].sort((a, b) => ms(b) - ms(a));
+  if (!items.length) { box.innerHTML = emptyState('sent'); return; }
+  const infos = await Promise.all(items.map(r => donorInfo(r.donorId)));
+  box.innerHTML = items.map((r, i) => { const d = infos[i]; return `
+    <div class="card ${esc(r.status)}" data-id="${esc(r.id)}" data-donor="${esc(r.donorId)}">
+      <div class="row"><div class="av">${d.photo && /^(data:image\/|https:\/\/)/.test(d.photo) ? `<img src="${esc(d.photo)}" alt="">` : esc(initials(d.name))}</div>
+        <div class="who"><b>${esc(d.name)}</b><span>${esc(timeAgo(r.createdAt))}</span></div>
+        <span class="chip ${esc(r.status)}">${esc(STATUS_SENT[r.status] || r.status)}</span></div>
+      <div class="msg">${esc(r.msg)}</div>
+      ${r.status === 'pending' ? `<div class="acts"><button class="act ghost" data-a="cancel">অনুরোধ বাতিল করুন</button></div><p class="note">দাতা সাড়া দিলে এখানে ও নোটিফিকেশনে জানতে পারবেন।</p>` : ''}
+      ${r.status === 'accepted' ? `<div class="acts" data-contact="donor"><button class="act call" data-a="donor-contact">যোগাযোগ করুন</button></div>` : ''}
+      ${r.status === 'declined' ? `<p class="note">দাতা এখন পারছেন না। অন্য দাতাকে অনুরোধ পাঠান।</p><div class="acts"><a class="act ghost" href="search.html">আরেকজন খুঁজুন</a></div>` : ''}
+    </div>`; }).join('');
+}
+
+/* ── অ্যাকশন ── */
+const contactButtons = (phone, wa, fb) => {
+  const out = [];
+  if (phone) out.push(`<a class="act call" href="${esc(telLink(phone))}">কল করুন</a>`);
+  if (wa || phone) out.push(`<a class="act wa" href="${esc(waLink(wa || phone))}" target="_blank" rel="noopener">WhatsApp</a>`);
+  if (fb && /^https:\/\/(www\.|m\.)?facebook\.com\//i.test(fb)) out.push(`<a class="act fb" href="${esc(fb)}" target="_blank" rel="noopener noreferrer">Facebook</a>`);
+  return out.join('') || '<p class="note">যোগাযোগের তথ্য পাওয়া যায়নি।</p>';
+};
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-a]'); if (!b || b.disabled) return;
+  const card = b.closest('.card'); const id = card && card.dataset.id; const a = b.dataset.a;
+  const reqRef = doc(db, 'donorRequests', id);
+  const lock = (txt) => { card.querySelectorAll('button.act').forEach(x => x.disabled = true); if (txt) b.textContent = txt; };
+  try {
+    if (a === 'accept' || a === 'decline') {
+      lock('অপেক্ষা করুন...');
+      await updateDoc(reqRef, { status: a === 'accept' ? 'accepted' : 'declined', respondedAt: serverTimestamp() });
+      toast(a === 'accept' ? 'ধন্যবাদ! সিকারকে জানানো হচ্ছে' : 'জানিয়ে দেওয়া হয়েছে');
+      notifyServer(id, 'response');                         // best-effort পুশ
+    } else if (a === 'cancel') {
+      lock('বাতিল হচ্ছে...'); await updateDoc(reqRef, { status: 'cancelled' }); toast('অনুরোধ বাতিল করা হয়েছে');
+    } else if (a === 'seeker-contact') {
+      lock('লোড হচ্ছে...');
+      const s = await getDoc(doc(db, 'donorRequests', id, 'contact', 'phone'));
+      card.querySelector('[data-contact]').innerHTML = contactButtons(s.exists() ? s.data().phone : '', '', '');
+    } else if (a === 'donor-contact') {
+      lock('লোড হচ্ছে...');
+      const s = await getDoc(doc(db, 'donorsPrivate', card.dataset.donor)); const d = s.exists() ? s.data() : {};
+      card.querySelector('[data-contact]').innerHTML = contactButtons(d.phone, d.wa, d.facebook);
+    }
+  } catch (err) {
+    console.warn('[inbox] action failed:', err);
+    toast(err && err.code === 'permission-denied' ? 'এই কাজটি এখন করা যাচ্ছে না' : 'ব্যর্থ হয়েছে — আবার চেষ্টা করুন');
+    card.querySelectorAll('button.act').forEach(x => x.disabled = false);
+  }
+});
+
+/* ── রিয়েলটাইম লিসেনার ── */
+function listen() {
+  unsubs.forEach(u => u()); unsubs = [];
+  let settled = false;
+  const fail = (err) => {
+    if (settled) return; settled = true; console.warn('[inbox] listen error:', err);
+    $('error-msg').textContent = (err && err.code === 'permission-denied')
+      ? 'এই মুহূর্তে অনুরোধ দেখা যাচ্ছে না। কিছুক্ষণ পরে আবার চেষ্টা করুন।' : 'ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।';
+    show('state-loading', false); show('state-error'); show('list-recv', false); show('list-sent', false);
+  };
+  const done = () => { if (settled) return; settled = true; show('state-loading', false); show('state-error', false); selectTab(new URLSearchParams(location.search).get('tab') === 'sent' ? 'sent' : 'recv'); };
+  const timer = setTimeout(() => fail({ code: 'timeout' }), 12000);        // কখনো চিরকাল ঘুরবে না
+
+  unsubs.push(onSnapshot(query(collection(db, 'donorRequests'), where('donorId', '==', me.uid), limit(50)), snap => {
+    clearTimeout(timer);
+    const fresh = new Set();
+    if (!first.recv) snap.docChanges().forEach(c => { if (c.type === 'added' && c.doc.data().status === 'pending') { fresh.add(c.doc.id); toast('নতুন রক্তের অনুরোধ এসেছে'); } });
+    first.recv = false; recv = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderRecv(fresh); done();
+  }, fail));
+  unsubs.push(onSnapshot(query(collection(db, 'donorRequests'), where('seekerUid', '==', me.uid), limit(50)), snap => {
+    const changed = !first.sent && snap.docChanges().some(c => c.type === 'modified' && ['accepted', 'declined'].includes(c.doc.data().status));
+    first.sent = false; sent = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderSent();
+    if (changed) toast('একটি অনুরোধে দাতা সাড়া দিয়েছেন');
+  }, err => console.warn('[inbox] sent listen error:', err)));
+}
+
+onAuthStateChanged(auth, user => {
+  if (!user) { show('state-loading', false); show('state-login'); show('list-recv', false); show('list-sent', false); $('push-card').hidden = true; return; }
+  me = user; show('state-login', false); pushCard(); refreshPushToken(); listen();
+});
+addEventListener('pagehide', () => unsubs.forEach(u => u()));
+</script>
+<script>
+// নিরাপত্তা-জাল: মূল module যদি লোডই না হয় (ধীর/ব্লকড নেটওয়ার্ক), স্পিনারে আটকে না রেখে স্পষ্ট বার্তা
+setTimeout(function () {
+  var l = document.getElementById('state-loading');
+  if (l && !l.hidden) { l.hidden = true; document.getElementById('state-error').hidden = false; }
+}, 15000);
+if ('serviceWorker' in navigator) {
+  var hadController = !!navigator.serviceWorker.controller, swRefreshed = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function () { if (swRefreshed || !hadController) return; swRefreshed = true; location.reload(); });
+  window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js').catch(function (e) { console.warn('SW register failed:', e); }); });
+}
+</script>
+</body>
+</html>

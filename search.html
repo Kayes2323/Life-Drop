@@ -490,7 +490,7 @@
       <div class="form-group"><label>আপনার নাম *</label>
         <div class="iw"><svg class="ic ic-sm iico2"><use href="#i-user"/></svg><input type="text" id="req-name" placeholder="আপনার নাম"/></div>
       </div>
-      <div class="form-group"><label>আপনার ফোন *</label>
+      <div class="form-group"><label>আপনার ফোন * <span style="font-weight:400;color:#999;font-size:11px">(দাতা রাজি হলে তবেই দেখতে পাবেন)</span></label>
         <div class="iw"><svg class="ic ic-sm iico2"><use href="#i-phone"/></svg><input type="tel" id="req-phone" placeholder="01XXXXXXXXX"/></div>
       </div>
       <div class="form-group"><label>হাসপাতাল ও বিবরণ *</label>
@@ -535,8 +535,8 @@ function stopLoadingMsgs(){ clearInterval(_loadTimer); }
 <script type="module">
 // Dynamic imports + try/catch: a failed/stale module must not leave Search blank.
 // Manual location browse + blood-group UI still need these; GPS remains optional.
-let auth, db, esc, initials, waLink, telLink, isValidBdPhone, isValidFacebookUrl, DIVISIONS, DISTRICTS, UPAZILAS;
-let onAuthStateChanged, collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp, runTransaction;
+let auth, db, esc, initials, waLink, telLink, isValidBdPhone, normalizeBdPhone, isValidFacebookUrl, DIVISIONS, DISTRICTS, UPAZILAS;
+let onAuthStateChanged, collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp, runTransaction, writeBatch;
 
 // TEMP DIAGNOSTIC (production incident — ঠিক কোন import ব্যর্থ হচ্ছে এবং কেন,
 // সেটা এখনো অজানা; screenshot থেকে এতদূর শুধু "ব্যর্থ হয়েছে" দেখা যাচ্ছে, "কেন"
@@ -548,11 +548,11 @@ let _bootStep = 'firebase-config.js';
 try {
   ({ auth, db } = await import('./firebase-config.js'));
   _bootStep = 'app.js';
-  ({ esc, initials, waLink, telLink, isValidBdPhone, isValidFacebookUrl, DIVISIONS, DISTRICTS, UPAZILAS } = await import('./app.js'));
+  ({ esc, initials, waLink, telLink, isValidBdPhone, normalizeBdPhone, isValidFacebookUrl, DIVISIONS, DISTRICTS, UPAZILAS } = await import('./app.js'));
   _bootStep = 'gstatic firebase-auth.js';
   ({ onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"));
   _bootStep = 'gstatic firebase-firestore.js';
-  ({ collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp, runTransaction } =
+  ({ collection, getDocs, addDoc, doc, getDoc, query, where, limit, serverTimestamp, runTransaction, writeBatch } =
     await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"));
 } catch (bootErr) {
   const elapsed = Date.now() - _bootT0;
@@ -1874,26 +1874,48 @@ window.openReq = (id,name,blood) => {
 
 window.submitReq = async () => {
   if (needLogin()) return;
-  const id    = document.getElementById('req-donor-id').value;
+  const donorId = document.getElementById('req-donor-id').value;
   const name  = document.getElementById('req-name').value.trim();
   const phone = document.getElementById('req-phone').value.trim();
   const msg   = document.getElementById('req-msg').value.trim();
   if(!name||!phone||!msg){ showToast('সব তথ্য পূরণ করুন'); return; }
   if(!isValidBdPhone(phone)){ showToast('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)'); return; }
   if(msg.length > 500){ showToast('বার্তা ৫০০ অক্ষরের কম রাখুন'); return; }
+  if(donorId === CU.uid){ showToast('নিজেকে অনুরোধ পাঠানো যাবে না'); return; }
   const btn = document.getElementById('req-btn');
+  const label = btn.innerHTML;
   btn.textContent='পাঠানো হচ্ছে...'; btn.disabled=true;
+  const id = CU.uid + '_' + donorId;                       // একই দাতাকে ডুপ্লিকেট অনুরোধ হয় না
+  const reqRef = doc(db, 'donorRequests', id);
   try {
-    await addDoc(collection(db,'requests'),{
-      donorId:id, seekerName:name, seekerPhone:phone,
-      seekerUid:CU.uid, msg, status:'pending',
-      createdAt:serverTimestamp()
-    });
+    // একই batch: অনুরোধ (নতুন বা ২৪ ঘণ্টা পর renew — সিদ্ধান্ত rules নেয়) + গতি-সীমার stamp + সিকারের ফোন
+    // (ফোন আলাদা সাব-ডকে; দাতা রাজি না হলে পড়তে পারেন না)
+    const batch = writeBatch(db);
+    batch.set(reqRef, { donorId, seekerUid: CU.uid, seekerName: name.slice(0,60), msg, status: 'pending', createdAt: serverTimestamp() });
+    batch.set(doc(db, 'users', CU.uid), { lastDonorRequestAt: serverTimestamp() }, { merge: true });
+    batch.set(doc(db, 'donorRequests', id, 'contact', 'phone'), { phone: normalizeBdPhone(phone) });
+    await batch.commit();
     document.getElementById('req-modal').classList.remove('open');
     document.getElementById('req-msg').value='';
-    showToast('অনুরোধ পাঠানো হয়েছে');
-  } catch(e){ showToast('অনুরোধ পাঠানো যায়নি'); console.warn(e); }
-  finally{ btn.innerHTML='<svg class="ic ic-sm" style="vertical-align:-2px;margin-right:5px"><use href="#i-droplet-f"/></svg>অনুরোধ পাঠান'; btn.disabled=false; }
+    showToast('অনুরোধ পাঠানো হয়েছে — দাতা সাড়া দিলে জানানো হবে');
+    // পুশ নোটিফিকেশন best-effort: ব্যর্থ/বন্ধ থাকলেও অনুরোধ ঠিকই দাতার ইনবক্সে পৌঁছায়
+    import('./notify.js').then(m => m.notifyServer(id, 'new')).catch(() => {});
+  } catch(e){
+    console.warn(e);
+    let m = 'অনুরোধ পাঠানো যায়নি — আবার চেষ্টা করুন';
+    if (e && e.code === 'permission-denied') {
+      // কারণ বুঝে সঠিক বার্তা: আগের অনুরোধ আছে কি না, নাকি গতি-সীমা
+      try {
+        const prev = await getDoc(reqRef);
+        const t = prev.exists() && prev.data().createdAt && prev.data().createdAt.toMillis ? prev.data().createdAt.toMillis() : 0;
+        if (prev.exists() && prev.data().status === 'pending') m = 'আপনি আগেই এই দাতাকে অনুরোধ পাঠিয়েছেন — সাড়ার অপেক্ষা করুন';
+        else if (prev.exists() && Date.now() - t < 24*3600*1000) m = 'এই দাতাকে ২৪ ঘণ্টা পর আবার অনুরোধ পাঠাতে পারবেন';
+        else m = 'একটু পরে (১০ সেকেন্ড) আবার চেষ্টা করুন';
+      } catch (_) { m = 'একটু পরে আবার চেষ্টা করুন'; }
+    }
+    showToast(m);
+  }
+  finally{ btn.innerHTML = label; btn.disabled=false; }
 };
 
 // এলাকা (GPS+সার্চ) UI পেজ লোড হওয়ার সাথে সাথেই রেডি থাকে — আলাদা কোনো

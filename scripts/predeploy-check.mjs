@@ -60,13 +60,27 @@ for (const u of locs) {
   if (fileFor(u).startsWith('guides/') && /(?:\+?88)?01[3-9]\d{8}/.test(h.replace(/<[^>]+>/g, ' '))) probs.push('phone-like number in guide');
   check(probs.length === 0, `SEO ${new URL(u).pathname}${probs.length ? ' — ' + probs.join('; ') : ''}`);
 }
-for (const f of ['login', 'signup', 'register', 'profile', 'request', 'admin', 'offline']) check(/name="robots" content="noindex/.test(fs.readFileSync(path.join(ROOT, f + '.html'), 'utf8')), `${f}.html is noindex`);
+for (const f of ['login', 'signup', 'register', 'profile', 'request', 'admin', 'offline', 'inbox']) check(/name="robots" content="noindex/.test(fs.readFileSync(path.join(ROOT, f + '.html'), 'utf8')), `${f}.html is noindex`);
 const rb = fs.readFileSync(path.join(ROOT, 'robots.txt'), 'utf8');
 try { execFileSync('node', [path.join(ROOT, 'scripts/build-sitemap.mjs'), '--check'], { stdio: 'pipe' }); ok('sitemap.xml lists exactly the public pages + guides (scripts/build-sitemap.mjs)'); }
 catch { bad('sitemap.xml is out of date — run: node scripts/build-sitemap.mjs'); }
 const inKey = fs.readdirSync(ROOT).filter(f => /^[0-9a-f]{32}\.txt$/.test(f));
 check(inKey.length === 1 && fs.readFileSync(path.join(ROOT, inKey[0]), 'utf8').trim() === inKey[0].replace('.txt', ''), 'IndexNow key file present and its content matches its name');
 check(/Sitemap: https:\/\/www\.sondhan\.org\/sitemap\.xml/.test(rb) && !/^Disallow:\s*\/\s*$/m.test(rb), 'robots.txt references sitemap and does not block the site');
+
+console.log('[1c] notification system');
+for (const f of ['inbox.html', 'notify.js', 'api/notify.js', 'package.json']) check(fs.existsSync(path.join(ROOT, f)), `${f} exists`);
+try { execFileSync('node', ['--check', path.join(ROOT, 'api/notify.js')], { stdio: 'pipe' }); ok('api/notify.js parses'); } catch { bad('api/notify.js has a syntax error'); }
+check(/addEventListener\('push'/.test(sw) && /addEventListener\('notificationclick'/.test(sw), 'sw.js handles push + notificationclick');
+check(/startsWith\('\/'\) && !d\.url\.startsWith\('\/\/'\)/.test(sw), 'sw.js only opens same-origin paths from push payloads');
+check(['fcmregistrations.googleapis.com', 'fcm.googleapis.com', 'firebaseinstallations.googleapis.com'].every(h => csp.includes(h)), 'CSP connect-src allows the FCM endpoints');
+const rules = fs.readFileSync(path.join(ROOT, 'firestore.rules'), 'utf8');
+check(/match \/donorRequests\/\{reqId\}/.test(rules) && /match \/fcmTokens\/\{uid\}/.test(rules), 'firestore.rules defines donorRequests + fcmTokens');
+check(!/match \/pushLimits/.test(rules), 'pushLimits stays server-only (no client rule)');
+const nj = fs.readFileSync(path.join(ROOT, 'api/notify.js'), 'utf8');
+check(!/phone|email/i.test(nj.slice(nj.indexOf('data: {'), nj.indexOf('webpush'))), 'push payload code contains no phone/email fields');
+const pk = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+check(Object.keys(pk.dependencies || {}).join() === 'firebase-admin', 'only firebase-admin is a runtime dependency');
 
 console.log('[2] browser check (real sw.js + real CSP)');
 let chromium;
