@@ -20,7 +20,7 @@ import { detectInAppBrowser } from './app.js';
 // Firebase Console → Project settings → Cloud Messaging → "Web Push certificates"
 // → "Generate key pair" থেকে পাওয়া PUBLIC key এখানে বসান (এটা গোপন নয়)।
 // খালি থাকলে পুশ বন্ধ থাকে (ইনবক্স চলে)।
-export const VAPID_KEY = '';
+export const VAPID_KEY = 'BPOztdNi30p78hk4ZwKYV__E6fTjAM5qvW0AqT3tunv6R96DXEDNLGQPxw-aUmXyWy3SWDaRPfVj7CBW03EE1ZM';
 
 const LS_KEY = 'sondhan-push-on';
 const withTimeout = (p, ms, label) => Promise.race([
