@@ -329,6 +329,34 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── healthRecords: ব্যক্তিগত মেডিকেল ফাইল (প্রেসক্রিপশন/রিপোর্ট) ──────
+    // প্রতিটা ডকুমেন্ট একজন ব্যবহারকারীর — শুধু owner (বা admin) পড়তে/মুছতে
+    // পারেন। আসল ফাইল (ছবি/PDF) Storage-এ থাকে, এখানে শুধু মেটাডেটা +
+    // path রাখা হয় — আসল নিরাপত্তা Storage rules-এ (storage.rules, uid-ভিত্তিক
+    // path আলাদা করে)। এখানে update বন্ধ রাখা হয়েছে (MVP): ভুল তথ্য হলে
+    // মুছে নতুন করে যোগ করতে হবে — rules সরল ও audit করা সহজ রাখার জন্য।
+    match /healthRecords/{recordId} {
+      allow get: if isAdmin() || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
+      allow list: if isAdmin() || (isSignedIn() && request.query.limit <= 100
+        && resource.data.ownerUid == request.auth.uid);
+
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly(['ownerUid','category','title','facility','docDate','createdAt','pageCount','pages'])
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.category in ['prescription','lab','diagnostic','discharge','other']
+        && (!('title' in request.resource.data) || (request.resource.data.title is string && request.resource.data.title.size() <= 100))
+        && (!('facility' in request.resource.data) || (request.resource.data.facility is string && request.resource.data.facility.size() <= 100))
+        && request.resource.data.docDate is string && request.resource.data.docDate.size() <= 10
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.pageCount is int
+        && request.resource.data.pageCount >= 1 && request.resource.data.pageCount <= 20
+        && request.resource.data.pages is list
+        && request.resource.data.pages.size() == request.resource.data.pageCount;
+
+      allow update: if false;
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
+    }
+
     // ── বাকি সবকিছু ডিফল্টভাবে বন্ধ ─────────────────────────────
     match /{document=**} {
       allow read, write: if false;

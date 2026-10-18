@@ -96,6 +96,29 @@ await t('tokens list denied', S().collection('fcmTokens').get(), 'fail');
 await t('owner reads own tokens', S().doc('fcmTokens/seeker1').get());
 await t('owner deletes own tokens', S().doc('fcmTokens/seeker1').delete());
 
+console.log('HEALTH RECORDS'); await seed();
+const hr = (o = {}) => ({ ownerUid: 'seeker1', category: 'prescription', docDate: '2026-01-01', createdAt: FV.serverTimestamp(), pageCount: 1, pages: [{ path: 'x', name: 'a.jpg', type: 'image/jpeg', size: 100 }], ...o });
+await t('owner creates own record', S().collection('healthRecords').add(hr()));
+await t('cannot create for someone else', S().collection('healthRecords').add(hr({ ownerUid: 'seeker2' })), 'fail');
+await t('anonymous cannot create', ANON().collection('healthRecords').add(hr()), 'fail');
+await t('bad category rejected', S().collection('healthRecords').add(hr({ category: 'xray' })), 'fail');
+await t('pageCount/pages mismatch rejected', S().collection('healthRecords').add(hr({ pageCount: 2 })), 'fail');
+await t('extra field rejected', S().collection('healthRecords').add({ ...hr(), note: 'x' }), 'fail');
+await t('title too long rejected', S().collection('healthRecords').add(hr({ title: 'x'.repeat(101) })), 'fail');
+{ let ref;
+  await env.withSecurityRulesDisabled(async c => { ref = c.firestore().collection('healthRecords').doc('rec1'); await ref.set(hr()); });
+  await t('owner reads own record', S().doc('healthRecords/rec1').get());
+  await t('stranger cannot read record', X().doc('healthRecords/rec1').get(), 'fail');
+  await t('anonymous cannot read record', ANON().doc('healthRecords/rec1').get(), 'fail');
+  await t('owner query (filtered) works', S().collection('healthRecords').where('ownerUid', '==', 'seeker1').limit(100).get());
+  await t('stranger filtered query for own uid returns nothing, not denied', X().collection('healthRecords').where('ownerUid', '==', 'stranger').limit(100).get());
+  await t('stranger cannot query someone else\'s uid', X().collection('healthRecords').where('ownerUid', '==', 'seeker1').limit(100).get(), 'fail');
+  await t('unfiltered list denied', S().collection('healthRecords').limit(100).get(), 'fail');
+  await t('update is always rejected (MVP)', S().doc('healthRecords/rec1').update({ title: 'new' }), 'fail');
+  await t('stranger cannot delete', X().doc('healthRecords/rec1').delete(), 'fail');
+  await t('owner deletes own record', S().doc('healthRecords/rec1').delete());
+}
+
 console.log('LEGACY / UNCHANGED'); await seed();
 await t("legacy 'requests' collection still closed", S().collection('requests').add({ donorId: 'donorA' }), 'fail');
 await t('donors still publicly readable', ANON().doc('donors/donorA').get());

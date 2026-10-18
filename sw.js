@@ -23,6 +23,7 @@ const APP_SHELL = [
   './ambulance.html',
   './bloodbank.html',
   './inbox.html',
+  './health.html',
   './offline.html',
   './style.css',
   './app.js',

@@ -7,6 +7,27 @@ export const stubs = {
   export const onAuthStateChanged=(a,cb)=>{A.cbs.push(cb);setTimeout(()=>cb(A.user),0);return()=>{}};
   globalThis.__setUser=(u)=>{A.user=u?{...u,getIdToken:async()=>'u:'+u.uid}:null;A.cbs.forEach(cb=>cb(A.user))};`,
  'firebase-messaging.js': `export const getMessaging=()=>({});export const getToken=async()=>'fcm-token-123';export const deleteToken=async()=>true;`,
+ 'firebase-storage.js': `
+  const S=globalThis.__fakeStorage||(globalThis.__fakeStorage={blobs:new Map(),log:[],failUpload:null});
+  export const getStorage=()=>({});
+  export const ref=(st,path)=>({path});
+  export const uploadBytesResumable=(r,file)=>{
+    const total=file.size||0; let cancelled=false; const cbs={progress:null,error:null,complete:null};
+    const task={
+      on:(ev,progress,error,complete)=>{cbs.progress=progress;cbs.error=error;cbs.complete=complete;
+        setTimeout(()=>{
+          if(cancelled)return;
+          if(S.failUpload){error&&error(Object.assign(new Error('fail'),{code:S.failUpload}));return;}
+          progress&&progress({bytesTransferred:Math.floor(total/2),totalBytes:total||1});
+          setTimeout(()=>{ if(cancelled)return; S.blobs.set(r.path,file); S.log.push(['put',r.path,file.size]);
+            progress&&progress({bytesTransferred:total,totalBytes:total||1}); complete&&complete(); },0);
+        },0);
+        return ()=>{};},
+      cancel:()=>{cancelled=true;S.log.push(['cancel',r.path]);},
+    };
+    return task;};
+  export const getDownloadURL=async(r)=>{ if(!S.blobs.has(r.path)) throw Object.assign(new Error('nf'),{code:'storage/object-not-found'}); return 'blob://'+r.path; };
+  export const deleteObject=async(r)=>{ S.log.push(['del',r.path]); S.blobs.delete(r.path); };`,
  'firebase-firestore.js': `
   const F=globalThis.__fake||(globalThis.__fake={docs:new Map(),listeners:new Set(),log:[],failListen:null,hangListen:false});
   const ts=(ms)=>({__ts:ms,toMillis:()=>ms,toDate:()=>new Date(ms)});
@@ -35,6 +56,7 @@ export const stubs = {
   export const getDoc=async(r)=>{const d=F.docs.get(r.path);return{exists:()=>!!d,data:()=>hydrate(d||{}),id:r.id}};
   export const setDoc=async(r,d,o)=>{F.log.push(['set',r.path]);put(r.path,d,o&&o.merge);notify()};
   export const updateDoc=async(r,d)=>{F.log.push(['update',r.path,Object.keys(d).join(',')]);if(!F.docs.has(r.path))throw Object.assign(new Error('nf'),{code:'not-found'});put(r.path,d,true);notify()};
+  export const deleteDoc=async(r)=>{F.log.push(['delete',r.path]);F.docs.delete(r.path);notify()};
   export const writeBatch=()=>{const ops=[];return{set:(r,d,o)=>ops.push(()=>put(r.path,d,o&&o.merge)),commit:async()=>{if(F.failCommit)throw Object.assign(new Error('x'),{code:F.failCommit});ops.forEach(f=>f());F.log.push(['batch',ops.length]);notify()}}};
   export const arrayUnion=(...a)=>a;export const arrayRemove=(...a)=>a;
   export const getDocs=async()=>({docs:[]});export const addDoc=async()=>({});export const runTransaction=async()=>{};

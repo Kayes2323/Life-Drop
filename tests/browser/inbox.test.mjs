@@ -9,7 +9,10 @@ https.createServer(tls, (q, s) => { const n = q.url.split('/').pop().split('?')[
 http.createServer((q, s) => { let p = q.url.split('?')[0]; if (p === '/__vapid') { VAPID = q.url.includes('on'); return s.end('ok'); }
   if (p === '/api/notify') { s.writeHead(200, { 'content-type': 'application/json' }); return s.end('{"ok":true,"sent":0}'); }
   const f = path.join(ROOT, p); if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { s.writeHead(404); return s.end(); }
-  let body = fs.readFileSync(f); if (p === '/notify.js' && VAPID) body = Buffer.from(body.toString().replace("export const VAPID_KEY = '';", "export const VAPID_KEY = 'TESTVAPID';"));
+  // notify.js-এর আসল VAPID_KEY যা-ই থাকুক (production-এ এখন একটা real key বসানো আছে), টেস্ট
+  // নিজের মতো কন্ট্রোল করে — তাই এই সুইট production-এর VAPID অবস্থার উপর নির্ভর করে না।
+  let body = fs.readFileSync(f);
+  if (p === '/notify.js') body = Buffer.from(body.toString().replace(/export const VAPID_KEY = '[^']*';/, `export const VAPID_KEY = '${VAPID ? 'TESTVAPID' : ''}';`));
   const t = p.endsWith('.js') ? 'text/javascript' : p.endsWith('.css') ? 'text/css' : p.endsWith('.png') ? 'image/png' : p.endsWith('.json') ? 'application/json' : 'text/html';
   s.writeHead(200, { 'content-type': t, 'content-security-policy': csp }); s.end(body); }).listen(8094);
 const b = await chromium.launch({ executablePath: exe, args: ['--host-resolver-rules=MAP www.gstatic.com 127.0.0.1:8443', '--ignore-certificate-errors', '--no-proxy-server'] });

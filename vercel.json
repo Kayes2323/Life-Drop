@@ -51,6 +51,10 @@
     {
       "source": "/inbox",
       "destination": "/inbox.html"
+    },
+    {
+      "source": "/health",
+      "destination": "/health.html"
     }
   ],
   "headers": [
@@ -83,12 +87,12 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://firestore.googleapis.com https://fcmregistrations.googleapis.com https://fcm.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://nominatim.openstreetmap.org https://www.google.com; frame-src https://accounts.google.com https://apis.google.com https://www.google.com https://life-drop-d4784.firebaseapp.com; upgrade-insecure-requests"
+          "value": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.googleusercontent.com https://firebasestorage.googleapis.com; connect-src 'self' https://firestore.googleapis.com https://fcmregistrations.googleapis.com https://fcm.googleapis.com https://firebaseinstallations.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://nominatim.openstreetmap.org https://www.google.com https://firebasestorage.googleapis.com; frame-src https://accounts.google.com https://apis.google.com https://www.google.com https://life-drop-d4784.firebaseapp.com; upgrade-insecure-requests"
         }
       ]
     },
     {
-      "source": "/(admin|inbox|login|signup|register|profile|request|offline)\\.html",
+      "source": "/(admin|inbox|login|signup|register|profile|request|offline|health)\\.html",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -217,6 +221,11 @@
     {
       "source": "/inbox/",
       "destination": "/inbox",
+      "permanent": true
+    },
+    {
+      "source": "/health/",
+      "destination": "/health",
       "permanent": true
     }
   ]
