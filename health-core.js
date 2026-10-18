@@ -14,11 +14,11 @@ export const CATEGORIES = [
 ];
 export const CATEGORY_IDS = CATEGORIES.map(c => c.id);
 
-export const MAX_FILE_BYTES = 15 * 1024 * 1024;   // storage.rules-এর সাথে মিলিয়ে
+export const MAX_FILE_BYTES = 15 * 1024 * 1024;   // api/storage.js-এর MAX_BYTES-এর সাথে মিলিয়ে
 export const MAX_PAGES = 20;
 export const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'application/pdf'];
 
-/** একটা ফাইল আপলোডের উপযুক্ত কি না — type/size যাচাই (storage.rules-এর আয়না)। */
+/** একটা ফাইল আপলোডের উপযুক্ত কি না — type/size যাচাই (api/storage.js-এর আয়না)। */
 export function validateFile(file) {
   if (!file || typeof file.size !== 'number') return { ok: false, reason: 'invalid-file' };
   const type = String(file.type || '').toLowerCase();

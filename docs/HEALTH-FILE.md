@@ -10,40 +10,67 @@
 ডিসচার্জ সামারি আর অন্য কাগজ — ছবি তুলে/গ্যালারি থেকে/PDF আপলোড করে — একটা ফোল্ডারের
 মতো গুছিয়ে রাখতে পারেন, পরে খুঁজে বের করতে পারেন, আর পাতা উল্টে (flip) দেখতে পারেন।
 
-**এই প্রজেক্টে Firebase Storage প্রথমবার ব্যবহার হচ্ছে** (আগে সব ছবি base64 আকারে Firestore-এ
-থাকতো — প্রোফাইল/ফাউন্ডার ছবির মতো)। মেডিকেল কাগজ (বিশেষ করে PDF, মূল ফাইল অপরিবর্তিত
-রাখার শর্ত) base64/Firestore-এ রাখা বাস্তবসম্মত না, তাই আলাদা Storage bucket ব্যবহার করা
-হয়েছে — Firestore-এ শুধু মেটাডেটা + path থাকে।
+**ফাইলের আসল সংরক্ষণস্থল Supabase Storage** (Firebase Storage নয়)। Firebase Storage
+চালু করতে Google Cloud-এর Blaze বিলিং লাগতো, আর সেটার সাইন-আপ বারবার আটকে যাচ্ছিল
+(identity-verification সমস্যা) — তাই Supabase Storage ব্যবহার করা হয়েছে, যেটাতে
+ফ্রি টায়ারে কোনো কার্ড/বিলিং লাগে না। **Firebase (Auth + Firestore) আগের মতোই আছে,
+শুধু ফাইল রাখার জায়গাটা বদলেছে** — `healthRecords` ডকে এখনো শুধু মেটাডেটা + path থাকে।
 
-## চালু করার ধাপ (৩টি)
+### কীভাবে কাজ করে
+- ব্রাউজার কখনো Supabase-এর গোপন চাবি দেখে না। `api/storage.js` (নতুন Vercel ফাংশন)
+  প্রথমে ব্যবহারকারীর Firebase ID token যাচাই করে, তারপর Supabase-কে বলে একটা
+  **সাময়িক (signed) আপলোড/ডাউনলোড URL** বানিয়ে দিতে — সেই URL-টাই ব্রাউজারকে ফেরত
+  পাঠানো হয়। ব্রাউজার তারপর সরাসরি Supabase-এ ফাইল পাঠায়/নেয় (Vercel ফাংশনের মধ্য
+  দিয়ে না — এতে বড় ফাইলেও Vercel-এর ফাংশন সাইজ-সীমায় আটকায় না)।
+- Path: `{uid}/{recordId}/page-NN.ext` — প্রথম অংশ (`uid`) `api/storage.js` সবসময়
+  টোকেন থেকে পাওয়া আসল uid-এর সাথে মেলায়; না মিললে সরাসরি 403 — এটাই আসল নিরাপত্তা
+  সীমানা (আগে storage.rules যা করতো, এখন এই সার্ভার ফাংশন করে)।
 
-### ধাপ ১ — Firestore নিয়ম আবার Publish করুন
-`firestore.rules`-এ `healthRecords` কালেকশনের নতুন নিয়ম যুক্ত হয়েছে (বাকি সব নিয়ম অপরিবর্তিত)।
+## চালু করার ধাপ
+
+### ধাপ ১ — Firestore নিয়ম Publish করুন (একবার, আগেই করা থাকলে বাদ দিন)
+`firestore.rules`-এ `healthRecords` কালেকশনের নিয়ম আছে।
 1. Firebase Console → প্রজেক্ট **life-drop-d4784** → **Firestore Database → Rules**।
-2. রেপোর `firestore.rules` ফাইলের **পুরোটা** পেস্ট করে **Publish** চাপুন (আগেরবারের মতোই — এটা
-   সম্পূর্ণ প্রতিস্থাপন করে, তাই পুরো ফাইলই লাগবে, শুধু নতুন অংশ না)।
+2. রেপোর `firestore.rules` ফাইলের **পুরোটা** পেস্ট করে **Publish** চাপুন।
 
-### ধাপ ২ — Firebase Storage চালু করে rules Publish করুন (নতুন ধাপ)
-1. Firebase Console → বাঁ পাশের মেনু থেকে **Storage**। প্রথমবার হলে **"Get started"** চেপে
-   default bucket তৈরি করুন (লোকেশন যেটা প্রস্তাব করে সেটাই রাখতে পারেন)।
-2. **Rules** ট্যাবে যান। রেপোর `storage.rules` ফাইলের পুরো কন্টেন্ট পেস্ট করে **Publish** করুন।
-   ⚠️ এই ধাপ ছাড়া কাগজ আপলোড করলে "permission denied" আসবে।
+### ধাপ ২ — Supabase প্রজেক্ট ও bucket বানান (নতুন, কার্ড লাগে না)
+1. [supabase.com](https://supabase.com)-এ ফ্রি অ্যাকাউন্ট খুলে একটা নতুন প্রজেক্ট বানান।
+2. বাঁ মেনু থেকে **Storage** → **"New bucket"** → নাম দিন ঠিক **`prescriptions`**
+   (code-এ হার্ডকোড করা আছে, নাম মিলতে হবে) → **Private** bucket রাখুন (Public না)।
+3. (ঐচ্ছিক কিন্তু ভালো) Bucket-এর settings-এ **Allowed MIME types**-এ বসান:
+   `image/jpeg, image/png, image/webp, image/heic, image/heif, application/pdf`
+   আর **File size limit** `15 MB` — এটা একটা বাড়তি নিরাপত্তা-স্তর, কোড-এর সীমার আয়না।
+4. প্রজেক্ট **Settings → API**-তে যান → দুটো জিনিস কপি করুন:
+   - **Project URL** (যেমন `https://xxxxxxxx.supabase.co`)
+   - **`service_role` key** (⚠️ এটা গোপন — RLS/অনুমতি এড়িয়ে পুরো প্রজেক্টে পূর্ণ
+     ক্ষমতা দেয়। কখনো ব্রাউজার কোডে বা চ্যাটে পেস্ট করবেন না — শুধু Vercel env var-এ)
 
-### ধাপ ৩ — ডেপ্লয়
-সবসময়ের মতো `main`-এ push/deploy করলে `health.html`, `prescription.html`, `prescription.js`, `health-core.js`,
-CSP (Storage-এর জন্য) আর হোমপেজের নতুন বাটন একসাথে লাইভ হবে।
+### ধাপ ৩ — Vercel Environment Variables যোগ করুন
+Vercel → project **life-drop** → Settings → Environment Variables → Add (দুটো, Production-এ):
+| Name | Value |
+|---|---|
+| `SUPABASE_URL` | ধাপ ২-এর Project URL (যেমন `https://xxxxxxxx.supabase.co`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | ধাপ ২-এর `service_role` key |
+
+এই দুটো না থাকলে `api/storage.js` `501 not-configured` দেয় — বাকি সাইট (প্রেসক্রিপশনের
+তালিকা/মেটাডেটা দেখা বাদে) স্বাভাবিক চলে, শুধু আপলোড/ডাউনলোড/ডিলিট বন্ধ থাকে।
+
+### ধাপ ৪ — Redeploy
+Env var বসানোর পর Vercel-এ Redeploy করতে হবে (নতুন env var আগের deployment-এ বসে না)।
 
 ## নিরাপত্তা — দুই স্তর
 - **Firestore rules**: `healthRecords/{recordId}` শুধু `ownerUid == নিজের uid` হলে পড়া/মুছা
   যায়; তৈরির সময় ফিল্ড/সীমা কড়াভাবে যাচাই হয়; আপডেট সম্পূর্ণ বন্ধ (ভুল হলে মুছে নতুন করে
   যোগ করতে হবে — rules সরল রাখার জন্য ইচ্ছাকৃত সিদ্ধান্ত)।
-- **Storage rules** (আসল সীমানা): path `healthRecords/{uid}/...`-এ `uid` অংশ
-  `request.auth.uid`-এর সাথে না মিললে কখনোই পড়া/লেখা/মোছা যাবে না — Firestore-এর ডেটা
-  যা-ই বলুক না কেন। তাই অন্য কারো আসল ফাইল কখনো খোলা যাবে না, এমনকি কেউ ডকুমেন্ট id
-  আন্দাজ করে চেষ্টা করলেও।
+- **`api/storage.js`** (আসল সীমানা): path-এর প্রথম অংশ (`{uid}/...`) Firebase token-এর
+  uid-এর সাথে না মিললে কখনোই sign/delete হবে না, Firestore-এর ডেটা যা-ই বলুক না কেন।
+  Supabase-এর `service_role` key শুধু এই একটা সার্ভার ফাংশনে থাকে, ব্রাউজারে কখনো যায় না।
 - পুশ/নোটিফিকেশন বা অ্যাডমিনের সাথে এই কালেকশনের কোনো সংযোগ নেই।
 - কোনো OCR/AI নেই — কোনো তথ্য স্বয়ংক্রিয়ভাবে পড়া/অনুমান করা হয় না; ব্যবহারকারী যা লেখেন
   আর যে ফাইল দেন, ঠিক তাই সংরক্ষণ হয়।
+- ⚠️ **এখনো বাস্তব Supabase প্রজেক্টের বিপরীতে টেস্ট করা হয়নি** (শুধু Supabase-এর
+  ডকুমেন্টেশন অনুযায়ী লেখা হয়েছে, fake/mock দিয়ে টেস্ট পাস করেছে) — প্রথমবার আসল
+  আপলোড করে দেখার সময় REST শেপে ছোটখাটো অমিল পাওয়া গেলে ঠিক করে দেওয়া হবে।
 
 ## ডিলিট/ব্যাকআপ সীমাবদ্ধতা (সততার সাথে বলা)
 "মুছে ফেলুন" চাপলে Storage-এর ফাইল আর Firestore ডকুমেন্ট সরিয়ে ফেলা হয় এবং সেগুলো অ্যাপে

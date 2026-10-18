@@ -9,10 +9,43 @@ const csp = vj.headers[0].headers.find(h => h.key === 'Content-Security-Policy')
 
 https.createServer(tls, (q, s) => { const n = q.url.split('/').pop().split('?')[0];
   s.writeHead(200, { 'content-type': 'text/javascript', 'access-control-allow-origin': '*' }); s.end(stubs[n] || ''); }).listen(8444);
-http.createServer((q, s) => { const p = q.url.split('?')[0];
+
+// একটা in-memory "fake Supabase Storage" — api/storage.js-এর আসল REST কলের বদলে, যাতে
+// prescription.js-এর আসল fetch('/api/storage') কল আর signed-URL-এ সরাসরি PUT/GET করা
+// (ব্রাউজারেরই কোড, যেটা আমরা টেস্ট করছি) পুরোপুরি real-এর মতোই ব্যায়াম হয়।
+const FAKE_SUPA = new Map(); // path -> {buf, type}
+const readBody = q => new Promise(res => { const cs = []; q.on('data', c => cs.push(c)); q.on('end', () => res(Buffer.concat(cs))); });
+
+http.createServer(async (q, s) => {
+  const p = q.url.split('?')[0];
+  const qs = new URLSearchParams(q.url.split('?')[1] || '');
+
+  if (p === '/api/storage' && q.method === 'POST') {
+    const body = JSON.parse((await readBody(q)).toString() || '{}');
+    const m = /^Bearer u:(.+)$/.exec(q.headers.authorization || '');
+    if (!m) { s.writeHead(401); return s.end(JSON.stringify({ ok: false, reason: 'no-token' })); }
+    const uid = m[1], { action, path: fpath, contentType } = body;
+    if (!fpath || !fpath.startsWith(uid + '/')) { s.writeHead(403); return s.end(JSON.stringify({ ok: false, reason: 'forbidden-path' })); }
+    s.writeHead(200, { 'content-type': 'application/json' });
+    if (action === 'sign-upload') return s.end(JSON.stringify({ ok: true, uploadUrl: `http://localhost:8096/__supa-put?path=${encodeURIComponent(fpath)}&ct=${encodeURIComponent(contentType)}` }));
+    if (action === 'sign-download') return s.end(JSON.stringify(FAKE_SUPA.has(fpath) ? { ok: true, url: `http://localhost:8096/__supa-get?path=${encodeURIComponent(fpath)}` } : { ok: false, reason: 'not-found' }));
+    if (action === 'delete') { FAKE_SUPA.delete(fpath); return s.end(JSON.stringify({ ok: true })); }
+    s.writeHead(400); return s.end(JSON.stringify({ ok: false, reason: 'bad-action' }));
+  }
+  if (p === '/__supa-put' && q.method === 'PUT') {
+    const buf = await readBody(q);
+    FAKE_SUPA.set(qs.get('path'), { buf, type: qs.get('ct') || 'application/octet-stream' });
+    s.writeHead(200); return s.end('{}');
+  }
+  if (p === '/__supa-get' && q.method === 'GET') {
+    const o = FAKE_SUPA.get(qs.get('path')); if (!o) { s.writeHead(404); return s.end(); }
+    s.writeHead(200, { 'content-type': o.type }); return s.end(o.buf);
+  }
+
   const f = path.join(ROOT, p); if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { s.writeHead(404); return s.end(); }
   const t = p.endsWith('.js') ? 'text/javascript' : p.endsWith('.css') ? 'text/css' : p.endsWith('.png') ? 'image/png' : 'text/html';
-  s.writeHead(200, { 'content-type': t, 'content-security-policy': csp }); s.end(fs.readFileSync(f)); }).listen(8096);
+  s.writeHead(200, { 'content-type': t, 'content-security-policy': csp }); s.end(fs.readFileSync(f));
+}).listen(8096);
 
 const b = await chromium.launch({ executablePath: exe, args: ['--host-resolver-rules=MAP www.gstatic.com 127.0.0.1:8444', '--ignore-certificate-errors', '--no-proxy-server'] });
 let pass = 0, fail = 0; const ok = (c, m) => { if (c) { pass++; console.log('  PASS', m); } else { fail++; console.log('  FAIL', m); } };
@@ -63,9 +96,10 @@ console.log('3. client-side validation rejects bad file / oversized file');
   ok((await page.textContent('#toast')).includes('MB'), 'oversized file rejected with size message');
 }
 
-console.log('4. create a multi-page record end-to-end (fake Storage + Firestore)');
+console.log('4. create a multi-page record end-to-end (fake Supabase Storage + Firestore)');
 { const { page, errs } = await open();
-  await page.evaluate(() => { window.__fake.docs.clear(); window.__fakeStorage.blobs.clear(); window.__fakeStorage.log.length = 0; window.__setUser({ uid: 'u1', displayName: 'Rahim' }); });
+  FAKE_SUPA.clear();
+  await page.evaluate(() => { window.__fake.docs.clear(); window.__setUser({ uid: 'u1', displayName: 'Rahim' }); });
   await page.waitForTimeout(500);
   await page.click('#add-btn'); await page.waitForTimeout(150);
   await page.selectOption('#doc-category', 'lab');
@@ -80,7 +114,7 @@ console.log('4. create a multi-page record end-to-end (fake Storage + Firestore)
   const stored = await page.evaluate(() => { const [id, d] = [...window.__fake.docs.entries()].find(([k]) => k.startsWith('healthRecords/')); return { id, d }; });
   ok(stored.d.ownerUid === 'u1', 'record owned by current user');
   ok(stored.d.category === 'lab' && stored.d.pageCount === 2 && stored.d.pages.length === 2, 'category + 2 pages stored correctly ' + JSON.stringify(stored.d));
-  ok(await page.evaluate(() => window.__fakeStorage.blobs.size === 2), '2 files actually uploaded to (fake) Storage');
+  ok(FAKE_SUPA.size === 2, '2 files actually uploaded to (fake) Supabase Storage');
   ok(errs.length === 0, 'no console errors ' + JSON.stringify(errs));
 
   console.log('5. appears in the list, filter + search work');
@@ -109,7 +143,7 @@ console.log('4. create a multi-page record end-to-end (fake Storage + Firestore)
   console.log('7. delete removes both Storage files and the Firestore doc');
   await page.click('[data-del]'); await page.waitForTimeout(500);
   ok((await page.$$eval('.rec-card', n => n.length)) === 0, 'record removed from list');
-  ok(await page.evaluate(() => window.__fakeStorage.blobs.size === 0), 'both files deleted from (fake) Storage');
+  ok(FAKE_SUPA.size === 0, 'both files deleted from (fake) Supabase Storage');
   ok(await page.evaluate(() => [...window.__fake.docs.keys()].filter(k => k.startsWith('healthRecords/')).length === 0), 'Firestore doc deleted');
   ok(await vis(page, '#state-empty'), 'back to empty state');
 }

@@ -4,27 +4,25 @@
 // ডেটা মডেল:
 //   healthRecords/{recordId}  { ownerUid, category, title?, facility?, docDate,
 //                               createdAt, pageCount, pages:[{path,name,type,size}] }
-//   আসল ফাইল Storage-এ: healthRecords/{uid}/{recordId}/page-NN.ext
-//   নিরাপত্তা: firestore.rules (ownerUid==auth.uid) + storage.rules (path-এর
-//   uid==auth.uid) — দুই জায়গাতেই, Storage rules-ই আসল সীমানা।
+//   আসল ফাইল এখন Supabase Storage-এ (Firebase Storage নয় — Google Cloud
+//   billing-এর ঝামেলা এড়াতে): path = {uid}/{recordId}/page-NN.ext
+//   নিরাপত্তা: firestore.rules (ownerUid==auth.uid) + api/storage.js (path-এর
+//   প্রথম অংশ uid-এর সাথে মিলতে হয়, Firebase ID token যাচাই করে) — সার্ভার
+//   ফাংশনই আসল সীমানা, কারণ Supabase-এর গোপন চাবি শুধু সার্ভারেই থাকে।
 //
 // এই ফাইল কখনো মেডিকেল তথ্য নিজে বানায়/অনুমান করে না (কোনো OCR/AI নেই) —
 // ব্যবহারকারী যা লেখেন আর যে ফাইল দেন, ঠিক তাই সংরক্ষণ করা হয়।
 // ══════════════════════════════════════════════════════════
-import { app, auth, db } from './firebase-config.js';
+import { auth, db } from './firebase-config.js';
 import { toast, esc, formatBnDate } from './app.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
   collection, query, where, orderBy, limit, onSnapshot, setDoc, deleteDoc, doc, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import {
-  getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject,
-} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
-import {
   CATEGORIES, validateFileList, buildRecordPayload, storageFileName, bnDigits, newRecordId,
 } from './health-core.js';
 
-const storage = getStorage(app);
 let CUR_UID = null;
 let RECORDS = [];           // সর্বশেষ onSnapshot ফলাফল (ক্যাশ — সার্চ/ফিল্টার এখান থেকেই)
 let unsubList = null;
@@ -38,6 +36,20 @@ const $$ = sel => Array.from(document.querySelectorAll(sel));
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
 function show(id, on = true) { const el = document.getElementById(id); if (el) el.hidden = !on; }
+
+// ── /api/storage-এর সাথে যোগাযোগ (Supabase Storage-এর গেটকিপার) ────────
+async function apiStorage(action, path, extra = {}) {
+  const u = auth.currentUser; if (!u) throw new Error('not-signed-in');
+  const idToken = await u.getIdToken();
+  const res = await fetch('/api/storage', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: 'Bearer ' + idToken },
+    body: JSON.stringify({ action, path, ...extra }),
+  });
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok || !j.ok) throw Object.assign(new Error('storage-' + action + '-failed'), { reason: j.reason || res.status });
+  return j;
+}
 
 // ── বুটস্ট্র্যাপ (inbox.html-এর সাথে মিলিয়ে: হার্ড-রিডাইরেক্ট নয়, বরং
 //    লগইন-প্রম্পট দেখানো হয় — একই পেজ থেকে লগইন করে ফিরে আসা যায়) ──────
@@ -150,7 +162,7 @@ function openAddModal() {
   $('#save-record-btn').disabled = false; $('#save-record-btn').textContent = 'সংরক্ষণ করুন';
 }
 function closeAddModal() {
-  uploadTasks.forEach(t => { try { t.cancel(); } catch (_) {} });
+  uploadTasks.forEach(xhr => { try { xhr.abort(); } catch (_) {} });
   uploadTasks = []; pendingFiles = [];
   show('add-modal', false); show('modal-backdrop', false);
 }
@@ -199,7 +211,7 @@ async function saveRecord() {
     for (let i = 0; i < pendingFiles.length; i++) {
       const file = pendingFiles[i];
       const isPdf = file.type === 'application/pdf';
-      const path = `healthRecords/${CUR_UID}/${recordId}/${storageFileName(i, file.name, isPdf)}`;
+      const path = `${CUR_UID}/${recordId}/${storageFileName(i, file.name, isPdf)}`;
       await uploadOne(file, path, i);
       uploaded.push({ path, name: file.name.slice(0, 120), type: file.type, size: file.size });
     }
@@ -210,22 +222,28 @@ async function saveRecord() {
     closeAddModal();
   } catch (e) {
     console.warn('[health] save failed:', e);
-    // যতটা আপলোড হয়েছিল, পরিষ্কার করার চেষ্টা (best-effort) — আধখেঁচড়া রেকর্ড Firestore-এ থাকে না যেহেতু addDoc সবশেষে হয়
-    for (const u of uploaded) { try { await deleteObject(ref(storage, u.path)); } catch (_) {} }
+    // যতটা আপলোড হয়েছিল, পরিষ্কার করার চেষ্টা (best-effort) — আধখেঁচড়া রেকর্ড Firestore-এ থাকে না যেহেতু setDoc সবশেষে হয়
+    for (const u of uploaded) { try { await apiStorage('delete', u.path); } catch (_) {} }
     toast('সংরক্ষণ করা যায়নি — ইন্টারনেট দেখে আবার চেষ্টা করুন');
     btn.disabled = false; btn.textContent = 'আবার চেষ্টা করুন';
   }
 }
 
-function uploadOne(file, path, idx) {
-  return new Promise((resolve, reject) => {
-    const task = uploadBytesResumable(ref(storage, path), file, { contentType: file.type });
-    uploadTasks.push(task);
-    const bar = document.querySelector(`[data-bar="${idx}"] div`);
-    task.on('state_changed',
-      snap => { if (bar) bar.style.width = Math.round(100 * snap.bytesTransferred / snap.totalBytes) + '%'; },
-      err => reject(err),
-      () => resolve());
+// Supabase-এর signed upload URL-এ সরাসরি ব্রাউজার থেকে PUT করা হয় (ফাইলের বাইট
+// আমাদের Vercel ফাংশন দিয়ে যায় না — সেখানে সাইজ-সীমা থাকতো, signed URL এড়িয়ে যায়)।
+async function uploadOne(file, path, idx) {
+  const { uploadUrl } = await apiStorage('sign-upload', path, { contentType: file.type });
+  const bar = document.querySelector(`[data-bar="${idx}"] div`);
+  await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    uploadTasks.push(xhr);
+    xhr.open('PUT', uploadUrl);
+    xhr.setRequestHeader('Content-Type', file.type);
+    xhr.upload.onprogress = e => { if (bar && e.lengthComputable) bar.style.width = Math.round(100 * e.loaded / e.total) + '%'; };
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve() : reject(new Error('upload-http-' + xhr.status));
+    xhr.onerror = () => reject(new Error('upload-network'));
+    xhr.onabort = () => reject(new Error('upload-cancelled'));
+    xhr.send(file);
   });
 }
 
@@ -234,7 +252,7 @@ async function confirmDelete(id) {
   const r = RECORDS.find(x => x.id === id); if (!r) return;
   if (!window.confirm(`"${r.title || catLabel(r.category)}" মুছে ফেলবেন? এই কাজ ফেরানো যাবে না।`)) return;
   try {
-    for (const p of (r.pages || [])) { try { await deleteObject(ref(storage, p.path)); } catch (e) { console.warn('[health] file delete failed (continuing):', p.path, e && e.code); } }
+    for (const p of (r.pages || [])) { try { await apiStorage('delete', p.path); } catch (e) { console.warn('[health] file delete failed (continuing):', p.path, e && e.reason); } }
     await deleteDoc(doc(db, 'healthRecords', id));
     toast('মুছে ফেলা হয়েছে');
   } catch (e) { console.warn('[health] delete failed:', e); toast('মুছতে সমস্যা হয়েছে — আবার চেষ্টা করুন'); }
@@ -260,7 +278,7 @@ function zoom(d) { setZoom(Math.min(3, Math.max(1, vZoom + d))); }
 function setZoom(z) { vZoom = z; $('#v-surface').style.setProperty('--z', String(z)); }
 
 async function urlFor(path) {
-  try { return await getDownloadURL(ref(storage, path)); } catch (e) { console.warn('[health] download url failed:', path, e && e.code); return ''; }
+  try { return (await apiStorage('sign-download', path)).url; } catch (e) { console.warn('[health] download url failed:', path, e && e.reason); return ''; }
 }
 
 async function pageMediaHtml(entry) {
