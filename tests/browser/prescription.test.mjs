@@ -1,4 +1,4 @@
-// Browser smoke test for health.html/health.js — real sw.js-free static pages, fake Firebase modules
+// Browser smoke test for prescription.html/prescription.js — real sw.js-free static pages, fake Firebase modules
 // (Firestore + Storage, both in-memory) served in place of www.gstatic.com. Exercises the actual
 // DOM/JS, not just health-core.js's pure functions (those have their own node:test in tests/health/).
 import http from 'http'; import https from 'https'; import fs from 'fs'; import os from 'os'; import path from 'path';
@@ -23,7 +23,7 @@ const open = async () => {
   page.on('pageerror', e => errs.push('PAGEERR ' + e.message));
   page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|ERR_|net::/.test(m.text())) errs.push(m.text()); });
   page.on('dialog', d => d.accept());
-  await page.goto('http://localhost:8096/health.html'); await page.waitForTimeout(600);
+  await page.goto('http://localhost:8096/prescription.html'); await page.waitForTimeout(600);
   return { ctx, page, errs };
 };
 const vis = (page, sel) => page.evaluate(s => { const e = document.querySelector(s); return !!e && !e.hidden && getComputedStyle(e).display !== 'none'; }, sel);

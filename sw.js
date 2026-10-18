@@ -24,6 +24,8 @@ const APP_SHELL = [
   './bloodbank.html',
   './inbox.html',
   './health.html',
+  './prescription.html',
+  './test-prices.html',
   './offline.html',
   './style.css',
   './app.js',

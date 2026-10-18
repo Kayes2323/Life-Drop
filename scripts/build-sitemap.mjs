@@ -7,7 +7,7 @@
 import fs from 'fs'; import path from 'path'; import { execFileSync } from 'child_process'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BASE = 'https://www.sondhan.org';
-const CORE = [['/', 'index.html'], ['/search.html', 'search.html'], ['/bloodbank.html', 'bloodbank.html'], ['/donor', 'donor.html'], ['/about.html', 'about.html'], ['/privacy.html', 'privacy.html'], ['/terms.html', 'terms.html']];
+const CORE = [['/', 'index.html'], ['/search.html', 'search.html'], ['/bloodbank.html', 'bloodbank.html'], ['/donor', 'donor.html'], ['/about.html', 'about.html'], ['/privacy.html', 'privacy.html'], ['/terms.html', 'terms.html'], ['/health.html', 'health.html'], ['/test-prices.html', 'test-prices.html']];
 const urls = [...CORE];
 for (const f of fs.readdirSync(path.join(ROOT, 'guides')).filter(f => f.endsWith('.html')).sort()) {
   if (/name="robots"[^>]*noindex/.test(fs.readFileSync(path.join(ROOT, 'guides', f), 'utf8'))) continue;

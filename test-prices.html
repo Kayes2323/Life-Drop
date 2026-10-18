@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#0f766e"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>মেডিকেল টেস্টের মূল্যতালিকা — Sondhan Health</title>
+<meta name="description" content="বাংলাদেশের সরকারি হাসপাতালে সাধারণ মেডিকেল পরীক্ষার (CBC, ব্লাড সুগার, লিভার-কিডনি পরীক্ষা, থাইরয়েড, ডেঙ্গু ইত্যাদি) প্রকাশিত মূল্য, উৎসসহ।">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.sondhan.org/test-prices.html"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+.header{background:linear-gradient(135deg,#0f766e,#14b8a6);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
+.back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header h1{color:#fff;font-size:15px;font-weight:800;font-family:'Hind Siliguri',sans-serif;line-height:1.3}
+.scr{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;font-family:'Hind Siliguri',sans-serif;padding-bottom:32px}
+
+.intro{background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.intro h2{font-size:15.5px;color:#222;margin-bottom:6px}
+.intro p{font-size:12.5px;color:#777;line-height:1.75}
+.gov-badge{display:inline-flex;align-items:center;gap:6px;background:#e6f7f4;color:#0f766e;font-size:11.5px;font-weight:700;padding:6px 11px;border-radius:999px;margin-top:10px}
+.gov-badge svg{width:14px;height:14px}
+
+.disclaimer{background:#fff8e6;border:1px solid #f1d58a;border-radius:14px;padding:12px 14px;font-size:11.5px;color:#7a5c00;line-height:1.75}
+
+.search-box{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:10px 14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.search-box input{flex:1;border:0;outline:0;font-family:inherit;font-size:13.5px;background:transparent}
+.search-box button{border:0;background:#f0f0f0;color:#777;width:24px;height:24px;border-radius:50%;font-size:12px;cursor:pointer;flex-shrink:0}
+
+#cat-filters{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px}
+.fchip{flex-shrink:0;border:1.5px solid #cdeae5;background:#fff;color:#0f766e;border-radius:20px;padding:7px 13px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.fchip.active{background:#0f766e;color:#fff;border-color:#0f766e}
+
+#count{font-size:11.5px;color:#999}
+
+.test-card{background:#fff;border-radius:16px;padding:14px;box-shadow:0 1px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:8px}
+.tc-en{font-size:14.5px;color:#222;font-weight:700}
+.tc-abbr{font-size:11px;color:#0f766e;background:#e6f7f4;padding:2px 8px;border-radius:999px;margin-left:6px;font-weight:700}
+.tc-bn{font-size:12.5px;color:#555}
+.tc-explain{font-size:12px;color:#777;line-height:1.75;background:#faf9f6;border-radius:10px;padding:9px 11px}
+.tc-prices{display:flex;flex-direction:column;gap:8px}
+.price-row{border:1px solid #eee;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.price-row-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.amt{font-size:17px;font-weight:800;color:#0f766e}
+.status-badge{font-size:9.5px;font-weight:700;background:#fff3cd;color:#8a6500;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.price-facility{font-size:12px;color:#444;font-weight:600}
+.price-meta{font-size:10.5px;color:#999}
+.price-note{font-size:11px;color:#8a6500;background:#fffaf0;border-radius:8px;padding:6px 8px;line-height:1.6}
+.src-link{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#2270C9;text-decoration:none;margin-top:2px}
+.src-link:hover{text-decoration:underline}
+
+#empty-state{text-align:center;padding:30px 18px;color:#777}
+#empty-state .ico{width:56px;height:56px;border-radius:50%;background:#e6f7f4;color:#0f766e;margin:0 auto 12px;display:flex;align-items:center;justify-content:center}
+#empty-state .ico svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.8}
+#empty-state button{margin-top:12px;min-height:40px;padding:0 20px;border-radius:11px;background:#0f766e;color:#fff;border:0;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="health.html" class="back" aria-label="হেলথ-এ ফিরুন">←</a>
+  <div class="sondhan-logo sondhan-logo--navbar-crop"><img src="sondhan-logo.png" alt="Sondhan" decoding="async"/></div>
+  <h1>মেডিকেল টেস্টের মূল্যতালিকা</h1>
+</div>
+
+<div class="scr">
+  <div class="intro">
+    <h2>কোন পরীক্ষার দাম কত জানুন</h2>
+    <p>সাধারণ মেডিকেল পরীক্ষার (রক্ত, প্রস্রাব, লিভার-কিডনি, থাইরয়েড, সংক্রমণ ইত্যাদি) সরকারি প্রতিষ্ঠানে প্রকাশিত মূল্য — সহজ বাংলায়, উৎসসহ।</p>
+    <div class="gov-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10 12 4l9 6"/><path d="M5 10v9M19 10v9M9 10v9M15 10v9"/><path d="M3 21h18"/></svg>শুধু সরকারি প্রতিষ্ঠানের মূল্য (বেসরকারি এখনো যোগ হয়নি)</div>
+  </div>
+
+  <div class="disclaimer">⚠️ এই মূল্যগুলো সরকারি প্রকাশিত নথি/সার্কুলার থেকে নেওয়া, প্রতিটার উৎস ও তারিখ নিচে দেওয়া আছে। কিন্তু হাসপাতাল ভেদে ও সময়ের সাথে মূল্য বদলাতে পারে — চিকিৎসা/খরচের সিদ্ধান্ত নেওয়ার আগে একবার ফোনে বা কাউন্টারে নিশ্চিত হয়ে নিন।</div>
+
+  <div class="search-box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+    <input id="search-inp" type="text" placeholder="কোন পরীক্ষা খুঁজছেন? (যেমন: CBC, সুগার, TSH)"/>
+    <button id="clear-search" hidden aria-label="সার্চ মুছুন">✕</button>
+  </div>
+
+  <div id="cat-filters"></div>
+  <div id="count"></div>
+  <div id="test-list"></div>
+
+  <div id="empty-state" hidden>
+    <div class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></div>
+    <h3>এই নামে কিছু পাওয়া যায়নি</h3>
+    <p>ভিন্ন বানান বা সংক্ষিপ্ত রূপ দিয়ে চেষ্টা করুন।</p>
+    <button id="empty-clear">সার্চ মুছুন</button>
+  </div>
+</div>
+
+<script type="module" src="test-prices.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js').catch(function (e) { console.warn('SW register failed:', e); }); });
+}
+</script>
+</body>
+</html>

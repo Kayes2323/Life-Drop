@@ -55,6 +55,14 @@
     {
       "source": "/health",
       "destination": "/health.html"
+    },
+    {
+      "source": "/prescription",
+      "destination": "/prescription.html"
+    },
+    {
+      "source": "/test-prices",
+      "destination": "/test-prices.html"
     }
   ],
   "headers": [
@@ -92,7 +100,7 @@
       ]
     },
     {
-      "source": "/(admin|inbox|login|signup|register|profile|request|offline|health)\\.html",
+      "source": "/(admin|inbox|login|signup|register|profile|request|offline|prescription)\\.html",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -226,6 +234,16 @@
     {
       "source": "/health/",
       "destination": "/health",
+      "permanent": true
+    },
+    {
+      "source": "/prescription/",
+      "destination": "/prescription",
+      "permanent": true
+    },
+    {
+      "source": "/test-prices/",
+      "destination": "/test-prices",
       "permanent": true
     }
   ]

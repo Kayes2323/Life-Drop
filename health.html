@@ -5,109 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="icon" type="image/png" href="sondhan-logo.png"/>
 <link rel="manifest" href="manifest.json"/>
-<meta name="theme-color" content="#c0392b"/>
+<meta name="theme-color" content="#0f766e"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<title>আমার মেডিকেল ফাইল — Sondhan</title>
-<meta name="robots" content="noindex, follow">
+<title>হেলথ — Sondhan</title>
+<meta name="description" content="সন্ধান হেলথ: প্রেসক্রিপশন ও মেডিকেল কাগজ সংরক্ষণ করুন, সরকারি হাসপাতালের মেডিকেল টেস্টের মূল্যতালিকা দেখুন।">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.sondhan.org/health.html"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
-.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
+.header{background:linear-gradient(135deg,#0f766e,#14b8a6);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
 .back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .header h1{color:#fff;font-size:16px;font-weight:800;font-family:'Hind Siliguri',sans-serif}
-.scr{flex:1;padding:14px;display:flex;flex-direction:column;gap:14px;font-family:'Hind Siliguri',sans-serif;padding-bottom:40px}
+.scr{flex:1;padding:16px 14px 40px;display:flex;flex-direction:column;gap:16px;font-family:'Hind Siliguri',sans-serif}
 
-/* ফোল্ডার কভার */
-.cover{background:linear-gradient(145deg,#7a1f12,#c0392b 55%,#e74c3c);border-radius:18px;padding:22px 18px;color:#fff;box-shadow:0 10px 26px rgba(192,57,43,.3);position:relative;overflow:hidden}
+.cover{background:linear-gradient(145deg,#0a3f3a,#0f766e 55%,#14b8a6);border-radius:18px;padding:22px 18px;color:#fff;box-shadow:0 10px 26px rgba(15,118,110,.3);position:relative;overflow:hidden}
 .cover::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 14px);pointer-events:none}
-.cover-title{font-size:19px;font-weight:800;position:relative}
-.cover-sub{font-size:12.5px;opacity:.9;margin-top:4px;position:relative}
-.cover-add{margin-top:16px;display:inline-flex;align-items:center;gap:8px;background:#fff;color:#c0392b;border:0;border-radius:12px;padding:11px 18px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;position:relative;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.cover-title{font-size:20px;font-weight:800;position:relative}
+.cover-sub{font-size:12.5px;opacity:.92;margin-top:5px;line-height:1.7;position:relative}
 
-/* সার্চ + ফিল্টার */
-.search-box{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:10px 14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-.search-box input{flex:1;border:0;outline:0;font-family:inherit;font-size:13.5px;background:transparent}
-#cat-filters{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px}
-.fchip{flex-shrink:0;border:1.5px solid #e6c9c3;background:#fff;color:#8a4a3f;border-radius:20px;padding:7px 13px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
-.fchip.active{background:#c0392b;color:#fff;border-color:#c0392b}
+.sec-title{font-size:13px;font-weight:700;color:#777;margin-bottom:2px}
+.feat{display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,.06);text-decoration:none;color:inherit}
+.feat:active{transform:scale(.98)}
+.feat-ic{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.feat-ic svg{width:24px;height:24px}
+.feat-ic.rx{background:linear-gradient(135deg,#c0392b,#e74c3c)}
+.feat-ic.price{background:linear-gradient(135deg,#0f766e,#14b8a6)}
+.feat-body{flex:1;min-width:0}
+.feat-body b{display:block;font-size:14.5px;color:#222}
+.feat-body span{display:block;font-size:12px;color:#888;margin-top:3px;line-height:1.6}
+.feat-arrow{color:#bbb;flex-shrink:0}
+.feat-arrow svg{width:18px;height:18px}
 
-/* রেকর্ড কার্ড */
-.rec-card{background:#fff;border-radius:14px;padding:12px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 8px rgba(0,0,0,.06);cursor:pointer}
-.rec-card:focus-visible{outline:3px solid #8e44ad;outline-offset:2px}
-.rec-ic{width:42px;height:42px;border-radius:11px;background:#fdecea;color:#c0392b;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.rec-ic svg{width:21px;height:21px}
-.rec-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.rec-body b{font-size:14px;color:#222;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rec-meta{font-size:11.5px;color:#888}
-.rec-pages{font-size:11px;color:#c0392b;font-weight:600}
-.rec-del{border:0;background:#faf3f2;color:#b94a3d;width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.rec-del svg{width:16px;height:16px}
-
-/* অবস্থা */
-.state{text-align:center;padding:30px 18px;color:#777}
-.state .ico{width:60px;height:60px;border-radius:50%;background:#fdecea;color:#c0392b;margin:0 auto 12px;display:flex;align-items:center;justify-content:center}
-.state .ico svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.8}
-.spin{width:32px;height:32px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 10px}
-@keyframes sp{to{transform:rotate(360deg)}}
-.state button.btn{margin-top:12px;min-height:42px;padding:0 20px;border-radius:11px;background:#c0392b;color:#fff;border:0;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
-[hidden]{display:none!important}
-
-/* মডাল/overlay সাধারণ */
-.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400}
-.modal{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,480px);max-height:88vh;background:#fff;border-radius:20px 20px 0 0;z-index:410;display:flex;flex-direction:column;overflow:hidden}
-.modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee}
-.modal-head h2{font-size:15.5px;font-weight:700;font-family:'Hind Siliguri',sans-serif}
-.modal-x{border:0;background:#f3f3f3;width:30px;height:30px;border-radius:50%;font-size:15px;cursor:pointer}
-.modal-body{padding:14px 16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;font-family:'Hind Siliguri',sans-serif}
-.field label{display:block;font-size:12.5px;color:#666;margin-bottom:5px;font-weight:600}
-.field select,.field input[type=text],.field input[type=date]{width:100%;border:1.5px solid #e4e4e4;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:13.5px;outline:0}
-.field select:focus,.field input:focus{border-color:#c0392b}
-.upload-row{display:flex;gap:8px}
-.upload-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;border:1.5px dashed #e0b9b2;background:#fff8f7;border-radius:12px;padding:12px 6px;cursor:pointer;font-size:11.5px;color:#9b4a3c;font-weight:600;text-align:center}
-.upload-btn svg{width:20px;height:20px}
-#pending-preview{display:flex;flex-wrap:wrap;gap:8px}
-.pp-item{position:relative;width:70px}
-.pp-item img{width:70px;height:70px;object-fit:cover;border-radius:10px;border:1px solid #eee}
-.pp-pdf{width:70px;height:70px;border-radius:10px;background:#fdecea;color:#c0392b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px}
-.pp-item .pp-name{display:none}
-.pp-item button{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#333;color:#fff;border:0;font-size:11px;cursor:pointer}
-.pp-bar{height:3px;background:#eee;border-radius:3px;margin-top:4px;overflow:hidden}
-.pp-bar div{height:100%;width:0;background:#27ae60;transition:width .2s}
-.pp-empty{font-size:12.5px;color:#999}
-.modal-foot{padding:12px 16px;border-top:1px solid #eee}
-#save-record-btn{width:100%;min-height:46px;border:0;border-radius:12px;background:#c0392b;color:#fff;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer}
-#save-record-btn:disabled{opacity:.6}
-
-/* Viewer */
-#viewer{position:fixed;inset:0;z-index:500;background:#1b1b1b;display:flex;flex-direction:column}
-.v-head{display:flex;align-items:center;gap:10px;padding:12px 14px;color:#fff;font-family:'Hind Siliguri',sans-serif}
-.v-head h3{flex:1;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.v-head button{background:rgba(255,255,255,.15);border:0;color:#fff;width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:14px}
-#v-surface{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;position:relative;--z:1}
-.v-leaf{transition:transform .25s ease,opacity .25s ease;max-width:94vw;max-height:72vh;transform:scale(var(--z))}
-.v-leaf img{max-width:94vw;max-height:72vh;object-fit:contain;border-radius:4px;background:#fff}
-#v-surface.turning .v-leaf{opacity:.35;transform:scale(calc(var(--z) * .96))}
-@media (prefers-reduced-motion:reduce){.v-leaf{transition:none}}
-@media (min-width:900px){ body.wide-spread-note{} }
-.v-pdf{background:#fff;color:#333;border-radius:10px;padding:20px;text-align:center;font-family:'Hind Siliguri',sans-serif;max-width:300px}
-.v-pdf-open{display:inline-block;margin-top:10px;background:#c0392b;color:#fff;padding:9px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700}
-.v-err{color:#e74c3c;font-family:'Hind Siliguri',sans-serif}
-#v-nav{display:flex;align-items:center;justify-content:center;gap:16px;padding:10px;color:#fff;font-family:'Hind Siliguri',sans-serif}
-#v-nav button{background:rgba(255,255,255,.15);border:0;color:#fff;width:40px;height:40px;border-radius:50%;font-size:17px;cursor:pointer}
-#v-nav button:disabled{opacity:.3}
-#v-thumbs{display:flex;gap:6px;overflow-x:auto;padding:8px 10px 14px;justify-content:center}
-.v-thumb{flex-shrink:0;width:30px;height:30px;border-radius:8px;border:0;background:rgba(255,255,255,.12);color:#ddd;font-size:11px;cursor:pointer}
-.v-thumb.active{background:#c0392b;color:#fff}
-#viewer.quick #v-surface{flex-direction:column;overflow-y:auto;padding:14px 10px;gap:14px}
-.v-quick-page{display:flex;flex-direction:column;align-items:center;gap:6px}
-.v-quick-page img{max-width:92vw;border-radius:6px;background:#fff}
-.v-quick-n{color:#ccc;font-size:11px;font-family:'Hind Siliguri',sans-serif}
-@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important}}
+.soon{opacity:.6}
+.soon .feat-arrow{display:none}
+.soon-badge{font-size:10px;font-weight:700;background:#eee;color:#888;padding:2px 8px;border-radius:999px;margin-left:6px}
+.note{font-size:11.5px;color:#999;text-align:center;line-height:1.7;padding:0 10px}
 </style>
 </head>
 <body>
@@ -115,112 +52,34 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 <div class="header">
   <a href="index.html" class="back" aria-label="হোমে ফিরুন">←</a>
   <div class="sondhan-logo sondhan-logo--navbar-crop"><img src="sondhan-logo.png" alt="Sondhan" decoding="async"/></div>
-  <h1>আমার মেডিকেল ফাইল</h1>
+  <h1>হেলথ</h1>
 </div>
 
 <div class="scr">
   <div class="cover">
-    <div class="cover-title">আমার মেডিকেল ফাইল</div>
-    <div class="cover-sub">প্রেসক্রিপশন, রিপোর্ট ও অন্য কাগজ একসাথে, নিরাপদে</div>
-    <button class="cover-add" id="add-btn">＋ কাগজ যোগ করুন</button>
+    <div class="cover-title">Sondhan হেলথ</div>
+    <div class="cover-sub">আপনার মেডিকেল কাগজ আর স্বাস্থ্য-সংক্রান্ত দরকারি তথ্য — একটা জায়গায়। সময়ের সাথে আরও ফিচার যুক্ত হবে।</div>
   </div>
 
-  <div class="search-box">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
-    <input id="search-inp" type="text" placeholder="নাম, হাসপাতাল বা ডাক্তার দিয়ে খুঁজুন"/>
-  </div>
+  <div>
+    <div class="sec-title">ফিচার</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+      <a class="feat" href="prescription.html">
+        <div class="feat-ic rx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+        <div class="feat-body"><b>প্রেসক্রিপশন</b><span>আমার মেডিকেল ফাইল — প্রেসক্রিপশন, রিপোর্ট ও অন্য কাগজ সংরক্ষণ করুন</span></div>
+        <div class="feat-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>
+      </a>
 
-  <div id="cat-filters">
-    <button class="fchip active" data-filter="all">সবগুলো</button>
-    <button class="fchip" data-filter="prescription">প্রেসক্রিপশন</button>
-    <button class="fchip" data-filter="lab">ল্যাব রিপোর্ট</button>
-    <button class="fchip" data-filter="diagnostic">ডায়াগনস্টিক</button>
-    <button class="fchip" data-filter="discharge">ডিসচার্জ</button>
-    <button class="fchip" data-filter="other">অন্যান্য</button>
-  </div>
-
-  <div id="state-loading" class="state"><div class="spin"></div><p>লোড হচ্ছে...</p></div>
-  <div id="state-login" class="state" hidden>
-    <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
-    <h3>মেডিকেল ফাইল দেখতে লগইন করুন</h3><p>আপনার প্রেসক্রিপশন ও রিপোর্ট শুধু আপনিই দেখতে পাবেন।</p>
-    <a class="btn" href="login.html?redirect=health.html" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">লগইন করুন</a>
-  </div>
-  <div id="state-error" class="state" hidden>
-    <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div>
-    <h3>লোড করা যায়নি</h3><p>ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।</p>
-    <button class="btn" onclick="location.reload()">আবার চেষ্টা করুন</button>
-  </div>
-  <div id="state-empty" class="state" hidden>
-    <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
-    <h3>এখনো কোনো কাগজ নেই</h3><p>প্রেসক্রিপশন, রিপোর্ট বা অন্য কাগজ এখানে যোগ করে রাখুন।</p>
-    <button class="btn" id="add-empty-btn">＋ কাগজ যোগ করুন</button>
-  </div>
-  <div id="state-no-match" class="state" hidden><p>এই অনুসন্ধানে কিছু পাওয়া যায়নি।</p></div>
-
-  <div id="record-list"></div>
-</div>
-
-<!-- Add Document মডাল -->
-<div class="backdrop" id="modal-backdrop" hidden></div>
-<div class="modal" id="add-modal" hidden>
-  <div class="modal-head"><h2>কাগজ যোগ করুন</h2><button class="modal-x" id="modal-close" aria-label="বন্ধ করুন">✕</button></div>
-  <div class="modal-body">
-    <div class="field"><label for="doc-category">ধরন</label>
-      <select id="doc-category">
-        <option value="prescription">প্রেসক্রিপশন</option>
-        <option value="lab">ল্যাব রিপোর্ট</option>
-        <option value="diagnostic">ডায়াগনস্টিক রিপোর্ট</option>
-        <option value="discharge">ডিসচার্জ সামারি</option>
-        <option value="other">অন্যান্য কাগজ</option>
-      </select>
-    </div>
-    <div class="field"><label for="doc-title">শিরোনাম (ঐচ্ছিক)</label><input type="text" id="doc-title" maxlength="100" placeholder="যেমন: জ্বরের প্রেসক্রিপশন"/></div>
-    <div class="field"><label for="doc-facility">হাসপাতাল/ডাক্তারের নাম (ঐচ্ছিক)</label><input type="text" id="doc-facility" maxlength="100" placeholder="যেমন: ডা. রহিম, ঢাকা মেডিকেল"/></div>
-    <div class="field"><label for="doc-date">তারিখ</label><input type="date" id="doc-date"/></div>
-
-    <div class="field"><label>ফাইল যোগ করুন (একাধিক পাতা একসাথে রাখতে পারেন)</label>
-      <div class="upload-row">
-        <label class="upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>ছবি তুলুন
-          <input type="file" id="file-camera" accept="image/*" capture="environment" multiple hidden/></label>
-        <label class="upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>গ্যালারি
-          <input type="file" id="file-gallery" accept="image/*" multiple hidden/></label>
-        <label class="upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>PDF
-          <input type="file" id="file-doc" accept="application/pdf" multiple hidden/></label>
-      </div>
-      <div id="pending-preview"></div>
+      <a class="feat" href="test-prices.html">
+        <div class="feat-ic price"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="feat-body"><b>মেডিকেল টেস্টের মূল্যতালিকা</b><span>সরকারি হাসপাতালে কোন পরীক্ষার দাম কত, উৎসসহ</span></div>
+        <div class="feat-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>
+      </a>
     </div>
   </div>
-  <div class="modal-foot"><button id="save-record-btn">সংরক্ষণ করুন</button></div>
+
+  <p class="note">নিজের কাগজ শুধু আপনিই দেখতে পাবেন — লগইন প্রয়োজন। মূল্যতালিকা সবার জন্য খোলা, লগইন লাগে না।</p>
 </div>
 
-<!-- Viewer -->
-<div class="backdrop" id="viewer-backdrop" hidden></div>
-<div id="viewer" hidden>
-  <div class="v-head">
-    <h3 id="v-title"></h3>
-    <button id="v-zoom-out" aria-label="জুম কমান">－</button>
-    <button id="v-fit" aria-label="পুরো স্ক্রিনে">⤢</button>
-    <button id="v-zoom-in" aria-label="জুম বাড়ান">＋</button>
-    <button id="v-quick" aria-label="কুইক ভিউ">▦</button>
-    <button id="viewer-close" aria-label="বন্ধ করুন">✕</button>
-  </div>
-  <div id="v-surface"></div>
-  <div id="v-nav"><button id="v-prev" aria-label="আগের পাতা">‹</button><span id="v-page-n"></span><button id="v-next" aria-label="পরের পাতা">›</button></div>
-  <div id="v-thumbs"></div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script type="module" src="health.js"></script>
-<script>
-// নিরাপত্তা-জাল: মূল module যদি লোডই না হয় (ধীর/ব্লকড নেটওয়ার্ক), স্পিনারে আটকে না রেখে স্পষ্ট বার্তা
-setTimeout(function () {
-  var l = document.getElementById('state-loading');
-  if (l && !l.hidden) { l.hidden = true; document.getElementById('state-error').hidden = false; }
-}, 15000);
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js').catch(function (e) { console.warn('SW register failed:', e); }); });
-}
-</script>
 </body>
 </html>
