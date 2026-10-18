@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#0f766e"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>রোগসমূহ — Sondhan Health</title>
+<meta name="description" content="সাধারণ রোগের লক্ষণ, যত্ন ও কখন ডাক্তার দেখাবেন — সহজ বাংলায়, রোগ অনুযায়ী সাজানো।">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.sondhan.org/diseases.html"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=2">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+.header{background:linear-gradient(135deg,#0f766e,#14b8a6);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
+.back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header h1{color:#fff;font-size:15px;font-weight:800;font-family:'Hind Siliguri',sans-serif}
+.scr{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;font-family:'Hind Siliguri',sans-serif;padding-bottom:32px}
+
+.intro{background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.intro h2{font-size:15.5px;color:#222;margin-bottom:6px}
+.intro p{font-size:12.5px;color:#777;line-height:1.75}
+
+.search-box{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:10px 14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.search-box input{flex:1;border:0;outline:0;font-family:inherit;font-size:13.5px;background:transparent}
+.search-box button{border:0;background:#f0f0f0;color:#777;width:24px;height:24px;border-radius:50%;font-size:12px;cursor:pointer;flex-shrink:0}
+
+#cat-filters{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px}
+.fchip{flex-shrink:0;border:1.5px solid #cdeae5;background:#fff;color:#0f766e;border-radius:20px;padding:7px 13px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.fchip.active{background:#0f766e;color:#fff;border-color:#0f766e}
+#count{font-size:11.5px;color:#999}
+
+#dz-list{display:flex;flex-direction:column;gap:10px}
+.dz-card{text-align:left;background:#fff;border:0;border-radius:14px;padding:14px;box-shadow:0 1px 8px rgba(0,0,0,.06);cursor:pointer}
+.dz-name{font-size:14.5px;font-weight:700;color:#222}
+.dz-summary{font-size:12px;color:#777;margin-top:4px;line-height:1.7}
+
+#empty-state{text-align:center;padding:30px 18px;color:#777}
+#empty-state button{margin-top:12px;min-height:40px;padding:0 20px;border-radius:11px;background:#0f766e;color:#fff;border:0;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400}
+#detail{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,480px);max-height:88vh;background:#fff;border-radius:20px 20px 0 0;z-index:410;display:flex;flex-direction:column;overflow:hidden}
+.detail-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee}
+.detail-head h2{font-size:15.5px;font-weight:700;font-family:'Hind Siliguri',sans-serif}
+.detail-x{border:0;background:#f3f3f3;width:30px;height:30px;border-radius:50%;font-size:15px;cursor:pointer;flex-shrink:0}
+#detail-body{padding:16px;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;font-size:13px;color:#444;line-height:1.8}
+#detail-body h3{font-size:13.5px;color:#0f766e;margin:14px 0 6px}
+#detail-body h3:first-child{margin-top:0}
+.dz-detail-summary{color:#555;font-size:13.5px}
+.dz-ul{padding-left:18px}
+.dz-ul li{margin-bottom:4px}
+.dz-when{background:#fff8e6;border-radius:10px;padding:10px 12px}
+.dz-disclaimer{margin-top:14px;font-size:11.5px;color:#999;border-top:1px solid #eee;padding-top:12px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="health.html" class="back" aria-label="হেলথ-এ ফিরুন">←</a>
+  <div class="sondhan-logo sondhan-logo--navbar-crop"><img src="sondhan-logo.png" alt="Sondhan" decoding="async"/></div>
+  <h1>রোগসমূহ</h1>
+</div>
+
+<div class="scr">
+  <div class="intro">
+    <h2>সাধারণ রোগ সম্পর্কে জানুন</h2>
+    <p>সাধারণ লক্ষণ, যত্ন আর কখন ডাক্তার দেখাবেন — সহজ বাংলায়। এটা রোগ নির্ণয় (diagnosis) না, সাধারণ তথ্য।</p>
+  </div>
+
+  <div class="search-box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+    <input id="search-inp" type="text" placeholder="রোগের নাম খুঁজুন (যেমন: ডায়াবেটিস, ডেঙ্গু)"/>
+    <button id="clear-search" hidden aria-label="সার্চ মুছুন">✕</button>
+  </div>
+
+  <div id="cat-filters"></div>
+  <div id="count"></div>
+  <div id="dz-list"></div>
+
+  <div id="empty-state" hidden>
+    <h3>এই নামে কিছু পাওয়া যায়নি</h3>
+    <p>ভিন্ন বানান দিয়ে চেষ্টা করুন।</p>
+    <button id="empty-clear">সার্চ মুছুন</button>
+  </div>
+</div>
+
+<div class="backdrop" id="detail-backdrop" hidden></div>
+<div id="detail" hidden>
+  <div class="detail-head"><h2 id="detail-title"></h2><button class="detail-x" id="detail-close" aria-label="বন্ধ করুন">✕</button></div>
+  <div id="detail-body"></div>
+</div>
+
+<script type="module" src="diseases.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js').catch(function (e) { console.warn('SW register failed:', e); }); });
+}
+</script>
+</body>
+</html>

@@ -26,10 +26,29 @@ const open = async (url) => {
 };
 const vis = (page, sel) => page.evaluate(s => { const e = document.querySelector(s); return !!e && !e.hidden && getComputedStyle(e).display !== 'none'; }, sel);
 
-console.log('1. health.html hub — no login required, links to both features');
+console.log('1. health.html hub — no login required, links to all three features');
 { const { page, errs } = await open('/health.html');
   ok(await vis(page, '.feat[href="prescription.html"]'), 'Prescription card present, links to prescription.html');
   ok(await vis(page, '.feat[href="test-prices.html"]'), 'Test-prices card present, links to test-prices.html');
+  ok(await vis(page, '.feat[href="diseases.html"]'), 'Diseases card present, links to diseases.html');
+  ok(errs.length === 0, 'no console errors ' + JSON.stringify(errs));
+}
+
+console.log('1b. diseases.html — static, public, search/filter/detail all work');
+{ const { page, errs } = await open('/diseases.html');
+  const n = await page.$$eval('.dz-card', n => n.length);
+  ok(n >= 8, `renders seeded diseases as cards (got ${n})`);
+  await page.fill('#search-inp', 'ডায়াবেটিস'); await page.waitForTimeout(150);
+  // কিডনি রোগের summary-তেও "ডায়াবেটিস" শব্দটা আছে (কারণ হিসেবে) — তাই একাধিক কার্ড আসা প্রত্যাশিত, ভুল না
+  const dzHits = await page.$$eval('.dz-card .dz-name', n => n.map(e => e.textContent));
+  ok(dzHits.length >= 1 && dzHits.some(t => t.includes('ডায়াবেটিস')), `Bengali name search finds diabetes among matches (got ${JSON.stringify(dzHits)})`);
+  await page.click('.dz-card'); await page.waitForTimeout(200);
+  ok(await vis(page, '#detail'), 'detail sheet opens on click');
+  ok((await page.textContent('#detail-title')).includes('ডায়াবেটিস'), 'detail title matches the clicked disease');
+  ok((await page.textContent('#detail-body')).includes('কখন ডাক্তার দেখাবেন'), "detail includes a 'when to see a doctor' section");
+  await page.click('#detail-close'); await page.waitForTimeout(150);
+  ok(!(await vis(page, '#detail')), 'detail sheet closes');
+  await page.fill('#search-inp', ''); await page.waitForTimeout(150);
   ok(errs.length === 0, 'no console errors ' + JSON.stringify(errs));
 }
 

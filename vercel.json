@@ -63,6 +63,10 @@
     {
       "source": "/test-prices",
       "destination": "/test-prices.html"
+    },
+    {
+      "source": "/diseases",
+      "destination": "/diseases.html"
     }
   ],
   "headers": [
@@ -244,6 +248,11 @@
     {
       "source": "/test-prices/",
       "destination": "/test-prices",
+      "permanent": true
+    },
+    {
+      "source": "/diseases/",
+      "destination": "/diseases",
       "permanent": true
     }
   ]

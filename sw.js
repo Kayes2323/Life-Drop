@@ -26,6 +26,7 @@ const APP_SHELL = [
   './health.html',
   './prescription.html',
   './test-prices.html',
+  './diseases.html',
   './offline.html',
   './style.css',
   './app.js',
