@@ -17,7 +17,7 @@ import { auth, db } from './firebase-config.js';
 import { toast, esc, formatBnDate } from './app.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
-  collection, query, where, orderBy, limit, onSnapshot, setDoc, deleteDoc, doc, serverTimestamp,
+  collection, query, where, limit, onSnapshot, setDoc, deleteDoc, doc, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import {
   CATEGORIES, validateFileList, buildRecordPayload, storageFileName, bnDigits, newRecordId,
@@ -64,11 +64,16 @@ onAuthStateChanged(auth, user => {
 
 function startListening() {
   if (unsubList) unsubList();
-  const q = query(collection(db, 'healthRecords'), where('ownerUid', '==', CUR_UID), orderBy('docDate', 'desc'), limit(100));
+  // নোট: orderBy('docDate') এখানে ইচ্ছাকৃতভাবে নেই — where+orderBy ভিন্ন
+  // ফিল্ডে একসাথে থাকলে Firestore composite index লাগে, যেটা কখনো বানানো
+  // হয়নি; তাই onSnapshot fail করে "ইন্টারনেট নেই" দেখাচ্ছিল। sort এখন
+  // ক্লায়েন্ট-সাইডে, নিচে।
+  const q = query(collection(db, 'healthRecords'), where('ownerUid', '==', CUR_UID), limit(100));
   const timer = setTimeout(() => { show('state-loading', false); show('state-error', true); }, 12000);
   unsubList = onSnapshot(q, snap => {
     clearTimeout(timer);
     RECORDS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    RECORDS.sort((a, b) => (b.docDate || '').localeCompare(a.docDate || ''));
     show('state-loading', false); show('state-error', false);
     render();
   }, err => {
