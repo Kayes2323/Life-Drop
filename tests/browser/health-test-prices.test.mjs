@@ -34,21 +34,42 @@ console.log('1. health.html hub — no login required, links to all three featur
   ok(errs.length === 0, 'no console errors ' + JSON.stringify(errs));
 }
 
-console.log('1b. diseases.html — static, public, search/filter/detail all work');
+console.log('1b. diseases.html — PDF-sourced encyclopedia library: cards, search/alias, category filter, URL state, real links');
 { const { page, errs } = await open('/diseases.html');
   const n = await page.$$eval('.dz-card', n => n.length);
-  ok(n >= 8, `renders seeded diseases as cards (got ${n})`);
+  ok(n === 26, `renders all 26 encyclopedia diseases as cards (got ${n})`);
+  ok((await page.textContent('#count')).includes('২৬টা রোগ'), 'result count shown in Bengali digits');
+
+  // কার্ড এখন আসল <a href="/diseases/{slug}"> লিংক — বাটন+মোডাল না — ব্যাক বাটন যাতে স্বাভাবিকভাবে কাজ করে
+  const hrefs = await page.$$eval('.dz-card', n => n.map(e => e.getAttribute('href')));
+  ok(hrefs.every(h => /^\/diseases\/[a-z0-9-]+$/.test(h)), `every card links to a clean /diseases/{slug} URL (sample: ${hrefs[0]})`);
+
   await page.fill('#search-inp', 'ডায়াবেটিস'); await page.waitForTimeout(150);
-  // কিডনি রোগের summary-তেও "ডায়াবেটিস" শব্দটা আছে (কারণ হিসেবে) — তাই একাধিক কার্ড আসা প্রত্যাশিত, ভুল না
-  const dzHits = await page.$$eval('.dz-card .dz-name', n => n.map(e => e.textContent));
-  ok(dzHits.length >= 1 && dzHits.some(t => t.includes('ডায়াবেটিস')), `Bengali name search finds diabetes among matches (got ${JSON.stringify(dzHits)})`);
-  await page.click('.dz-card'); await page.waitForTimeout(200);
-  ok(await vis(page, '#detail'), 'detail sheet opens on click');
-  ok((await page.textContent('#detail-title')).includes('ডায়াবেটিস'), 'detail title matches the clicked disease');
-  ok((await page.textContent('#detail-body')).includes('কখন ডাক্তার দেখাবেন'), "detail includes a 'when to see a doctor' section");
-  await page.click('#detail-close'); await page.waitForTimeout(150);
-  ok(!(await vis(page, '#detail')), 'detail sheet closes');
+  // সার্চ শুধু নাম/alias ফিল্ডে হয়, summary টেক্সটে না — তাই "ডায়াবেটিস" শুধু টাইপ ২ ডায়াবেটিস কার্ডই আনবে,
+  // যদিও অন্য রোগের (যেমন কিডনি রোগ) সার-সংক্ষেপেও "ডায়াবেটিস" শব্দটা ঝুঁকির কারণ হিসেবে উল্লেখ আছে।
+  let names = await page.$$eval('.dz-card .dz-name', n => n.map(e => e.textContent));
+  ok(names.length === 1 && names[0] === 'টাইপ ২ ডায়াবেটিস', `name-only search does not false-match other diseases whose summary mentions the term (got ${JSON.stringify(names)})`);
+  ok(new URL(page.url()).searchParams.get('q') === 'ডায়াবেটিস', 'search term is reflected in the URL (?q=...) so back/refresh preserves it');
+
+  await page.fill('#search-inp', 'Dengue'); await page.waitForTimeout(150);
+  names = await page.$$eval('.dz-card .dz-name-en', n => n.map(e => e.textContent));
+  ok(names.length === 1 && names[0] === 'Dengue', 'English-name search narrows to the matching disease');
+
+  await page.fill('#search-inp', 'টিবি'); await page.waitForTimeout(150);
+  names = await page.$$eval('.dz-card .dz-name', n => n.map(e => e.textContent));
+  ok(names.length === 1 && names[0].includes('যক্ষ্মা'), `alias search ("টিবি") finds Tuberculosis (got ${JSON.stringify(names)})`);
+
   await page.fill('#search-inp', ''); await page.waitForTimeout(150);
+  await page.click('[data-cat="mental"]'); await page.waitForTimeout(150);
+  names = await page.$$eval('.dz-card .dz-name', n => n.map(e => e.textContent));
+  ok(names.length === 1 && names[0] === 'বিষণ্নতা', `category filter (মানসিক স্বাস্থ্য) shows only Depression (got ${JSON.stringify(names)})`);
+  ok(new URL(page.url()).searchParams.get('cat') === 'mental', 'category choice is reflected in the URL (?cat=...)');
+
+  await page.fill('#search-inp', 'zzzznomatch'); await page.waitForTimeout(150);
+  ok(await vis(page, '#empty-state'), 'empty state shown for no matches');
+  await page.click('#empty-clear'); await page.waitForTimeout(150);
+  ok(!(await vis(page, '#empty-state')), 'empty state clears');
+  ok((await page.$$eval('.dz-card', n => n.length)) === 26, 'full list restored after clearing search + category');
   ok(errs.length === 0, 'no console errors ' + JSON.stringify(errs));
 }
 
