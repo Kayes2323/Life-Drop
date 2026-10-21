@@ -5,56 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="icon" type="image/png" href="sondhan-logo.png"/>
 <link rel="manifest" href="manifest.json"/>
-<meta name="theme-color" content="#c0392b"/>
+<meta name="theme-color" content="#0b3d3a"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
 <title>আমার মেডিকেল ফাইল — Sondhan</title>
 <meta name="robots" content="noindex, follow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;700&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=2">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
-.header{background:linear-gradient(135deg,#c0392b,#e74c3c);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
-.back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.header h1{color:#fff;font-size:16px;font-weight:800;font-family:'Hind Siliguri',sans-serif}
-.scr{flex:1;padding:14px;display:flex;flex-direction:column;gap:14px;font-family:'Hind Siliguri',sans-serif;padding-bottom:40px}
+body{font-family:'Inter','Hind Siliguri',sans-serif;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;
+  background:repeating-linear-gradient(to bottom, transparent 0 27px, rgba(11,61,58,.05) 27px 28px), #f4efe2}
+.header{background:linear-gradient(135deg,#0b3d3a,#145c56);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
+.back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.16);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header h1{color:#fff;font-size:16px;font-weight:700;font-family:'Noto Serif Bengali',serif}
+.scr{flex:1;padding:16px 14px;display:flex;flex-direction:column;gap:16px;font-family:'Hind Siliguri',sans-serif;padding-bottom:40px}
 
-/* ফোল্ডার কভার */
-.cover{background:linear-gradient(145deg,#7a1f12,#c0392b 55%,#e74c3c);border-radius:18px;padding:22px 18px;color:#fff;box-shadow:0 10px 26px rgba(192,57,43,.3);position:relative;overflow:hidden}
-.cover::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 14px);pointer-events:none}
-.cover-title{font-size:19px;font-weight:800;position:relative}
-.cover-sub{font-size:12.5px;opacity:.9;margin-top:4px;position:relative}
-.cover-add{margin-top:16px;display:inline-flex;align-items:center;gap:8px;background:#fff;color:#c0392b;border:0;border-radius:12px;padding:11px 18px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;position:relative;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+/* "প্রেসক্রিপশন প্যাড" হিরো কার্ড */
+.cover{background:#fffdf8;border:1.5px solid #d8cfb8;border-radius:14px;padding:20px 18px 16px;position:relative;box-shadow:0 2px 10px rgba(11,61,58,.06)}
+.cover-rx{position:absolute;top:-14px;left:16px;background:#0b3d3a;color:#e8c77a;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:21px;font-family:'Noto Serif Bengali',serif;box-shadow:0 4px 10px rgba(0,0,0,.18)}
+.cover-title{margin-top:14px;font-family:'Noto Serif Bengali',serif;font-weight:700;font-size:18px;color:#1c1b17}
+.cover-sub{font-size:12px;color:#7a7364;margin-top:4px;line-height:1.6}
+.cover-add{margin-top:14px;width:100%;min-height:46px;border:0;border-radius:11px;background:#0b3d3a;color:#fff;font-family:inherit;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
 
-/* সার্চ + ফিল্টার */
-.search-box{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:10px 14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-.search-box input{flex:1;border:0;outline:0;font-family:inherit;font-size:13.5px;background:transparent}
-#cat-filters{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px}
-.fchip{flex-shrink:0;border:1.5px solid #e6c9c3;background:#fff;color:#8a4a3f;border-radius:20px;padding:7px 13px;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
-.fchip.active{background:#c0392b;color:#fff;border-color:#c0392b}
+/* সার্চ — আন্ডারলাইন স্টাইল, কোনো বক্স নেই */
+.search-box{display:flex;align-items:center;gap:10px;border-bottom:1.5px solid #d8cfb8;padding-bottom:9px}
+.search-box input{flex:1;border:0;outline:0;font-family:inherit;font-size:13px;background:transparent;color:#4a4638}
 
-/* রেকর্ড কার্ড */
-.rec-card{background:#fff;border-radius:14px;padding:12px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 8px rgba(0,0,0,.06);cursor:pointer}
-.rec-card:focus-visible{outline:3px solid #8e44ad;outline-offset:2px}
-.rec-ic{width:42px;height:42px;border-radius:11px;background:#fdecea;color:#c0392b;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.rec-ic svg{width:21px;height:21px}
+/* রেকর্ড কার্ড — কাগজের স্লিপের মতো */
+.rec-card{background:#fffdf8;border:1px solid #e3dcc8;border-radius:12px;padding:13px 14px;display:flex;gap:12px;align-items:center;cursor:pointer}
+.rec-card:focus-visible{outline:3px solid #0b3d3a;outline-offset:2px}
+.rec-bar{width:4px;align-self:stretch;background:#b4894a;border-radius:3px;flex-shrink:0}
 .rec-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.rec-body b{font-size:14px;color:#222;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rec-meta{font-size:11.5px;color:#888}
-.rec-pages{font-size:11px;color:#c0392b;font-weight:600}
-.rec-del{border:0;background:#faf3f2;color:#b94a3d;width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.rec-body b{font-family:'Noto Serif Bengali',serif;font-weight:700;font-size:14.5px;color:#1c1b17;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-meta{font-size:11.5px;color:#8a8370}
+.rec-pages{display:none}
+.rec-del{border:0;background:transparent;color:#b4894a;width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.75}
 .rec-del svg{width:16px;height:16px}
 
 /* অবস্থা */
-.state{text-align:center;padding:30px 18px;color:#777}
-.state .ico{width:60px;height:60px;border-radius:50%;background:#fdecea;color:#c0392b;margin:0 auto 12px;display:flex;align-items:center;justify-content:center}
+.state{text-align:center;padding:30px 18px;color:#7a7364}
+.state .ico{width:60px;height:60px;border-radius:50%;background:#fffdf8;border:1px solid #e3dcc8;color:#0b3d3a;margin:0 auto 12px;display:flex;align-items:center;justify-content:center}
 .state .ico svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.8}
-.spin{width:32px;height:32px;border:4px solid #fde;border-top-color:#c0392b;border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 10px}
+.spin{width:32px;height:32px;border:4px solid #e3dcc8;border-top-color:#0b3d3a;border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 10px}
 @keyframes sp{to{transform:rotate(360deg)}}
-.state button.btn{margin-top:12px;min-height:42px;padding:0 20px;border-radius:11px;background:#c0392b;color:#fff;border:0;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+.state button.btn{margin-top:12px;min-height:42px;padding:0 20px;border-radius:11px;background:#0b3d3a;color:#fff;border:0;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
 [hidden]{display:none!important}
 
 /* মডাল/overlay সাধারণ */
@@ -66,47 +63,70 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 .modal-body{padding:14px 16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;font-family:'Hind Siliguri',sans-serif}
 .field label{display:block;font-size:12.5px;color:#666;margin-bottom:5px;font-weight:600}
 .field select,.field input[type=text],.field input[type=date]{width:100%;border:1.5px solid #e4e4e4;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:13.5px;outline:0}
-.field select:focus,.field input:focus{border-color:#c0392b}
+.field select:focus,.field input:focus{border-color:#0b3d3a}
 .upload-row{display:flex;gap:8px}
-.upload-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;border:1.5px dashed #e0b9b2;background:#fff8f7;border-radius:12px;padding:12px 6px;cursor:pointer;font-size:11.5px;color:#9b4a3c;font-weight:600;text-align:center}
+.upload-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;border:1.5px dashed #c9bd9c;background:#fdfbf5;border-radius:12px;padding:12px 6px;cursor:pointer;font-size:11.5px;color:#6b5d3f;font-weight:600;text-align:center}
 .upload-btn svg{width:20px;height:20px}
 #pending-preview{display:flex;flex-wrap:wrap;gap:8px}
 .pp-item{position:relative;width:70px}
 .pp-item img{width:70px;height:70px;object-fit:cover;border-radius:10px;border:1px solid #eee}
-.pp-pdf{width:70px;height:70px;border-radius:10px;background:#fdecea;color:#c0392b;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px}
+.pp-pdf{width:70px;height:70px;border-radius:10px;background:#e6f7f4;color:#0b3d3a;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px}
 .pp-item .pp-name{display:none}
 .pp-item button{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#333;color:#fff;border:0;font-size:11px;cursor:pointer}
 .pp-bar{height:3px;background:#eee;border-radius:3px;margin-top:4px;overflow:hidden}
 .pp-bar div{height:100%;width:0;background:#27ae60;transition:width .2s}
 .pp-empty{font-size:12.5px;color:#999}
 .modal-foot{padding:12px 16px;border-top:1px solid #eee}
-#save-record-btn{width:100%;min-height:46px;border:0;border-radius:12px;background:#c0392b;color:#fff;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer}
+#save-record-btn{width:100%;min-height:46px;border:0;border-radius:12px;background:#0b3d3a;color:#fff;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer}
 #save-record-btn:disabled{opacity:.6}
 
-/* Viewer */
-#viewer{position:fixed;inset:0;z-index:500;background:#1b1b1b;display:flex;flex-direction:column}
-.v-head{display:flex;align-items:center;gap:10px;padding:12px 14px;color:#fff;font-family:'Hind Siliguri',sans-serif}
-.v-head h3{flex:1;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.v-head button{background:rgba(255,255,255,.15);border:0;color:#fff;width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:14px}
-#v-surface{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;position:relative;--z:1}
-.v-leaf{transition:transform .25s ease,opacity .25s ease;max-width:94vw;max-height:72vh;transform:scale(var(--z))}
-.v-leaf img{max-width:94vw;max-height:72vh;object-fit:contain;border-radius:4px;background:#fff}
-#v-surface.turning .v-leaf{opacity:.35;transform:scale(calc(var(--z) * .96))}
+/* Viewer — "ক্লিপবোর্ডে আটকানো আসল কাগজ" */
+#viewer{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;
+  background:repeating-linear-gradient(to bottom, transparent 0 27px, rgba(11,61,58,.05) 27px 28px), #f4efe2}
+.v-head{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#0b3d3a;color:#fff;font-family:'Hind Siliguri',sans-serif;flex-shrink:0}
+.v-head h3{flex:1;font-size:14.5px;font-weight:700;font-family:'Noto Serif Bengali',serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v-head button{background:rgba(255,255,255,.14);border:0;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:13px;flex-shrink:0}
+
+#v-surface{flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;padding:26px 22px 16px;--z:1}
+.v-board{position:absolute;top:26px;left:22px;right:22px;bottom:16px;background:#cfcabd;border-radius:14px;box-shadow:0 10px 24px rgba(0,0,0,.14);z-index:0}
+.v-clip{position:relative;z-index:3;width:74px;height:20px;background:linear-gradient(180deg,#8d8d92,#5c5c60);border-radius:6px;box-shadow:0 3px 6px rgba(0,0,0,.25);margin-bottom:-10px;flex-shrink:0}
+
+.v-leaf{position:relative;z-index:2;width:100%;flex:1;background:#fffdf8;border-radius:4px 4px 10px 10px;box-shadow:0 14px 30px rgba(0,0,0,.22);transform:rotate(-.6deg) scale(var(--z));transition:transform .25s ease,opacity .25s ease;display:flex;flex-direction:column;overflow:hidden}
+.v-leaf-tear{height:0;border-top:2.5px dashed #d8cfb8;margin:10px 14px 0;flex-shrink:0}
+.v-leaf-inner{flex:1;position:relative;padding:14px 14px 12px;display:flex;flex-direction:column;overflow:hidden}
+.v-leaf-letterhead{font-family:'Noto Serif Bengali',serif;font-weight:700;font-size:12.5px;color:#0b3d3a;border-bottom:1.5px solid #e3dcc8;padding-bottom:8px;margin-bottom:10px;display:flex;justify-content:space-between;gap:10px;flex-shrink:0}
+.v-leaf-letterhead span:last-child{color:#9a9380;font-weight:500;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v-media-box{flex:1;border-radius:7px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#eee}
+.v-media-box img{max-width:100%;max-height:100%;object-fit:contain}
+#v-surface.turning .v-leaf{opacity:.35;transform:rotate(-.6deg) scale(calc(var(--z) * .96))}
 @media (prefers-reduced-motion:reduce){.v-leaf{transition:none}}
-@media (min-width:900px){ body.wide-spread-note{} }
+
+/* লোডিং শিমার — ফ্রেম সাথে সাথে দেখা যায়, শুধু ছবির জায়গাটা পরে ভরে */
+@keyframes vshimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+.v-shimmer{background:linear-gradient(90deg,#ececec 0%,#f6f6f6 40%,#ececec 80%);background-size:400px 100%;animation:vshimmer 1.3s ease-in-out infinite}
+@keyframes vpulse{0%,100%{opacity:.18}50%{opacity:.34}}
+.v-rx-pulse{font-family:'Noto Serif Bengali',serif;font-size:50px;color:#0b3d3a;line-height:1;animation:vpulse 1.6s ease-in-out infinite}
+.v-loading-row{margin-top:8px;display:flex;align-items:center;gap:8px;justify-content:center;flex-shrink:0}
+.v-loading-row .v-spin{width:14px;height:14px;border:2.5px solid #d8cfb8;border-top-color:#b4894a;border-radius:50%;animation:sp .8s linear infinite}
+.v-loading-row span{font-size:11.5px;color:#9a9380;font-family:'Hind Siliguri',sans-serif}
+
 .v-pdf{background:#fff;color:#333;border-radius:10px;padding:20px;text-align:center;font-family:'Hind Siliguri',sans-serif;max-width:300px}
-.v-pdf-open{display:inline-block;margin-top:10px;background:#c0392b;color:#fff;padding:9px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700}
-.v-err{color:#e74c3c;font-family:'Hind Siliguri',sans-serif}
-#v-nav{display:flex;align-items:center;justify-content:center;gap:16px;padding:10px;color:#fff;font-family:'Hind Siliguri',sans-serif}
-#v-nav button{background:rgba(255,255,255,.15);border:0;color:#fff;width:40px;height:40px;border-radius:50%;font-size:17px;cursor:pointer}
-#v-nav button:disabled{opacity:.3}
-#v-thumbs{display:flex;gap:6px;overflow-x:auto;padding:8px 10px 14px;justify-content:center}
-.v-thumb{flex-shrink:0;width:30px;height:30px;border-radius:8px;border:0;background:rgba(255,255,255,.12);color:#ddd;font-size:11px;cursor:pointer}
-.v-thumb.active{background:#c0392b;color:#fff}
+.v-pdf-open{display:inline-block;margin-top:10px;background:#0b3d3a;color:#fff;padding:9px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:700}
+.v-err{color:#c0392b;font-family:'Hind Siliguri',sans-serif}
+
+#v-nav{flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center}
+.v-nav-pill{background:#0b3d3a;color:#fff;border-radius:999px;padding:9px 6px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:14px;box-shadow:0 8px 18px rgba(11,61,58,.3);margin:-24px 0 10px}
+.v-nav-pill button{background:transparent;border:0;color:#fff;width:28px;height:28px;border-radius:50%;font-size:16px;cursor:pointer}
+.v-nav-pill button:disabled{opacity:.3}
+
+#v-thumbs{flex-shrink:0;background:#fffdf8;border-top:1px solid #e9e3d2;display:flex;gap:6px;overflow-x:auto;padding:10px;justify-content:center}
+.v-thumb{flex-shrink:0;width:30px;height:30px;border-radius:8px;border:0;background:#f0ead9;color:#8a8370;font-size:11px;cursor:pointer}
+.v-thumb.active{background:#0b3d3a;color:#fff}
 #viewer.quick #v-surface{flex-direction:column;overflow-y:auto;padding:14px 10px;gap:14px}
+#viewer.quick .v-board,#viewer.quick .v-clip{display:none}
 .v-quick-page{display:flex;flex-direction:column;align-items:center;gap:6px}
 .v-quick-page img{max-width:92vw;border-radius:6px;background:#fff}
-.v-quick-n{color:#ccc;font-size:11px;font-family:'Hind Siliguri',sans-serif}
+.v-quick-n{color:#8a8370;font-size:11px;font-family:'Hind Siliguri',sans-serif}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important}}
 </style>
 </head>
@@ -120,23 +140,15 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
 
 <div class="scr">
   <div class="cover">
-    <div class="cover-title">আমার মেডিকেল ফাইল</div>
-    <div class="cover-sub">প্রেসক্রিপশন, রিপোর্ট ও অন্য কাগজ একসাথে, নিরাপদে</div>
-    <button class="cover-add" id="add-btn">＋ কাগজ যোগ করুন</button>
+    <div class="cover-rx">℞</div>
+    <div class="cover-title">আপনার ফাইল</div>
+    <div class="cover-sub">প্রেসক্রিপশন ও রিপোর্ট — একই জায়গায়, নিরাপদে সংরক্ষিত</div>
+    <button class="cover-add" id="add-btn"><span style="font-size:17px;line-height:1">+</span> কাগজ যোগ করুন</button>
   </div>
 
   <div class="search-box">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
-    <input id="search-inp" type="text" placeholder="নাম, হাসপাতাল বা ডাক্তার দিয়ে খুঁজুন"/>
-  </div>
-
-  <div id="cat-filters">
-    <button class="fchip active" data-filter="all">সবগুলো</button>
-    <button class="fchip" data-filter="prescription">প্রেসক্রিপশন</button>
-    <button class="fchip" data-filter="lab">ল্যাব রিপোর্ট</button>
-    <button class="fchip" data-filter="diagnostic">ডায়াগনস্টিক</button>
-    <button class="fchip" data-filter="discharge">ডিসচার্জ</button>
-    <button class="fchip" data-filter="other">অন্যান্য</button>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9a9380" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+    <input id="search-inp" type="text" placeholder="নাম বা হাসপাতাল দিয়ে খুঁজুন"/>
   </div>
 
   <div id="state-loading" class="state"><div class="spin"></div><p>লোড হচ্ছে...</p></div>
@@ -193,7 +205,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
   <div class="modal-foot"><button id="save-record-btn">সংরক্ষণ করুন</button></div>
 </div>
 
-<!-- Viewer -->
+<!-- Viewer — ক্লিপবোর্ডে আটকানো আসল কাগজের ভাইব -->
 <div class="backdrop" id="viewer-backdrop" hidden></div>
 <div id="viewer" hidden>
   <div class="v-head">
@@ -204,14 +216,18 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-heigh
     <button id="v-quick" aria-label="কুইক ভিউ">▦</button>
     <button id="viewer-close" aria-label="বন্ধ করুন">✕</button>
   </div>
-  <div id="v-surface"></div>
-  <div id="v-nav"><button id="v-prev" aria-label="আগের পাতা">‹</button><span id="v-page-n"></span><button id="v-next" aria-label="পরের পাতা">›</button></div>
+  <div id="v-surface">
+    <div class="v-board" aria-hidden="true"></div>
+    <div class="v-clip" aria-hidden="true"></div>
+    <div id="v-surface-content" style="position:relative;z-index:2;width:100%;flex:1;display:flex;flex-direction:column;overflow:hidden"></div>
+  </div>
+  <div id="v-nav"><div class="v-nav-pill"><button id="v-prev" aria-label="আগের পাতা">‹</button><span id="v-page-n"></span><button id="v-next" aria-label="পরের পাতা">›</button></div></div>
   <div id="v-thumbs"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script type="module" src="prescription.js?v=2"></script>
+<script type="module" src="prescription.js?v=3"></script>
 <script>
 // নিরাপত্তা-জাল: মূল module যদি লোডই না হয় (ধীর/ব্লকড নেটওয়ার্ক), স্পিনারে আটকে না রেখে স্পষ্ট বার্তা
 setTimeout(function () {

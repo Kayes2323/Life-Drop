@@ -117,13 +117,13 @@ console.log('4. create a multi-page record end-to-end (fake Supabase Storage + F
   ok(FAKE_SUPA.size === 2, '2 files actually uploaded to (fake) Supabase Storage');
   ok(errs.length === 0, 'no console errors ' + JSON.stringify(errs));
 
-  console.log('5. appears in the list, filter + search work');
+  console.log('5. appears in the list, search works');
   await page.waitForTimeout(400);
   ok((await page.$$eval('.rec-card', n => n.length)) === 1, 'record appears in the list');
   ok((await page.textContent('.rec-card')).includes('CBC রিপোর্ট'), 'title shown');
-  await page.click('[data-filter="prescription"]'); await page.waitForTimeout(150);
-  ok(await vis(page, '#state-no-match'), 'category filter hides non-matching record');
-  await page.click('[data-filter="all"]'); await page.fill('#search-inp', 'ঢাকা মেডিকেল'); await page.waitForTimeout(150);
+  await page.fill('#search-inp', 'zzz-no-match'); await page.waitForTimeout(150);
+  ok(await vis(page, '#state-no-match'), 'non-matching search shows the no-match state');
+  await page.fill('#search-inp', 'ঢাকা মেডিকেল'); await page.waitForTimeout(150);
   ok((await page.$$eval('.rec-card', n => n.length)) === 1, 'search by facility name finds the record');
   await page.fill('#search-inp', ''); await page.waitForTimeout(150);
 

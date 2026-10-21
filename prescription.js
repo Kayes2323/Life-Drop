@@ -24,9 +24,8 @@ import {
 } from './health-core.js';
 
 let CUR_UID = null;
-let RECORDS = [];           // সর্বশেষ onSnapshot ফলাফল (ক্যাশ — সার্চ/ফিল্টার এখান থেকেই)
+let RECORDS = [];           // সর্বশেষ onSnapshot ফলাফল (ক্যাশ — সার্চ এখান থেকেই)
 let unsubList = null;
-let activeFilter = 'all';
 let activeSearch = '';
 let pendingFiles = [];      // মডালে বাছা ফাইল (এখনো আপলোড হয়নি)
 let uploadTasks = [];       // চলমান uploadBytesResumable task — cancel-এর জন্য
@@ -86,7 +85,6 @@ function startListening() {
 // ── ইন্ডেক্স/টাইমলাইন রেন্ডার (সার্চ + ফিল্টার ক্লায়েন্ট-সাইডে) ──────
 function render() {
   const list = RECORDS.filter(r => {
-    if (activeFilter !== 'all' && r.category !== activeFilter) return false;
     if (!activeSearch) return true;
     const hay = [r.title, r.facility, catLabel(r.category)].filter(Boolean).join(' ').toLowerCase();
     return hay.includes(activeSearch);
@@ -104,27 +102,19 @@ function catLabel(id) { return (CATEGORIES.find(c => c.id === id) || {}).label |
 function cardHtml(r) {
   const n = r.pageCount || (r.pages || []).length || 1;
   return `<div class="rec-card" data-open="${esc(r.id)}" tabindex="0" role="button" aria-label="${esc(r.title || catLabel(r.category))} খুলুন">
-    <div class="rec-ic" aria-hidden="true">${pageIcon}</div>
+    <div class="rec-bar" aria-hidden="true"></div>
     <div class="rec-body">
       <b>${esc(r.title || catLabel(r.category))}</b>
-      <span class="rec-meta">${esc(catLabel(r.category))} · ${esc(formatBnDate(r.docDate) || r.docDate)}${r.facility ? ' · ' + esc(r.facility) : ''}</span>
-      <span class="rec-pages">${bnDigits(n)} পাতা</span>
+      <span class="rec-meta">${esc(catLabel(r.category))} · ${esc(formatBnDate(r.docDate) || r.docDate)}${r.facility ? ' · ' + esc(r.facility) : ''} · ${bnDigits(n)} পাতা</span>
     </div>
     <button class="rec-del" data-del="${esc(r.id)}" aria-label="মুছে ফেলুন" title="মুছে ফেলুন">${trashIcon}</button>
   </div>`;
 }
-const pageIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>`;
 const trashIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>`;
 
 // ── UI তার (ফিল্টার/সার্চ/মডাল) ────────────────────────────────
 function wireUi() {
   $('#search-inp').addEventListener('input', e => { activeSearch = e.target.value.trim().toLowerCase(); render(); });
-  $('#cat-filters').addEventListener('click', e => {
-    const b = e.target.closest('[data-filter]'); if (!b) return;
-    activeFilter = b.dataset.filter;
-    $$('#cat-filters [data-filter]').forEach(x => x.classList.toggle('active', x === b));
-    render();
-  });
   $('#add-btn').addEventListener('click', openAddModal);
   $('#add-empty-btn')?.addEventListener('click', openAddModal);
   $('#modal-close').addEventListener('click', closeAddModal);
@@ -264,7 +254,7 @@ async function confirmDelete(id) {
 }
 
 // ── Viewer (পাতা উল্টানো + quick view + zoom) ──────────────────
-let vRecord = null, vFlat = [], vIdx = 0, vQuick = false, vZoom = 1;
+let vRecord = null, vFlat = [], vIdx = 0, vQuick = false, vZoom = 1, vToken = 0;
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 async function openViewer(id) {
@@ -282,11 +272,38 @@ function toggleQuickView() { vQuick = !vQuick; $('#viewer').classList.toggle('qu
 function zoom(d) { setZoom(Math.min(3, Math.max(1, vZoom + d))); }
 function setZoom(z) { vZoom = z; $('#v-surface').style.setProperty('--z', String(z)); }
 
+// ── সাইন করা ডাউনলোড URL ক্যাশ ───────────────────────────────────────
+// Supabase-এর sign-download প্রতিবার নতুন URL দেয় (সার্ভারে ~৫ মিনিট মেয়াদ,
+// api/storage.js-এর SIGN_DOWNLOAD_TTL)। সেই একই URL পুনর্ব্যবহার করলে (ক) একই
+// রেকর্ড আবার খুললে নেটওয়ার্ক round-trip লাগে না, আর (খ) ব্রাউজারের নিজস্ব
+// HTTP image cache-ও কাজে লাগে (নতুন URL মানে নতুন cache entry, তাই আগে এই
+// সুবিধা পাওয়া যেত না)। মেয়াদ সার্ভারের চেয়ে ছোট রাখা হয়েছে, নিরাপদ margin-এর জন্য।
+const urlCache = new Map(); // path -> { url, exp }
+const URL_CACHE_MS = 4 * 60 * 1000;
+
 async function urlFor(path) {
-  try { return (await apiStorage('sign-download', path)).url; } catch (e) { console.warn('[health] download url failed:', path, e && e.reason); return ''; }
+  const cached = urlCache.get(path);
+  if (cached && cached.exp > Date.now()) return cached.url;
+  try {
+    const url = (await apiStorage('sign-download', path)).url;
+    urlCache.set(path, { url, exp: Date.now() + URL_CACHE_MS });
+    return url;
+  } catch (e) { console.warn('[health] download url failed:', path, e && e.reason); return ''; }
 }
 
-async function pageMediaHtml(entry) {
+// বর্তমান পাতা দেখানোর পরপরই বাকি পাতাগুলোর URL ব্যাকগ্রাউন্ডে আগেই নিয়ে রাখা হয়
+// (ছবিও প্রি-লোড করা হয় new Image() দিয়ে) — তাই পরের/আগের পাতায় গেলে তাৎক্ষণিক দেখা যায়।
+function prefetchOtherPages() {
+  vFlat.forEach((entry, i) => {
+    if (i === vIdx) return;
+    const path = entry.file.path;
+    const cached = urlCache.get(path);
+    if (cached && cached.exp > Date.now()) return;
+    urlFor(path).then(url => { if (url && entry.file.type !== 'application/pdf') { const im = new Image(); im.src = url; } }).catch(() => {});
+  });
+}
+
+async function mediaInnerHtml(entry) {
   const f = entry.file;
   if (f.type === 'application/pdf') {
     // সরল, নিরাপদ পদ্ধতি: PDF নতুন ট্যাবে/ব্রাউজারের নিজের ভিউয়ারে খোলে —
@@ -299,20 +316,45 @@ async function pageMediaHtml(entry) {
   return url ? `<img src="${esc(url)}" alt=""/>` : '<p class="v-err">ছবি লোড করা যায়নি</p>';
 }
 
+// "ক্লিপবোর্ডে আটকানো আসল কাগজ" শেল — সাথে সাথে দেখা যায়, ছবি পরে ভরে (নিচে)
+function leafShellHtml() {
+  const cat = esc(catLabel(vRecord.category));
+  const facility = vRecord.facility ? `<span>${esc(vRecord.facility)}</span>` : '';
+  return `<div class="v-leaf">
+    <div class="v-leaf-tear"></div>
+    <div class="v-leaf-inner">
+      <div class="v-leaf-letterhead"><span>${cat}</span>${facility}</div>
+      <div class="v-media-box" id="v-media-slot">
+        <div class="v-shimmer" style="position:absolute;inset:0"></div>
+        <div class="v-rx-pulse" style="position:relative">℞</div>
+      </div>
+      <div class="v-loading-row" id="v-loading-row"><div class="v-spin"></div><span>আসল কাগজ লোড হচ্ছে…</span></div>
+    </div>
+  </div>`;
+}
+
 async function renderViewer() {
   if (vQuick) {
-    const items = await Promise.all(vFlat.map(pageMediaHtml));
-    $('#v-surface').innerHTML = items.map((h, i) => `<div class="v-quick-page">${h}<span class="v-quick-n">${bnDigits(i + 1)}</span></div>`).join('');
+    const items = await Promise.all(vFlat.map(mediaInnerHtml));
+    $('#v-surface-content').innerHTML = items.map((h, i) => `<div class="v-quick-page">${h}<span class="v-quick-n">${bnDigits(i + 1)}</span></div>`).join('');
     $('#v-nav').hidden = true; $('#v-thumbs').hidden = true;
     return;
   }
   $('#v-nav').hidden = false; $('#v-thumbs').hidden = false;
   const entry = vFlat[vIdx];
-  $('#v-surface').innerHTML = entry ? `<div class="v-leaf">${await pageMediaHtml(entry)}</div>` : '';
+  const myToken = ++vToken;
+  $('#v-surface-content').innerHTML = entry ? leafShellHtml() : '';
   $('#v-page-n').textContent = `${bnDigits(vIdx + 1)} / ${bnDigits(vFlat.length)}`;
   $('#v-prev').disabled = vIdx === 0; $('#v-next').disabled = vIdx === vFlat.length - 1;
   renderThumbs();
   setZoom(1);
+  if (!entry) return;
+  const html = await mediaInnerHtml(entry);
+  if (myToken !== vToken) return; // ততক্ষণে ইউজার অন্য পাতায়/বন্ধ করে চলে গেছেন
+  const slot = $('#v-media-slot');
+  if (slot) slot.innerHTML = html;
+  $('#v-loading-row')?.remove();
+  prefetchOtherPages();
 }
 
 function renderThumbs() {
