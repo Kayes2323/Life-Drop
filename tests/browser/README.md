@@ -7,6 +7,8 @@ Real pages (`inbox.html`, `index.html`, `search.html`, `sw.js`) run in Chromium 
     node tests/browser/inbox.test.mjs        # inbox, push card states, live updates, outage/timeout
     node tests/browser/bell-search.test.mjs  # home bell badge + "send request" payload shape
     node tests/browser/sw-push.test.mjs      # push -> system notification (Chrome's own push simulator)
+    node tests/browser/auth.test.mjs         # signup/login/verify-email: email+Google+phone OTP, error
+                                              # mapping, resend cooldowns, link verification, no-overwrite
     node --test tests/sw-click.test.mjs      # notification click behaviour (mocked worker scope)
     node --test tests/api/notify.test.mjs    # api/notify.js (fake Admin SDK)
     (cd tests/rules && npm i && npm test)    # Firestore rules on the real emulator (needs Java)
