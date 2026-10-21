@@ -101,6 +101,10 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
       <button class="eye" onclick="toggleEye()">👁</button>
     </div>
     <button class="submit-btn" id="e-btn" onclick="loginEmail()">→ লগইন করুন</button>
+    <div style="text-align:center;margin-top:10px">
+      <button type="button" id="forgot-link" onclick="forgotPassword()" style="background:none;border:none;color:#999;font-size:12.5px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;text-decoration:underline;padding:4px">পাসওয়ার্ড ভুলে গেছেন?</button>
+    </div>
+    <div id="fp-ok" style="display:none;background:#d1f3e0;color:#155724;padding:10px 13px;border-radius:11px;font-size:12.5px;margin-top:10px;border-left:3px solid #27ae60;font-family:'Hind Siliguri',sans-serif;line-height:1.6"></div>
   </div>
 
   <!-- PHONE TAB -->
@@ -146,7 +150,7 @@ showInAppBrowserPrompt();
 <script type="module">
 import { auth, db } from './firebase-config.js';
 import { normalizeBdPhone, safeRedirect } from './app.js';
-import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithPhoneNumber, RecaptchaVerifier, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 // এই imports সফল হলেই শুধু এখানে পৌঁছায় — নিচের fallback script এটা
 // চেক করে বোঝে যে এই module আদৌ চলেছে কিনা (in-app browser-এ এই
@@ -159,6 +163,11 @@ const redir = safeRedirect(new URLSearchParams(window.location.search).get('redi
 
 let confirmationResult = null;
 let recaptchaVerifier  = null;
+// নিরাপত্তা (brief 2.8/2.10): বাটনে বারবার ক্লিকে একাধিক concurrent OTP-অনুরোধ
+// বা SMS-spam ঠেকাতে ন্যূনতম cooldown — btn.disabled শুধু in-flight অবস্থায়
+// সুরক্ষা দেয়, সফল পাঠানোর পরেও তৎক্ষণাৎ আবার পাঠানো আটকাতে এই টাইমস্ট্যাম্প লাগে।
+let lastOtpSentAt = 0;
+const OTP_RESEND_COOLDOWN_MS = 30000;
 
 // Already logged in
 onAuthStateChanged(auth, u => {
@@ -271,6 +280,12 @@ window.sendOTP = async () => {
     showErr('মোবাইল নম্বর সঠিক দিন: +880 দিয়ে ১১ টি সংখ্যা (যেমন +8801712345678) বা 01XXXXXXXXX'); return;
   }
 
+  const sinceLast = Date.now() - lastOtpSentAt;
+  if (sinceLast < OTP_RESEND_COOLDOWN_MS) {
+    showErr(`একটু অপেক্ষা করুন — আবার OTP চাইতে ${Math.ceil((OTP_RESEND_COOLDOWN_MS - sinceLast) / 1000)} সেকেন্ড বাকি।`);
+    return;
+  }
+
   btn.textContent='OTP পাঠানো হচ্ছে...'; btn.disabled=true;
 
   try {
@@ -278,10 +293,12 @@ window.sendOTP = async () => {
       btn.textContent='OTP পাঠান'; btn.disabled=false; return;
     }
     confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
+    lastOtpSentAt = Date.now();
     document.getElementById('phone-num').value = phone;
     document.getElementById('phone-step1').style.display='none';
     document.getElementById('phone-step2').style.display='block';
     document.getElementById('otp-sent-msg').style.display='block';
+    btn.textContent='OTP পাঠান'; btn.disabled=false;
   } catch(e){
     const code = e?.code || '';
     showErr(phoneErrMsg(code) || ('OTP পাঠানো যায়নি: ' + (e?.message || String(e))));
@@ -296,10 +313,13 @@ window.verifyOTP = async () => {
   const btn  = document.getElementById('otp-verify-btn');
   hideErr();
   if(!code||code.length<6){ showErr('6 সংখ্যার OTP কোড দিন'); return; }
+  if(!confirmationResult){ showErr('আগে OTP পাঠান।'); return; }
   btn.textContent='যাচাই হচ্ছে...'; btn.disabled=true;
   try {
     const res = await confirmationResult.confirm(code);
     const u = res.user;
+    // নিরাপত্তা (brief 2.9): owner-write + merge:false দিয়ে শুধুই "ডকুমেন্ট নেই"
+    // অবস্থায় প্রোফাইল তৈরি হয় — বিদ্যমান প্রোফাইল কখনো ওভাররাইট হয় না।
     const ref = doc(db,'users',u.uid);
     const snap = await getDoc(ref);
     if(!snap.exists()){
@@ -313,8 +333,51 @@ window.verifyOTP = async () => {
     }
     window.location.replace(redir);
   } catch(e){
-    showErr('OTP ভুল বা মেয়াদ শেষ।');
+    // BUGFIX (brief 2.5/2.8): আগে এখানে সব ভুল কোডের জন্য একই বার্তা দেখাতো।
+    // SDK প্রকৃতপক্ষে এই নির্দিষ্ট কোডগুলো ফেরত দেয় — আলাদা, স্পষ্ট বার্তা দরকার।
+    const code = e?.code || '';
+    showErr({
+      'auth/invalid-verification-code': 'OTP কোডটি ভুল। আবার চেষ্টা করুন।',
+      'auth/code-expired'             : 'OTP-এর মেয়াদ শেষ হয়ে গেছে। নতুন OTP চান।',
+      'auth/missing-verification-code': '6 সংখ্যার OTP কোড দিন।',
+      'auth/too-many-requests'        : 'অনেকবার ভুল চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
+      'auth/network-request-failed'   : 'ইন্টারনেট সংযোগ চেক করুন।'
+    }[code] || 'OTP ভুল বা মেয়াদ শেষ।');
     btn.textContent='✅ যাচাই করুন'; btn.disabled=false;
+  }
+};
+
+// পাসওয়ার্ড রিসেট (brief Phase 1 — আগে এই ফ্লো-টাই পুরোপুরি অনুপস্থিত ছিল, এমনকি
+// একটা লিংকও ছিল না; পাসওয়ার্ড ভুলে যাওয়া ব্যবহারকারীর লগইনে ফিরে আসার কোনো উপায়
+// ছিল না)। নিরাপত্তা (brief Phase 5 — account-existence leak এড়ানো): সফল/ব্যর্থ
+// (auth/user-not-found) দুই ক্ষেত্রেই হুবহু একই বার্তা দেখানো হয়, যাতে এই ফর্ম
+// দিয়ে কোন ইমেইলে Sondhan একাউন্ট আছে তা bruteforce করে বের করা না যায়।
+window.forgotPassword = async () => {
+  const email = document.getElementById('email').value.trim();
+  const btn = document.getElementById('forgot-link');
+  const okBox = document.getElementById('fp-ok');
+  hideErr(); okBox.style.display = 'none';
+  if (!email) { showErr('আগে ইমেইল লিখুন, তারপর "পাসওয়ার্ড ভুলে গেছেন?" চাপুন।'); return; }
+  btn.disabled = true; btn.textContent = 'পাঠানো হচ্ছে...';
+  try {
+    await sendPasswordResetEmail(auth, email);
+    okBox.textContent = 'যদি এই ইমেইলে Sondhan একাউন্ট থাকে, একটি পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে। ইনবক্স/Spam ফোল্ডার চেক করুন।';
+    okBox.style.display = 'block';
+  } catch (e) {
+    if (e?.code === 'auth/invalid-email') {
+      showErr('সঠিক ইমেইল ঠিকানা দিন।');
+    } else if (e?.code === 'auth/network-request-failed') {
+      showErr('ইন্টারনেট সংযোগ চেক করুন।');
+    } else if (e?.code === 'auth/user-not-found') {
+      // উদ্দেশ্যমূলকভাবে success-এর মতো একই বার্তা — কোনো ইমেইলে একাউন্ট
+      // আছে কিনা তা এখান থেকে অনুমান করা না যায়।
+      okBox.textContent = 'যদি এই ইমেইলে Sondhan একাউন্ট থাকে, একটি পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে। ইনবক্স/Spam ফোল্ডার চেক করুন।';
+      okBox.style.display = 'block';
+    } else {
+      showErr('রিসেট লিংক পাঠানো যায়নি। আবার চেষ্টা করুন।');
+    }
+  } finally {
+    btn.disabled = false; btn.textContent = 'পাসওয়ার্ড ভুলে গেছেন?';
   }
 };
 
