@@ -6,7 +6,7 @@
 // ══════════════════════════════════════════════════════════
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন।
-const CACHE_VERSION = 'sondhan-v50-dzencyc';
+const CACHE_VERSION = 'sondhan-v51-verifyemail';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -16,6 +16,7 @@ const APP_SHELL = [
   './donor.html',
   './login.html',
   './signup.html',
+  './verify-email.html',
   './about.html',
   './privacy.html',
   './terms.html',

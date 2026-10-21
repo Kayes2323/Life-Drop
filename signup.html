@@ -90,14 +90,32 @@ showInAppBrowserPrompt();
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// Phase 3 (ইমেইল যাচাই): verify-email.html-এর সাথে হুবহু একই actionCodeSettings।
+// handleCodeInApp:true মানে Firebase ইমেইলের লিংক সরাসরি এই ডোমেইনের
+// verify-email.html-এ পাঠায় (Firebase-এর নিজস্ব জেনেরিক hosted পেজে না) —
+// তাই পুরো যাচাইকরণ অভিজ্ঞতাই Sondhan-ব্র্যান্ডেড থাকে।
+const actionCodeSettings = {
+  url: 'https://www.sondhan.org/verify-email.html',
+  handleCodeInApp: true
+};
 // এই imports সফল হলেই শুধু এখানে পৌঁছায় — নিচের fallback script এটা
 // চেক করে বোঝে যে এই module আদৌ চলেছে কিনা।
 window.__sondhanAuthModuleReady = true;
-// Redirect if already logged in
+
+// BUGFIX (race condition): createUserWithEmailAndPassword সফল হওয়ার সাথে সাথেই
+// Firebase ভেতরে ভেতরে onAuthStateChanged ফায়ার করে — নিচের এই লিসেনার আর
+// signupEmail()-এর নিজের redirect (verify-email.html-এ) দুটোই প্রায় একই সময়ে
+// window.location.replace() চালানোর চেষ্টা করলে race হয়, আর ব্যবহারকারী
+// যাচাইকরণ স্ক্রিন না দেখেই সরাসরি index.html-এ চলে যেতে পারতেন। signupInProgress
+// ফ্ল্যাগ দিয়ে এই লিসেনারকে সাইনআপের নিজস্ব ফ্লো শেষ না হওয়া পর্যন্ত থামিয়ে রাখা হয়।
+let signupInProgress = false;
+
+// Redirect if already logged in (কিন্তু সাইনআপ ফ্লো নিজেই চলমান থাকলে না)
 onAuthStateChanged(auth, u => {
-  if(u) window.location.replace('index.html');
+  if(u && !signupInProgress) window.location.replace('index.html');
 });
 
 // ── GOOGLE SIGNUP ─────────────────────────────────────────────
@@ -149,6 +167,7 @@ window.signupEmail = async () => {
   if(pass.length < 6){ showErr('পাসওয়ার্ড কমপক্ষে ৬ অক্ষর'); return; }
 
   btn.textContent = 'তৈরি হচ্ছে...'; btn.disabled = true;
+  signupInProgress = true;
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
@@ -161,8 +180,13 @@ window.signupEmail = async () => {
       donations: 0, rating: 0, raters: 0,
       createdAt: serverTimestamp()
     });
-    window.location.replace('index.html');
+    // একাউন্ট + প্রোফাইল তৈরি সফল হওয়ার পরই যাচাইকরণ ইমেইল পাঠানো হয় — এটা
+    // ব্যর্থ হলেও (quota/network) সাইনআপ আটকায় না, কারণ verify-email.html-এর
+    // "আবার পাঠান" বাটন দিয়ে ব্যবহারকারী নিজেই আবার চেষ্টা করতে পারবেন।
+    try { await sendEmailVerification(cred.user, actionCodeSettings); } catch(_) {}
+    window.location.replace('verify-email.html');
   } catch(e) {
+    signupInProgress = false;
     showErr(errMsg(e.code));
     btn.textContent = '✅ একাউন্ট তৈরি করুন';
     btn.disabled = false;

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#c0392b"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>Sondhan — ইমেইল যাচাই</title>
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=2">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.hero{text-align:center;padding:44px 20px 24px;color:#fff;width:100%;display:flex;flex-direction:column;align-items:center}
+.hero .sondhan-logo{margin-bottom:10px}
+.hero p{font-size:13px;margin-top:6px;opacity:.88;font-family:'Inter',sans-serif}
+.brand-tagline{font-family:'Hind Siliguri',sans-serif;font-weight:400;color:#6B7280;font-size:12px}
+.card{background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:480px;flex:1;padding:30px 22px 40px;overflow-y:auto;text-align:center}
+.icon-wrap{font-size:48px;margin-bottom:14px}
+h1{font-size:18px;color:#222;font-family:'Hind Siliguri',sans-serif;margin-bottom:10px;line-height:1.5}
+.sub{font-size:13.5px;color:#666;font-family:'Hind Siliguri',sans-serif;line-height:1.7;margin-bottom:6px}
+.email-chip{display:inline-block;background:#f8f8f8;border-radius:10px;padding:6px 14px;font-size:13px;color:#c0392b;font-weight:700;margin:8px 0 18px;word-break:break-all}
+.err{background:#fdecea;color:#c0392b;padding:11px 14px;border-radius:11px;font-size:13px;margin-bottom:14px;border-left:3px solid #c0392b;display:none;text-align:left;font-family:'Hind Siliguri',sans-serif}
+.ok-box{background:#d1f3e0;color:#155724;padding:11px 14px;border-radius:11px;font-size:13px;margin-bottom:14px;border-left:3px solid #27ae60;display:none;text-align:left;font-family:'Hind Siliguri',sans-serif}
+.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border:none;border-radius:13px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;margin-bottom:10px}
+.submit-btn:disabled{background:#e0a0a0;cursor:not-allowed}
+.ghost-btn{width:100%;padding:13px;background:#fff;color:#c0392b;border:1.5px solid #c0392b;border-radius:13px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;margin-bottom:10px}
+.ghost-btn:disabled{opacity:.5;cursor:not-allowed}
+.link-btn{background:none;border:none;color:#999;font-size:12.5px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;text-decoration:underline;padding:6px}
+.spam-note{font-size:11.5px;color:#aaa;font-family:'Hind Siliguri',sans-serif;line-height:1.6;margin:10px 0 18px}
+.edit-box{display:none;text-align:left;margin-top:14px;border-top:1px solid #f0f0f0;padding-top:14px}
+.iw{display:flex;align-items:center;background:#f8f8f8;border:1.5px solid #eee;border-radius:12px;padding:0 13px;margin-bottom:10px}
+.iw input{flex:1;border:none;background:transparent;padding:12px 0;font-size:13.5px;outline:none;font-family:'Hind Siliguri',sans-serif;color:#222}
+.spinner{width:34px;height:34px;border:3px solid #f0dcd8;border-top-color:#c0392b;border-radius:50%;margin:0 auto 16px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="sondhan-logo sondhan-logo--navbar-crop">
+    <img src="sondhan-logo.png" alt="Sondhan" decoding="async" fetchpriority="high"/>
+  </div>
+  <p class="brand-tagline">রক্তের সন্ধানে</p>
+</div>
+
+<div class="card">
+  <div id="err" class="err"></div>
+  <div id="ok" class="ok-box"></div>
+
+  <!-- CHECKING LINK (mode=verifyEmail&oobCode=... present) -->
+  <div id="state-checking" style="display:none">
+    <div class="spinner"></div>
+    <h1>যাচাই করা হচ্ছে...</h1>
+  </div>
+
+  <!-- LINK VERIFIED SUCCESSFULLY -->
+  <div id="state-verified" style="display:none">
+    <div class="icon-wrap">✅</div>
+    <h1>আপনার ইমেইল সফলভাবে যাচাই হয়েছে!</h1>
+    <p class="sub">এখন আপনি Sondhan-এর সব ফিচার ব্যবহার করতে পারবেন।</p>
+    <br/>
+    <button class="submit-btn" id="continue-btn">→ চালিয়ে যান</button>
+  </div>
+
+  <!-- LINK INVALID / EXPIRED -->
+  <div id="state-link-error" style="display:none">
+    <div class="icon-wrap">⚠️</div>
+    <h1 id="link-error-title">এই যাচাইকরণ লিংকটি কাজ করছে না</h1>
+    <p class="sub" id="link-error-sub">নিচে থেকে লগইন করুন অথবা নতুন একটি যাচাইকরণ ইমেইল চান।</p>
+    <br/>
+    <a href="login.html" class="submit-btn" style="display:block;text-decoration:none;text-align:center;box-sizing:border-box">লগইন করুন</a>
+  </div>
+
+  <!-- NOT SIGNED IN (opened this page without a session) -->
+  <div id="state-signed-out" style="display:none">
+    <div class="icon-wrap">🔒</div>
+    <h1>আগে লগইন করুন</h1>
+    <p class="sub">ইমেইল যাচাইয়ের অবস্থা দেখতে প্রথমে সাইন-ইন করুন।</p>
+    <br/>
+    <a href="login.html" class="submit-btn" style="display:block;text-decoration:none;text-align:center;box-sizing:border-box">লগইন করুন</a>
+  </div>
+
+  <!-- ALREADY VERIFIED (landed here while already verified) -->
+  <div id="state-already" style="display:none">
+    <div class="icon-wrap">✅</div>
+    <h1>আপনার ইমেইল আগেই যাচাই করা আছে</h1>
+    <br/>
+    <button class="submit-btn" id="already-continue-btn">→ চালিয়ে যান</button>
+  </div>
+
+  <!-- WAITING FOR VERIFICATION (main pending screen) -->
+  <div id="state-waiting" style="display:none">
+    <div class="icon-wrap">📩</div>
+    <h1>আপনার ইমেইল যাচাই করুন</h1>
+    <p class="sub">আমরা একটি যাচাইকরণ লিংক পাঠিয়েছি:</p>
+    <div class="email-chip" id="email-chip">—</div>
+    <p class="sub">লিংকে ক্লিক করে যাচাই সম্পন্ন করুন, তারপর নিচে "যাচাই হয়েছে কিনা দেখুন" বাটনে চাপুন।</p>
+    <p class="spam-note">📭 ইমেইল না পেলে Spam/Junk ফোল্ডার চেক করুন। কয়েক মিনিট সময় লাগতে পারে।</p>
+
+    <button class="submit-btn" id="refresh-btn">🔄 যাচাই হয়েছে কিনা দেখুন</button>
+    <button class="ghost-btn" id="resend-btn">✉️ আবার পাঠান</button>
+
+    <div style="margin-top:6px">
+      <button class="link-btn" id="edit-email-toggle">ইমেইল ঠিকানা ভুল হয়েছে?</button>
+    </div>
+
+    <div class="edit-box" id="edit-box">
+      <div class="iw"><input type="email" id="new-email" placeholder="নতুন ইমেইল ঠিকানা"/></div>
+      <div class="iw"><input type="password" id="current-pass" placeholder="বর্তমান পাসওয়ার্ড (যাচাইয়ের জন্য)"/></div>
+      <button class="ghost-btn" id="save-email-btn">ইমেইল পরিবর্তন করে আবার পাঠান</button>
+    </div>
+
+    <div style="margin-top:14px;border-top:1px solid #f0f0f0;padding-top:14px">
+      <a href="login.html" style="font-size:12.5px;color:#999;font-family:'Hind Siliguri',sans-serif;text-decoration:underline">আগেই একাউন্ট যাচাই করা আছে? লগইন করুন</a>
+    </div>
+    <div style="margin-top:10px">
+      <button class="link-btn" id="skip-btn">এখন এড়িয়ে সাইটে যান →</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { safeRedirect } from './app.js';
+import {
+  onAuthStateChanged, sendEmailVerification, applyActionCode,
+  EmailAuthProvider, reauthenticateWithCredential, updateEmail
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// নিরাপত্তা: ?redirect= সরাসরি ব্যবহার না করে safeRedirect() দিয়ে যাচাই করা হয়
+// (শুধু এই সাইটের নিজস্ব .html পেজেই যাওয়ার অনুমতি — open-redirect প্রতিরোধ)।
+const params = new URLSearchParams(window.location.search);
+const redir = safeRedirect(params.get('redirect'), 'index.html');
+
+// Firebase email-link action handler এই পেজে সরাসরি পাঠায় (actionCodeSettings.url
+// এই পেজ, handleCodeInApp:true) — mode/oobCode থাকলে এটা signup-এর পাঠানো
+// যাচাইকরণ লিংক, অপেক্ষা-স্ক্রিন না।
+const mode    = params.get('mode');
+const oobCode = params.get('oobCode');
+
+const RESEND_COOLDOWN_MS = 60 * 1000;
+
+function show(id) {
+  ['state-checking','state-verified','state-link-error','state-signed-out','state-already','state-waiting']
+    .forEach(s => document.getElementById(s).style.display = s === id ? 'block' : 'none');
+}
+function showErr(m){ const e=document.getElementById('err'); e.textContent=m; e.style.display='block'; }
+function hideErr(){ document.getElementById('err').style.display='none'; }
+function showOk(m){ const e=document.getElementById('ok'); e.textContent=m; e.style.display='block'; }
+function hideOk(){ document.getElementById('ok').style.display='none'; }
+
+// ── actionCodeSettings — signup.html-এও হুবহু এই একই অবজেক্ট ব্যবহার হয় ──
+export const actionCodeSettings = {
+  url: 'https://www.sondhan.org/verify-email.html',
+  handleCodeInApp: true
+};
+window.__sondhanActionCodeSettings = actionCodeSettings;
+
+function linkErrMsg(code){
+  return {
+    'auth/expired-action-code': 'এই যাচাইকরণ লিংকের মেয়াদ শেষ হয়ে গেছে। লগইন করে একটি নতুন লিংক চান।',
+    'auth/invalid-action-code': 'এই লিংকটি অবৈধ অথবা আগেই ব্যবহার করা হয়ে গেছে। হয়তো ইমেইল আগেই যাচাই হয়ে গেছে — নিচে লগইন করে দেখুন।',
+    'auth/user-disabled': 'এই একাউন্টটি নিষ্ক্রিয় করা হয়েছে।',
+    'auth/user-not-found': 'এই একাউন্ট আর খুঁজে পাওয়া যায়নি।'
+  }[code] || 'লিংকটি যাচাই করা যায়নি। আবার চেষ্টা করুন।';
+}
+
+async function handleVerifyLink() {
+  show('state-checking');
+  try {
+    await applyActionCode(auth, oobCode);
+    // নিরাপত্তা (brief অনুযায়ী বাধ্যতামূলক): শুধু এখানে পৌঁছানো বা URL প্যারাম
+    // থেকে ধরে নিই না যে verified — signed-in থাকলে Firebase auth state
+    // সার্ভার থেকে reload করে প্রকৃত emailVerified ফ্ল্যাগ আবার পড়ি।
+    if (auth.currentUser) {
+      try { await auth.currentUser.reload(); } catch(_) {}
+    }
+    show('state-verified');
+    document.getElementById('continue-btn').onclick = () => window.location.replace(redir);
+  } catch(e) {
+    show('state-link-error');
+    document.getElementById('link-error-sub').textContent = linkErrMsg(e?.code);
+  }
+}
+
+let currentUser = null;
+let resendTimer = null;
+
+function cooldownKey(uid){ return 'sondhan-verify-resend-' + uid; }
+
+function applyCooldownUI(uid){
+  const btn = document.getElementById('resend-btn');
+  const last = parseInt(localStorage.getItem(cooldownKey(uid)) || '0', 10);
+  const remain = RESEND_COOLDOWN_MS - (Date.now() - last);
+  clearInterval(resendTimer);
+  if (remain > 0) {
+    btn.disabled = true;
+    const tick = () => {
+      const left = Math.ceil((RESEND_COOLDOWN_MS - (Date.now() - last)) / 1000);
+      if (left <= 0) { btn.disabled = false; btn.textContent = '✉️ আবার পাঠান'; clearInterval(resendTimer); return; }
+      btn.textContent = `✉️ আবার পাঠান (${left}s)`;
+    };
+    tick();
+    resendTimer = setInterval(tick, 1000);
+  } else {
+    btn.disabled = false; btn.textContent = '✉️ আবার পাঠান';
+  }
+}
+
+async function showWaitingScreen(user){
+  document.getElementById('email-chip').textContent = user.email || '—';
+  show('state-waiting');
+  applyCooldownUI(user.uid);
+}
+
+async function initWaitingFlow() {
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { show('state-signed-out'); return; }
+    currentUser = user;
+    if (!user.email) { window.location.replace(redir); return; } // phone-only account — কিছুই যাচাই করার নেই
+    try { await user.reload(); } catch(_) {}
+    if (auth.currentUser?.emailVerified) {
+      show('state-already');
+      document.getElementById('already-continue-btn').onclick = () => window.location.replace(redir);
+      return;
+    }
+    showWaitingScreen(auth.currentUser);
+  });
+}
+
+document.getElementById('resend-btn').onclick = async () => {
+  hideErr(); hideOk();
+  const user = auth.currentUser;
+  if (!user) return;
+  const last = parseInt(localStorage.getItem(cooldownKey(user.uid)) || '0', 10);
+  if (Date.now() - last < RESEND_COOLDOWN_MS) return; // defensive — বাটন এমনিতেই disabled থাকার কথা
+  const btn = document.getElementById('resend-btn');
+  btn.disabled = true; btn.textContent = 'পাঠানো হচ্ছে...';
+  try {
+    await sendEmailVerification(user, actionCodeSettings);
+    localStorage.setItem(cooldownKey(user.uid), String(Date.now()));
+    showOk('একটি নতুন যাচাইকরণ ইমেইল পাঠানো হয়েছে। Spam/Junk ফোল্ডার দেখুন।');
+    applyCooldownUI(user.uid);
+  } catch(e) {
+    const msg = {
+      'auth/too-many-requests': 'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
+      'auth/network-request-failed': 'ইন্টারনেট সংযোগ চেক করুন।'
+    }[e?.code] || 'ইমেইল পাঠানো যায়নি। আবার চেষ্টা করুন।';
+    showErr(msg);
+    btn.disabled = false; btn.textContent = '✉️ আবার পাঠান';
+  }
+};
+
+document.getElementById('refresh-btn').onclick = async () => {
+  hideErr(); hideOk();
+  const user = auth.currentUser;
+  if (!user) return;
+  const btn = document.getElementById('refresh-btn');
+  btn.disabled = true; btn.textContent = 'চেক করা হচ্ছে...';
+  try {
+    await user.reload();
+    if (auth.currentUser.emailVerified) {
+      show('state-already');
+      document.getElementById('already-continue-btn').onclick = () => window.location.replace(redir);
+    } else {
+      showOk('এখনো যাচাই হয়নি — ইমেইলের লিংকে ক্লিক করুন, তারপর আবার চেষ্টা করুন।');
+    }
+  } catch(_) {
+    showErr('যাচাই অবস্থা চেক করা যায়নি। ইন্টারনেট সংযোগ চেক করুন।');
+  } finally {
+    btn.disabled = false; btn.textContent = '🔄 যাচাই হয়েছে কিনা দেখুন';
+  }
+};
+
+document.getElementById('skip-btn').onclick = () => window.location.replace(redir);
+
+document.getElementById('edit-email-toggle').onclick = () => {
+  const box = document.getElementById('edit-box');
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+};
+
+document.getElementById('save-email-btn').onclick = async () => {
+  hideErr(); hideOk();
+  const user = auth.currentUser;
+  if (!user) return;
+  const newEmail = document.getElementById('new-email').value.trim();
+  const pass = document.getElementById('current-pass').value;
+  if (!newEmail) { showErr('নতুন ইমেইল দিন'); return; }
+  if (!pass)     { showErr('বর্তমান পাসওয়ার্ড দিন'); return; }
+  const isPasswordUser = (user.providerData || []).some(p => p.providerId === 'password');
+  if (!isPasswordUser) { showErr('এই একাউন্টে ইমেইল/পাসওয়ার্ড লগইন সেট করা নেই — তাই এখান থেকে ইমেইল বদলানো যাবে না।'); return; }
+
+  const btn = document.getElementById('save-email-btn');
+  btn.disabled = true; btn.textContent = 'পরিবর্তন করা হচ্ছে...';
+  try {
+    const cred = EmailAuthProvider.credential(user.email, pass);
+    await reauthenticateWithCredential(user, cred);
+    await updateEmail(user, newEmail);
+    try { await updateDoc(doc(db, 'users', user.uid), { email: newEmail }); } catch(_) {}
+    await sendEmailVerification(user, actionCodeSettings);
+    localStorage.setItem(cooldownKey(user.uid), String(Date.now()));
+    document.getElementById('edit-box').style.display = 'none';
+    document.getElementById('new-email').value = '';
+    document.getElementById('current-pass').value = '';
+    showOk('ইমেইল পরিবর্তন হয়েছে। নতুন ঠিকানায় যাচাইকরণ ইমেইল পাঠানো হয়েছে।');
+    showWaitingScreen(user);
+  } catch(e) {
+    const msg = {
+      'auth/wrong-password': 'পাসওয়ার্ড ভুল।',
+      'auth/invalid-credential': 'পাসওয়ার্ড ভুল।',
+      'auth/requires-recent-login': 'নিরাপত্তার জন্য আবার লগইন করুন, তারপর চেষ্টা করুন।',
+      'auth/email-already-in-use': 'এই ইমেইলে আগেই একটি একাউন্ট আছে।',
+      'auth/invalid-email': 'সঠিক ইমেইল দিন।',
+      'auth/network-request-failed': 'ইন্টারনেট সংযোগ চেক করুন।'
+    }[e?.code] || 'ইমেইল পরিবর্তন করা যায়নি।';
+    showErr(msg);
+  } finally {
+    btn.disabled = false; btn.textContent = 'ইমেইল পরিবর্তন করে আবার পাঠান';
+  }
+};
+
+// ── বুট ──────────────────────────────────────────────────────────
+if (mode === 'verifyEmail' && oobCode) {
+  handleVerifyLink();
+} else {
+  initWaitingFlow();
+}
+</script>
+</body>
+</html>

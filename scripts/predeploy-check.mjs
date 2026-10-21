@@ -60,7 +60,7 @@ for (const u of locs) {
   if (fileFor(u).startsWith('guides/') && /(?:\+?88)?01[3-9]\d{8}/.test(h.replace(/<[^>]+>/g, ' '))) probs.push('phone-like number in guide');
   check(probs.length === 0, `SEO ${new URL(u).pathname}${probs.length ? ' — ' + probs.join('; ') : ''}`);
 }
-for (const f of ['login', 'signup', 'register', 'profile', 'request', 'admin', 'offline', 'inbox']) check(/name="robots" content="noindex/.test(fs.readFileSync(path.join(ROOT, f + '.html'), 'utf8')), `${f}.html is noindex`);
+for (const f of ['login', 'signup', 'verify-email', 'register', 'profile', 'request', 'admin', 'offline', 'inbox']) check(/name="robots" content="noindex/.test(fs.readFileSync(path.join(ROOT, f + '.html'), 'utf8')), `${f}.html is noindex`);
 const rb = fs.readFileSync(path.join(ROOT, 'robots.txt'), 'utf8');
 try { execFileSync('node', [path.join(ROOT, 'scripts/build-sitemap.mjs'), '--check'], { stdio: 'pipe' }); ok('sitemap.xml lists exactly the public pages + guides (scripts/build-sitemap.mjs)'); }
 catch { bad('sitemap.xml is out of date — run: node scripts/build-sitemap.mjs'); }
