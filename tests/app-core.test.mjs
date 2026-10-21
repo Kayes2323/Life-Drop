@@ -53,7 +53,7 @@ test('isValidBdPhone: mirrors normalizeBdPhone exactly', () => {
   assert.equal(isValidBdPhone(''), false);
 });
 
-// ── safeRedirect: open-redirect protection used by login.html / verify-email.html / auth-guard.js ──
+// ── safeRedirect: open-redirect protection used by login.html / signup.html / auth-guard.js ──
 test('safeRedirect: allows a bare same-site .html path', () => {
   assert.equal(safeRedirect('profile.html'), 'profile.html');
   assert.equal(safeRedirect('index.html?tab=donor'), 'index.html?tab=donor');

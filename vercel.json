@@ -108,7 +108,7 @@
       ]
     },
     {
-      "source": "/(admin|inbox|login|signup|verify-email|register|profile|request|offline|prescription)\\.html",
+      "source": "/(admin|inbox|login|signup|register|profile|request|offline|prescription)\\.html",
       "headers": [
         {
           "key": "X-Robots-Tag",

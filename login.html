@@ -45,15 +45,10 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
 .divider hr{flex:1;border:none;border-top:1px solid #eee}
 .divider span{font-size:11px;color:#ccc}
 
-/* OTP */
-.otp-sent{background:#d1f3e0;border:1px solid #c3e6cb;border-radius:11px;padding:10px 14px;font-size:12px;color:#155724;font-family:'Hind Siliguri',sans-serif;margin-bottom:12px;display:none}
-
 /* REGISTER BOX */
 .reg-box{margin-top:18px;background:#fafafa;border:1.5px solid #f0f0f0;border-radius:14px;padding:14px;text-align:center}
 .reg-box p{font-size:13px;color:#444;font-weight:700;font-family:'Hind Siliguri',sans-serif;margin-bottom:10px}
 .reg-link{display:block;padding:11px;background:#fff;color:#c0392b;border:1.5px solid #c0392b;border-radius:11px;font-size:13px;font-weight:700;text-decoration:none;font-family:'Hind Siliguri',sans-serif}
-
-#recaptcha-container{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -72,7 +67,6 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
   <div class="login-tabs">
     <button class="login-tab active" id="t-google" onclick="switchTab('google')">Google</button>
     <button class="login-tab" id="t-email" onclick="switchTab('email')">ইমেইল</button>
-    <button class="login-tab" id="t-phone" onclick="switchTab('phone')">ফোন</button>
   </div>
 
   <!-- GOOGLE TAB -->
@@ -107,31 +101,6 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;background:#c0392b;min-heigh
     <div id="fp-ok" style="display:none;background:#d1f3e0;color:#155724;padding:10px 13px;border-radius:11px;font-size:12.5px;margin-top:10px;border-left:3px solid #27ae60;font-family:'Hind Siliguri',sans-serif;line-height:1.6"></div>
   </div>
 
-  <!-- PHONE TAB -->
-  <div id="tab-phone" style="display:none">
-    <div id="otp-sent-msg" class="otp-sent">✅ OTP পাঠানো হয়েছে। নিচে কোড দিন।</div>
-
-    <!-- Step 1: phone input -->
-    <div id="phone-step1">
-      <div class="iw">
-        <span class="ico">📞</span>
-        <input type="tel" id="phone-num" placeholder="+8801XXXXXXXXX"/>
-      </div>
-      <div id="recaptcha-container"></div>
-      <button class="submit-btn" id="otp-send-btn" onclick="sendOTP()">OTP পাঠান</button>
-    </div>
-
-    <!-- Step 2: OTP input -->
-    <div id="phone-step2" style="display:none">
-      <div class="iw">
-        <span class="ico">🔢</span>
-        <input type="number" id="otp-code" placeholder="6 সংখ্যার OTP কোড"/>
-      </div>
-      <button class="submit-btn" id="otp-verify-btn" onclick="verifyOTP()">✅ যাচাই করুন</button>
-      <button onclick="switchTab('phone')" style="width:100%;margin-top:10px;padding:10px;background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;font-family:'Hind Siliguri',sans-serif">← আবার চেষ্টা করুন</button>
-    </div>
-  </div>
-
   <!-- REGISTER LINK -->
   <div class="reg-box">
     <p>নতুন ব্যবহারকারী?</p>
@@ -149,8 +118,8 @@ showInAppBrowserPrompt();
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { normalizeBdPhone, safeRedirect } from './app.js';
-import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithPhoneNumber, RecaptchaVerifier, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { safeRedirect } from './app.js';
+import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 // এই imports সফল হলেই শুধু এখানে পৌঁছায় — নিচের fallback script এটা
 // চেক করে বোঝে যে এই module আদৌ চলেছে কিনা (in-app browser-এ এই
@@ -161,14 +130,6 @@ window.__sondhanAuthModuleReady = true;
 // শুধু এই সাইটের নিজস্ব .html পেজেই রিডাইরেক্ট করার অনুমতি দেয়।
 const redir = safeRedirect(new URLSearchParams(window.location.search).get('redirect'));
 
-let confirmationResult = null;
-let recaptchaVerifier  = null;
-// নিরাপত্তা (brief 2.8/2.10): বাটনে বারবার ক্লিকে একাধিক concurrent OTP-অনুরোধ
-// বা SMS-spam ঠেকাতে ন্যূনতম cooldown — btn.disabled শুধু in-flight অবস্থায়
-// সুরক্ষা দেয়, সফল পাঠানোর পরেও তৎক্ষণাৎ আবার পাঠানো আটকাতে এই টাইমস্ট্যাম্প লাগে।
-let lastOtpSentAt = 0;
-const OTP_RESEND_COOLDOWN_MS = 30000;
-
 // Already logged in
 onAuthStateChanged(auth, u => {
   if(u) window.location.replace(redir);
@@ -176,18 +137,11 @@ onAuthStateChanged(auth, u => {
 
 // TAB SWITCH
 window.switchTab = (tab) => {
-  ['google','email','phone'].forEach(t => {
+  ['google','email'].forEach(t => {
     document.getElementById('tab-'+t).style.display = t===tab ? 'block':'none';
     document.getElementById('t-'+t).classList.toggle('active', t===tab);
   });
   hideErr();
-  // Reset phone steps
-  if(tab==='phone'){
-    document.getElementById('phone-step1').style.display = 'block';
-    document.getElementById('phone-step2').style.display = 'none';
-    document.getElementById('otp-sent-msg').style.display = 'none';
-    initRecaptcha(true);
-  }
 };
 
 // GOOGLE
@@ -234,116 +188,6 @@ window.loginEmail = async () => {
   } catch(e){
     showErr(errMsg(e.code));
     btn.textContent='→ লগইন করুন'; btn.disabled=false;
-  }
-};
-
-// PHONE OTP — Firebase SMS + reCAPTCHA; tear down verifier on failures so retries work.
-function destroyRecaptcha(){
-  try {
-    recaptchaVerifier?.clear?.();
-  } catch(_) {}
-  recaptchaVerifier = null;
-  const el = document.getElementById('recaptcha-container');
-  if (el) el.innerHTML = '';
-}
-
-// BUGFIX: আগের normalizeBdPhone-এ বাগ ছিল — নম্বর '1' দিয়ে শুরু না হলে
-// শুধু '+880' ফেরত দিতো (নম্বরটাই হারিয়ে যেতো)। এখন app.js-এর
-// একটাই সঠিক version ব্যবহার হচ্ছে (উপরে import করা আছে)।
-
-/** @returns {boolean} */
-function initRecaptcha(silent){
-  destroyRecaptcha();
-  try {
-    recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-      size:'invisible',
-      callback: () => {}
-    });
-    return true;
-  } catch(e){
-    if(!silent){
-      showErr('যাচাইকরণ লোড করা যায়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।');
-    }
-    return false;
-  }
-}
-
-window.sendOTP = async () => {
-  const raw = document.getElementById('phone-num').value.trim();
-  const btn   = document.getElementById('otp-send-btn');
-  hideErr();
-
-  if (!raw){ showErr('ফোন নম্বর দিন'); return; }
-  // সব ফরম্যাট (+880…, 880…, 01…, 1…) একই পথে normalize হয়
-  const phone = normalizeBdPhone(raw);
-  if (!/^\+8801\d{9}$/.test(phone)){
-    showErr('মোবাইল নম্বর সঠিক দিন: +880 দিয়ে ১১ টি সংখ্যা (যেমন +8801712345678) বা 01XXXXXXXXX'); return;
-  }
-
-  const sinceLast = Date.now() - lastOtpSentAt;
-  if (sinceLast < OTP_RESEND_COOLDOWN_MS) {
-    showErr(`একটু অপেক্ষা করুন — আবার OTP চাইতে ${Math.ceil((OTP_RESEND_COOLDOWN_MS - sinceLast) / 1000)} সেকেন্ড বাকি।`);
-    return;
-  }
-
-  btn.textContent='OTP পাঠানো হচ্ছে...'; btn.disabled=true;
-
-  try {
-    if (!recaptchaVerifier && !initRecaptcha(false)){
-      btn.textContent='OTP পাঠান'; btn.disabled=false; return;
-    }
-    confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
-    lastOtpSentAt = Date.now();
-    document.getElementById('phone-num').value = phone;
-    document.getElementById('phone-step1').style.display='none';
-    document.getElementById('phone-step2').style.display='block';
-    document.getElementById('otp-sent-msg').style.display='block';
-    btn.textContent='OTP পাঠান'; btn.disabled=false;
-  } catch(e){
-    const code = e?.code || '';
-    showErr(phoneErrMsg(code) || ('OTP পাঠানো যায়নি: ' + (e?.message || String(e))));
-    destroyRecaptcha();
-    initRecaptcha(true);
-    btn.textContent='OTP পাঠান'; btn.disabled=false;
-  }
-};
-
-window.verifyOTP = async () => {
-  const code = document.getElementById('otp-code').value.trim();
-  const btn  = document.getElementById('otp-verify-btn');
-  hideErr();
-  if(!code||code.length<6){ showErr('6 সংখ্যার OTP কোড দিন'); return; }
-  if(!confirmationResult){ showErr('আগে OTP পাঠান।'); return; }
-  btn.textContent='যাচাই হচ্ছে...'; btn.disabled=true;
-  try {
-    const res = await confirmationResult.confirm(code);
-    const u = res.user;
-    // নিরাপত্তা (brief 2.9): owner-write + merge:false দিয়ে শুধুই "ডকুমেন্ট নেই"
-    // অবস্থায় প্রোফাইল তৈরি হয় — বিদ্যমান প্রোফাইল কখনো ওভাররাইট হয় না।
-    const ref = doc(db,'users',u.uid);
-    const snap = await getDoc(ref);
-    if(!snap.exists()){
-      await setDoc(ref,{
-        uid:u.uid, name:u.displayName||u.phoneNumber||'',
-        email:'', photo:'', phone:u.phoneNumber||'',
-        isDonor:false, available:false,
-        donations:0, rating:0, raters:0,
-        createdAt:serverTimestamp()
-      });
-    }
-    window.location.replace(redir);
-  } catch(e){
-    // BUGFIX (brief 2.5/2.8): আগে এখানে সব ভুল কোডের জন্য একই বার্তা দেখাতো।
-    // SDK প্রকৃতপক্ষে এই নির্দিষ্ট কোডগুলো ফেরত দেয় — আলাদা, স্পষ্ট বার্তা দরকার।
-    const code = e?.code || '';
-    showErr({
-      'auth/invalid-verification-code': 'OTP কোডটি ভুল। আবার চেষ্টা করুন।',
-      'auth/code-expired'             : 'OTP-এর মেয়াদ শেষ হয়ে গেছে। নতুন OTP চান।',
-      'auth/missing-verification-code': '6 সংখ্যার OTP কোড দিন।',
-      'auth/too-many-requests'        : 'অনেকবার ভুল চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
-      'auth/network-request-failed'   : 'ইন্টারনেট সংযোগ চেক করুন।'
-    }[code] || 'OTP ভুল বা মেয়াদ শেষ।');
-    btn.textContent='✅ যাচাই করুন'; btn.disabled=false;
   }
 };
 
@@ -397,20 +241,6 @@ function errMsg(c){
     'auth/too-many-requests':'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
     'auth/network-request-failed':'ইন্টারনেট সংযোগ চেক করুন।'
   }[c]||'সমস্যা হয়েছে: '+c;
-}
-
-function phoneErrMsg(c){
-  return {
-    'auth/invalid-phone-number':'ফোন নম্বরের ফরম্যাট ভুল। +8801XXXXXXXXX দিন।',
-    'auth/missing-phone-number':'ফোন নম্বর দিন।',
-    'auth/captcha-check-failed':'যাচাইকরণ (reCAPTCHA) ব্যর্থ। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।',
-    'auth/quota-exceeded':'SMS কোটা শেষ। Firebase Console / বিলিং চেক করুন।',
-    'auth/too-many-requests':'একই নম্বরে অনেকবার চেষ্টা। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
-    'auth/missing-app-credential':'Firebase ফোন লগইন এই ব্রাউজার/ডোমেইনে সেটআপ নেই। Authorized domains চেক করুন।',
-    'auth/invalid-app-credential':'অ্যাপ কনফিগ/SHA বা ডোমেইন মিলছে না। Firebase Authentication সেটিং দেখুন।',
-    'auth/operation-not-allowed':'Firebase Console এ Phone sign-in চালু করুন।',
-    'auth/network-request-failed':'ইন্টারনেট সংযোগ চেক করুন।'
-  }[c] || '';
 }
 
 document.addEventListener('keydown', e => {
@@ -512,7 +342,7 @@ if ('serviceWorker' in navigator) {
 <script>
 // BUGFIX (donor.html-এর একই ক্লাসের বাগ, এখানেও প্রযোজ্য): উপরের মূল
 // module script যদি gstatic.com import ব্যর্থ হওয়ায় কখনো না চলে, তাহলে
-// window.loginGoogle/loginEmail/sendOTP ইত্যাদি কখনো define-ই হয় না —
+// window.loginGoogle/loginEmail ইত্যাদি কখনো define-ই হয় না —
 // ব্যবহারকারী বাটনে চাপলে কিছুই হয় না, কোনো দৃশ্যমান error ছাড়াই। এই
 // স্বতন্ত্র non-module script সবসময় চলে, আর কোনো নির্দিষ্ট অ্যাপ (Facebook
 // ইত্যাদি) চেনার চেষ্টা না করে শুধু "module সত্যিই চলেছে কিনা" (উপরের
