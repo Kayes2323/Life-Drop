@@ -11,7 +11,9 @@ const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 
 let activeCat = 'all';
-let activeSearch = '';
+// অন্য পেজ (যেমন disease.html) থেকে ?q=... দিয়ে ডিপ-লিংক করলে সেই সার্চ-টার্ম
+// দিয়েই পেজ খোলে — ব্যবহারকারীকে আবার টাইপ করতে হয় না।
+let activeSearch = new URLSearchParams(location.search).get('q') || '';
 
 const STATUS_LABEL = { needs_reverify: 'মূল্য পুনরায় যাচাই করা প্রয়োজন', verified: 'সাম্প্রতিক যাচাই করা হয়েছে' };
 
@@ -82,6 +84,8 @@ function buildFilters() {
   });
 }
 
+$('#search-inp').value = activeSearch;
+$('#clear-search').hidden = !activeSearch;
 $('#search-inp').addEventListener('input', e => { activeSearch = e.target.value; $('#clear-search').hidden = !e.target.value; render(); });
 $('#clear-search').addEventListener('click', () => { $('#search-inp').value = ''; activeSearch = ''; $('#clear-search').hidden = true; render(); });
 $('#empty-clear').addEventListener('click', () => { $('#search-inp').value = ''; activeSearch = ''; $('#clear-search').hidden = true; activeCat = 'all';

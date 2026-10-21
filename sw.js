@@ -6,7 +6,7 @@
 // ══════════════════════════════════════════════════════════
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন।
-const CACHE_VERSION = 'sondhan-v49-rxjscb';
+const CACHE_VERSION = 'sondhan-v50-dzencyc';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -27,6 +27,7 @@ const APP_SHELL = [
   './prescription.html',
   './test-prices.html',
   './diseases.html',
+  './disease.html',
   './offline.html',
   './style.css',
   './app.js',

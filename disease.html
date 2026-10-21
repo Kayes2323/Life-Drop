@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" type="image/png" href="/sondhan-logo.png"/>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#0f766e"/>
+<link rel="apple-touch-icon" href="/icon-192.png"/>
+<title>রোগের বিস্তারিত — Sondhan Health</title>
+<meta name="description" content="রোগের কারণ, লক্ষণ, প্রতিরোধ, পরীক্ষা ও জরুরি করণীয় সম্পর্কে বিস্তারিত তথ্য — সহজ বাংলায়।">
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css?v=2">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Hind Siliguri',sans-serif;background:#f5f5f5;min-height:100vh;display:flex;flex-direction:column;max-width:720px;margin:0 auto}
+.header{background:linear-gradient(135deg,#0f766e,#14b8a6);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:260}
+.back{color:#fff;font-size:18px;text-decoration:none;background:rgba(255,255,255,.2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.back:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.header h1{color:#fff;font-size:15px;font-weight:800;font-family:'Hind Siliguri',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scr{flex:1;padding:14px;display:flex;flex-direction:column;gap:14px;font-family:'Hind Siliguri',sans-serif;padding-bottom:40px;max-width:680px;width:100%;margin:0 auto}
+
+#loading{text-align:center;padding:60px 18px;color:#999;font-size:13px}
+
+#notfound{display:flex;flex-direction:column;gap:14px;text-align:center;padding:40px 18px;background:#fff;border-radius:16px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+#notfound h2{font-size:17px;color:#222}
+#notfound p{font-size:13px;color:#777;line-height:1.7}
+#notfound a.btn{align-self:center;margin-top:6px;min-height:42px;padding:0 22px;display:inline-flex;align-items:center;border-radius:11px;background:#0f766e;color:#fff;text-decoration:none;font-weight:700;font-size:13.5px}
+
+.top-card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 1px 10px rgba(0,0,0,.07)}
+.cat-badge{display:inline-block;font-size:11px;font-weight:700;background:#e6f7f4;color:#0f766e;padding:4px 10px;border-radius:999px;margin-bottom:8px}
+.name-bn{font-size:21px;font-weight:800;color:#1a1a1a;line-height:1.35}
+.name-en{font-size:13.5px;color:#0f766e;font-weight:600;margin-top:2px}
+.top-summary{font-size:13.5px;color:#555;line-height:1.85;margin-top:10px}
+.review-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;background:#fff3cd;color:#8a6500;padding:5px 10px;border-radius:999px;margin-top:12px}
+.review-badge svg{width:13px;height:13px;flex-shrink:0}
+
+.emg-banner{background:#fdecea;border:1.5px solid #f3b7b0;border-radius:14px;padding:13px 15px;display:flex;gap:10px;align-items:flex-start}
+.emg-banner svg{width:20px;height:20px;color:#c0392b;flex-shrink:0;margin-top:1px}
+.emg-banner div{font-size:12.5px;color:#7a2219;line-height:1.75}
+.emg-banner b{display:block;font-size:13px;margin-bottom:3px;color:#c0392b}
+
+details.toc{background:#fff;border-radius:14px;padding:4px 16px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+details.toc summary{list-style:none;cursor:pointer;padding:12px 0;font-size:13.5px;font-weight:700;color:#222;display:flex;align-items:center;justify-content:space-between}
+details.toc summary::-webkit-details-marker{display:none}
+details.toc summary::after{content:'';width:9px;height:9px;border-right:2px solid #999;border-bottom:2px solid #999;transform:rotate(45deg);transition:transform .15s}
+details.toc[open] summary::after{transform:rotate(-135deg)}
+.toc-list{list-style:none;padding:0 0 12px;display:flex;flex-direction:column;gap:2px}
+.toc-list a{display:block;padding:7px 4px;font-size:12.5px;color:#0f766e;text-decoration:none;border-radius:8px}
+.toc-list a:hover,.toc-list a:focus-visible{background:#e6f7f4;outline:none}
+.toc-list a:focus-visible{outline:2px solid #0f766e;outline-offset:1px}
+
+article{display:flex;flex-direction:column;gap:14px}
+.sec{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 1px 8px rgba(0,0,0,.06);scroll-margin-top:72px}
+.sec h2{font-size:15.5px;color:#0f766e;font-weight:800;margin-bottom:10px;line-height:1.4}
+.sec h3{font-size:13px;color:#444;font-weight:700;margin:12px 0 5px}
+.sec p{font-size:13.5px;color:#444;line-height:1.9;margin-bottom:6px}
+.sec ul{padding-left:19px;display:flex;flex-direction:column;gap:6px;margin-bottom:4px}
+.sec li{font-size:13.5px;color:#444;line-height:1.75}
+.caution{background:#fff8e6;border:1px solid #f1d58a;border-radius:11px;padding:11px 13px;margin-top:8px;font-size:12.5px;color:#7a5c00;line-height:1.8}
+.src-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:7px}
+.src-list a{color:#2270C9;text-decoration:none;font-size:13px}
+.src-list a:hover,.src-list a:focus-visible{text-decoration:underline}
+.related-link{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:12.5px;font-weight:700;color:#0f766e;background:#e6f7f4;padding:8px 13px;border-radius:999px;text-decoration:none}
+.related-link:hover,.related-link:focus-visible{background:#cdeae5}
+.related-link svg{width:14px;height:14px}
+.footer-note{font-size:11px;color:#999;line-height:1.8;padding:0 2px}
+.back-lib{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#0f766e;text-decoration:none;padding:6px 2px}
+.back-lib svg{width:15px;height:15px}
+[hidden]{display:none!important}
+a:focus-visible,button:focus-visible{outline:2px solid #0f766e;outline-offset:2px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="/diseases" class="back" id="header-back" aria-label="ডিজিজ লাইব্রেরিতে ফিরুন">←</a>
+  <div class="sondhan-logo sondhan-logo--navbar-crop"><img src="/sondhan-logo.png" alt="Sondhan" decoding="async"/></div>
+  <h1 id="header-title">রোগের বিস্তারিত</h1>
+</div>
+
+<div class="scr">
+  <div id="loading">লোড হচ্ছে…</div>
+
+  <div id="notfound" hidden>
+    <h2>এই রোগ পাওয়া যায়নি</h2>
+    <p>লিংকটা হয়তো ভুল বানান বা পুরনো। ডিজিজ লাইব্রেরি থেকে খুঁজে দেখুন।</p>
+    <a class="btn" href="/diseases">ডিজিজ লাইব্রেরিতে ফিরে যান</a>
+  </div>
+
+  <div id="content" hidden>
+    <a class="back-lib" id="back-lib-link" href="/diseases">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      ডিজিজ লাইব্রেরিতে ফিরুন
+    </a>
+
+    <div class="top-card">
+      <span class="cat-badge" id="top-cat"></span>
+      <div class="name-bn" id="top-name-bn"></div>
+      <div class="name-en" id="top-name-en"></div>
+      <p class="top-summary" id="top-summary"></p>
+      <span class="review-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg> চিকিৎসক-পর্যালোচনা বাকি</span>
+    </div>
+
+    <div class="emg-banner" id="emg-top">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+      <div><b>জরুরি সতর্কতা</b><span id="emg-top-text"></span></div>
+    </div>
+
+    <details class="toc">
+      <summary>এই পৃষ্ঠায় যা আছে</summary>
+      <ul class="toc-list" id="toc-list"></ul>
+    </details>
+
+    <article id="article"></article>
+  </div>
+</div>
+
+<script type="module" src="/disease.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function (e) { console.warn('SW register failed:', e); }); });
+}
+</script>
+</body>
+</html>

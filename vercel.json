@@ -67,6 +67,10 @@
     {
       "source": "/diseases",
       "destination": "/diseases.html"
+    },
+    {
+      "source": "/diseases/:slug",
+      "destination": "/disease.html"
     }
   ],
   "headers": [
@@ -253,6 +257,11 @@
     {
       "source": "/diseases/",
       "destination": "/diseases",
+      "permanent": true
+    },
+    {
+      "source": "/diseases/:slug/",
+      "destination": "/diseases/:slug",
       "permanent": true
     }
   ]
