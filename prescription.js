@@ -57,9 +57,30 @@ onAuthStateChanged(auth, user => {
   if (!user) { CUR_UID = null; show('state-loading', false); show('state-login', true); show('record-list', false); return; }
   CUR_UID = user.uid;
   show('state-login', false); show('record-list', true); show('state-loading', true);
-  if (!uiWired) { wireUi(); uiWired = true; }
+  if (!uiWired) { wireUi(); uiWired = true; maybeShowTutorial(); }
   startListening();
 });
+
+// ── নতুন ব্যবহারকারীর জন্য ছোট ৩-ধাপের টিউটোরিয়াল — localStorage-এ একবার
+// দেখানো হলে চিরতরে আর দেখানো হয় না (ডিভাইস/ব্রাউজার অনুযায়ী) ──────────
+const TUT_KEY = 'sondhan-rx-tutorial-seen-v1';
+function maybeShowTutorial() {
+  if (localStorage.getItem(TUT_KEY)) return;
+  let step = 0;
+  const steps = $$('.tut-step');
+  const dots = $$('.tut-dots span');
+  const render = () => {
+    steps.forEach((el, i) => { el.hidden = i !== step; });
+    dots.forEach((d, i) => d.classList.toggle('on', i === step));
+    $('#tut-next').textContent = step === steps.length - 1 ? 'বুঝেছি, শুরু করি' : 'পরবর্তী';
+  };
+  const finish = () => { localStorage.setItem(TUT_KEY, '1'); show('tut-backdrop', false); show('tut-card', false); };
+  $('#tut-next').addEventListener('click', () => { if (step >= steps.length - 1) { finish(); return; } step++; render(); });
+  $('#tut-skip').addEventListener('click', finish);
+  $('#tut-backdrop').addEventListener('click', finish);
+  render();
+  show('tut-backdrop', true); show('tut-card', true);
+}
 
 function startListening() {
   if (unsubList) unsubList();
@@ -263,7 +284,12 @@ async function openViewer(id) {
   vIdx = 0; vQuick = false; vZoom = 1;
   $('#v-title').textContent = vRecord.title || catLabel(vRecord.category);
   show('viewer', true); show('viewer-backdrop', true);
-  $('#viewer').classList.toggle('quick', false);
+  const v = $('#viewer');
+  v.classList.toggle('quick', false);
+  // কার্ডে ট্যাপ করে পাতা খোলার সময় একটা ছোট "খুলে যাওয়া" অ্যানিমেশন — প্রতিবার
+  // নতুন করে চালাতে class রিমুভ করে reflow করিয়ে আবার যোগ করা হয় (একই class
+  // পরপর যোগ করলে CSS animation আবার শুরু হয় না)।
+  v.classList.remove('anim-in'); void v.offsetWidth; v.classList.add('anim-in');
   await renderViewer();
 }
 function closeViewer() { show('viewer', false); show('viewer-backdrop', false); vRecord = null; }

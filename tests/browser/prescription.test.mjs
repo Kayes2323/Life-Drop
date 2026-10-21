@@ -74,7 +74,7 @@ console.log('1. logged out — no crash, auth-guard takes over');
 
 console.log('2. logged in, empty state');
 { const { page, errs } = await open();
-  await page.evaluate(() => { window.__fake.docs.clear(); window.__setUser({ uid: 'u1', displayName: 'Rahim' }); });
+  await page.evaluate(() => { localStorage.setItem('sondhan-rx-tutorial-seen-v1', '1'); window.__fake.docs.clear(); window.__setUser({ uid: 'u1', displayName: 'Rahim' }); });
   await page.waitForTimeout(700);
   ok(await vis(page, '#state-empty'), 'empty state shown when no records');
   ok(!(await vis(page, '#state-loading')), 'loading spinner gone');
@@ -83,7 +83,7 @@ console.log('2. logged in, empty state');
 
 console.log('3. client-side validation rejects bad file / oversized file');
 { const { page } = await open();
-  await page.evaluate(() => window.__setUser({ uid: 'u1', displayName: 'Rahim' })); await page.waitForTimeout(500);
+  await page.evaluate(() => { localStorage.setItem('sondhan-rx-tutorial-seen-v1', '1'); window.__setUser({ uid: 'u1', displayName: 'Rahim' }); }); await page.waitForTimeout(500);
   await page.click('#add-btn'); await page.waitForTimeout(200);
   ok(await vis(page, '#add-modal'), 'add modal opens');
   await page.setInputFiles('#file-gallery', [exeFile]);
@@ -99,7 +99,7 @@ console.log('3. client-side validation rejects bad file / oversized file');
 console.log('4. create a multi-page record end-to-end (fake Supabase Storage + Firestore)');
 { const { page, errs } = await open();
   FAKE_SUPA.clear();
-  await page.evaluate(() => { window.__fake.docs.clear(); window.__setUser({ uid: 'u1', displayName: 'Rahim' }); });
+  await page.evaluate(() => { localStorage.setItem('sondhan-rx-tutorial-seen-v1', '1'); window.__fake.docs.clear(); window.__setUser({ uid: 'u1', displayName: 'Rahim' }); });
   await page.waitForTimeout(500);
   await page.click('#add-btn'); await page.waitForTimeout(150);
   await page.selectOption('#doc-category', 'lab');
@@ -146,6 +146,35 @@ console.log('4. create a multi-page record end-to-end (fake Supabase Storage + F
   ok(FAKE_SUPA.size === 0, 'both files deleted from (fake) Supabase Storage');
   ok(await page.evaluate(() => [...window.__fake.docs.keys()].filter(k => k.startsWith('healthRecords/')).length === 0), 'Firestore doc deleted');
   ok(await vis(page, '#state-empty'), 'back to empty state');
+}
+
+console.log('8. first-time tutorial shows once, walks 3 steps, never shown again after finishing');
+{ const { page, errs } = await open(); // fresh context — no tutorial-seen flag pre-set, unlike the tests above
+  await page.evaluate(() => window.__setUser({ uid: 'u1', displayName: 'Rahim' }));
+  await page.waitForTimeout(500);
+  ok(await vis(page, '#tut-card'), 'tutorial shown for a brand-new user');
+  ok((await page.textContent('.tut-step:not([hidden])')).includes('কাগজ যোগ করুন'), 'step 1 shown first');
+  await page.click('#tut-next'); await page.waitForTimeout(150);
+  ok((await page.textContent('.tut-step:not([hidden])')).includes('কাগজ দেখুন'), 'step 2 shown after next');
+  await page.click('#tut-next'); await page.waitForTimeout(150);
+  ok((await page.textContent('.tut-step:not([hidden])')).includes('দ্রুত খুঁজুন'), 'step 3 (last) shown');
+  ok((await page.textContent('#tut-next')).includes('বুঝেছি'), 'last step button reads "বুঝেছি, শুরু করি"');
+  await page.click('#tut-next'); await page.waitForTimeout(150);
+  ok(!(await vis(page, '#tut-card')), 'tutorial closes after the last step');
+  ok(await page.evaluate(() => localStorage.getItem('sondhan-rx-tutorial-seen-v1') === '1'), 'seen-flag persisted so it will not show again');
+  await page.reload(); await page.waitForTimeout(500);
+  await page.evaluate(() => window.__setUser({ uid: 'u1', displayName: 'Rahim' })); await page.waitForTimeout(400);
+  ok(!(await vis(page, '#tut-card')), 'tutorial does not show again on a later visit');
+  ok(errs.length === 0, 'no console errors ' + JSON.stringify(errs));
+}
+
+console.log('9. opening a record plays an open animation, closeable tutorial does not block card clicks');
+{ const { page, errs } = await open();
+  await page.evaluate(() => { localStorage.setItem('sondhan-rx-tutorial-seen-v1', '1'); window.__fake.docs.set('healthRecords/r1', { ownerUid: 'u1', category: 'prescription', title: 'Test Rx', docDate: '2026-10-18', pageCount: 0, pages: [] }); window.__setUser({ uid: 'u1', displayName: 'Rahim' }); });
+  await page.waitForTimeout(600);
+  await page.click('.rec-card'); await page.waitForTimeout(100);
+  ok(await page.evaluate(() => document.getElementById('viewer').classList.contains('anim-in')), 'viewer plays the open animation on click');
+  ok(errs.length === 0, 'no console errors ' + JSON.stringify(errs));
 }
 
 console.log(`\n${pass} passed, ${fail} failed`); await b.close(); process.exit(fail ? 1 : 0);

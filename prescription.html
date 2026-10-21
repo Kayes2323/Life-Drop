@@ -80,26 +80,33 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;min-height:100vh;display:fle
 #save-record-btn{width:100%;min-height:46px;border:0;border-radius:12px;background:#0b3d3a;color:#fff;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer}
 #save-record-btn:disabled{opacity:.6}
 
-/* Viewer — "ক্লিপবোর্ডে আটকানো আসল কাগজ" */
+/* Viewer — "কর্কবোর্ডে পিন করা আসল কাগজ" */
 #viewer{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;
   background:repeating-linear-gradient(to bottom, transparent 0 27px, rgba(11,61,58,.05) 27px 28px), #f4efe2}
+#viewer.anim-in{animation:vopen .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes vopen{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
 .v-head{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#0b3d3a;color:#fff;font-family:'Hind Siliguri',sans-serif;flex-shrink:0}
 .v-head h3{flex:1;font-size:14.5px;font-weight:700;font-family:'Noto Serif Bengali',serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .v-head button{background:rgba(255,255,255,.14);border:0;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:13px;flex-shrink:0}
 
-#v-surface{flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;padding:26px 22px 16px;--z:1}
-.v-board{position:absolute;top:26px;left:22px;right:22px;bottom:16px;background:#cfcabd;border-radius:14px;box-shadow:0 10px 24px rgba(0,0,0,.14);z-index:0}
-.v-clip{position:relative;z-index:3;width:74px;height:20px;background:linear-gradient(180deg,#8d8d92,#5c5c60);border-radius:6px;box-shadow:0 3px 6px rgba(0,0,0,.25);margin-bottom:-10px;flex-shrink:0}
+#v-surface{flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;padding:30px 24px 16px;--z:1;
+  background:radial-gradient(circle at 20% 20%, rgba(0,0,0,.05) 0 2px, transparent 2px),
+    radial-gradient(circle at 70% 60%, rgba(0,0,0,.05) 0 2px, transparent 2px),
+    radial-gradient(circle at 40% 85%, rgba(0,0,0,.05) 0 2px, transparent 2px),
+    #e8dcc6}
+.v-pin{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#ff6b5e,#c0392b);box-shadow:0 3px 6px rgba(0,0,0,.35);z-index:5}
 
-.v-leaf{position:relative;z-index:2;width:100%;flex:1;background:#fffdf8;border-radius:4px 4px 10px 10px;box-shadow:0 14px 30px rgba(0,0,0,.22);transform:rotate(-.6deg) scale(var(--z));transition:transform .25s ease,opacity .25s ease;display:flex;flex-direction:column;overflow:hidden}
+.v-leaf{position:relative;z-index:2;width:100%;flex:1;background:#fffdf8;border-radius:3px;box-shadow:0 16px 34px rgba(0,0,0,.26);transform:rotate(1deg) scale(var(--z));transition:transform .25s ease,opacity .25s ease;display:flex;flex-direction:column;overflow:hidden}
+.v-leaf::after{content:'';position:absolute;right:0;bottom:0;width:0;height:0;border-style:solid;border-width:0 0 22px 22px;border-color:transparent transparent #e9e3d2 transparent;filter:drop-shadow(-1px -1px 2px rgba(0,0,0,.12))}
 .v-leaf-tear{height:0;border-top:2.5px dashed #d8cfb8;margin:10px 14px 0;flex-shrink:0}
 .v-leaf-inner{flex:1;position:relative;padding:14px 14px 12px;display:flex;flex-direction:column;overflow:hidden}
 .v-leaf-letterhead{font-family:'Noto Serif Bengali',serif;font-weight:700;font-size:12.5px;color:#0b3d3a;border-bottom:1.5px solid #e3dcc8;padding-bottom:8px;margin-bottom:10px;display:flex;justify-content:space-between;gap:10px;flex-shrink:0}
 .v-leaf-letterhead span:last-child{color:#9a9380;font-weight:500;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .v-media-box{flex:1;border-radius:7px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#eee}
 .v-media-box img{max-width:100%;max-height:100%;object-fit:contain}
-#v-surface.turning .v-leaf{opacity:.35;transform:rotate(-.6deg) scale(calc(var(--z) * .96))}
-@media (prefers-reduced-motion:reduce){.v-leaf{transition:none}}
+#v-surface.turning .v-leaf{opacity:.35;transform:rotate(1deg) scale(calc(var(--z) * .96))}
+@media (prefers-reduced-motion:reduce){.v-leaf{transition:none}#viewer.anim-in{animation:none}}
 
 /* লোডিং শিমার — ফ্রেম সাথে সাথে দেখা যায়, শুধু ছবির জায়গাটা পরে ভরে */
 @keyframes vshimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
@@ -122,11 +129,24 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;min-height:100vh;display:fle
 #v-thumbs{flex-shrink:0;background:#fffdf8;border-top:1px solid #e9e3d2;display:flex;gap:6px;overflow-x:auto;padding:10px;justify-content:center}
 .v-thumb{flex-shrink:0;width:30px;height:30px;border-radius:8px;border:0;background:#f0ead9;color:#8a8370;font-size:11px;cursor:pointer}
 .v-thumb.active{background:#0b3d3a;color:#fff}
-#viewer.quick #v-surface{flex-direction:column;overflow-y:auto;padding:14px 10px;gap:14px}
-#viewer.quick .v-board,#viewer.quick .v-clip{display:none}
+#viewer.quick #v-surface{flex-direction:column;overflow-y:auto;padding:14px 10px;gap:14px;background:#e8dcc6}
+#viewer.quick .v-pin{display:none}
 .v-quick-page{display:flex;flex-direction:column;align-items:center;gap:6px}
 .v-quick-page img{max-width:92vw;border-radius:6px;background:#fff}
 .v-quick-n{color:#8a8370;font-size:11px;font-family:'Hind Siliguri',sans-serif}
+
+/* প্রথমবার আসা ব্যবহারকারীর জন্য ছোট টিউটোরিয়াল */
+.tut-card{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,440px);background:#fffdf8;border-radius:20px 20px 0 0;z-index:610;padding:22px 22px 24px;box-shadow:0 -10px 30px rgba(0,0,0,.2);font-family:'Hind Siliguri',sans-serif;text-align:center}
+.tut-rx{width:44px;height:44px;border-radius:12px;background:#0b3d3a;color:#e8c77a;display:flex;align-items:center;justify-content:center;font-size:22px;font-family:'Noto Serif Bengali',serif;margin:0 auto 14px}
+.tut-step h3{font-family:'Noto Serif Bengali',serif;font-size:16px;color:#1c1b17;margin-bottom:8px}
+.tut-step p{font-size:13px;color:#6b6555;line-height:1.7}
+.tut-dots{display:flex;gap:6px;justify-content:center;margin:16px 0}
+.tut-dots span{width:7px;height:7px;border-radius:50%;background:#e3dcc8}
+.tut-dots span.on{background:#0b3d3a}
+.tut-actions{display:flex;gap:10px}
+.tut-actions button{flex:1;min-height:44px;border-radius:12px;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;border:0}
+#tut-skip{background:#f4efe2;color:#7a7364}
+.tut-primary{background:#0b3d3a;color:#fff}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important}}
 </style>
 </head>
@@ -205,7 +225,7 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;min-height:100vh;display:fle
   <div class="modal-foot"><button id="save-record-btn">সংরক্ষণ করুন</button></div>
 </div>
 
-<!-- Viewer — ক্লিপবোর্ডে আটকানো আসল কাগজের ভাইব -->
+<!-- Viewer — কর্কবোর্ডে পিন করা আসল কাগজের ভাইব -->
 <div class="backdrop" id="viewer-backdrop" hidden></div>
 <div id="viewer" hidden>
   <div class="v-head">
@@ -217,17 +237,39 @@ body{font-family:'Inter','Hind Siliguri',sans-serif;min-height:100vh;display:fle
     <button id="viewer-close" aria-label="বন্ধ করুন">✕</button>
   </div>
   <div id="v-surface">
-    <div class="v-board" aria-hidden="true"></div>
-    <div class="v-clip" aria-hidden="true"></div>
+    <div class="v-pin" aria-hidden="true"></div>
     <div id="v-surface-content" style="position:relative;z-index:2;width:100%;flex:1;display:flex;flex-direction:column;overflow:hidden"></div>
   </div>
   <div id="v-nav"><div class="v-nav-pill"><button id="v-prev" aria-label="আগের পাতা">‹</button><span id="v-page-n"></span><button id="v-next" aria-label="পরের পাতা">›</button></div></div>
   <div id="v-thumbs"></div>
 </div>
 
+<!-- নতুন ব্যবহারকারীদের জন্য ছোট টিউটোরিয়াল — একবারই দেখা যায় (localStorage) -->
+<div class="backdrop" id="tut-backdrop" hidden style="z-index:600"></div>
+<div class="tut-card" id="tut-card" hidden>
+  <div class="tut-rx">℞</div>
+  <div class="tut-step" data-step="0">
+    <h3>কাগজ যোগ করুন</h3>
+    <p>উপরে <b>+ কাগজ যোগ করুন</b> বাটনে চাপুন — ছবি তুলুন বা গ্যালারি/PDF থেকে বেছে দিন।</p>
+  </div>
+  <div class="tut-step" data-step="1" hidden>
+    <h3>কাগজ দেখুন</h3>
+    <p>তালিকায় যেকোনো কাগজে ট্যাপ করুন — পুরো কাগজ খুলে যাবে, পাশে সোয়াইপ করে পাতা পাল্টাতে পারবেন।</p>
+  </div>
+  <div class="tut-step" data-step="2" hidden>
+    <h3>দ্রুত খুঁজুন</h3>
+    <p>উপরের সার্চ বক্সে নাম, হাসপাতাল বা ডাক্তারের নাম লিখে সাথে সাথে খুঁজে পাবেন।</p>
+  </div>
+  <div class="tut-dots"><span class="on"></span><span></span><span></span></div>
+  <div class="tut-actions">
+    <button id="tut-skip" type="button">এড়িয়ে যান</button>
+    <button id="tut-next" type="button" class="tut-primary">পরবর্তী</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script type="module" src="prescription.js?v=3"></script>
+<script type="module" src="prescription.js?v=4"></script>
 <script>
 // নিরাপত্তা-জাল: মূল module যদি লোডই না হয় (ধীর/ব্লকড নেটওয়ার্ক), স্পিনারে আটকে না রেখে স্পষ্ট বার্তা
 setTimeout(function () {
