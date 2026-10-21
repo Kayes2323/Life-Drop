@@ -15,8 +15,6 @@ let activeCat = 'all';
 // দিয়েই পেজ খোলে — ব্যবহারকারীকে আবার টাইপ করতে হয় না।
 let activeSearch = new URLSearchParams(location.search).get('q') || '';
 
-const STATUS_LABEL = { needs_reverify: 'মূল্য পুনরায় যাচাই করা প্রয়োজন', verified: 'সাম্প্রতিক যাচাই করা হয়েছে' };
-
 function fmtDate(iso) {
   if (!iso) return '';
   const d = new Date(iso + 'T00:00:00');
@@ -34,13 +32,16 @@ function matches(t, q) {
 }
 
 function priceRow(p) {
+  // status 'needs_reverify' (default, honest-by-default) একটা হালকা, শান্ত
+  // রিমাইন্ডার যোগ করে — বড় হলুদ ব্যাজের বদলে তারিখের লাইনের সাথেই মিশিয়ে,
+  // যাতে তথ্যটা থাকে কিন্তু চোখে alarm-এর মতো না লাগে।
+  const reverify = p.status !== 'verified';
   return `<div class="price-row">
     <div class="price-row-top">
       <span class="amt">৳${bnDigits(p.amount)}</span>
-      <span class="status-badge">${esc(STATUS_LABEL[p.status] || STATUS_LABEL.needs_reverify)}</span>
     </div>
     <div class="price-facility">${esc(p.facility)}</div>
-    ${p.publishedDate ? `<div class="price-meta">সূত্রের তারিখ: ${fmtDate(p.publishedDate)}</div>` : ''}
+    ${p.publishedDate ? `<div class="price-meta">সূত্রের তারিখ: ${fmtDate(p.publishedDate)}${reverify ? ' · কাউন্টারে একবার নিশ্চিত করুন' : ''}</div>` : ''}
     ${p.notes ? `<div class="price-note">${esc(p.notes)}</div>` : ''}
     <a class="src-link" href="${esc(p.sourceUrl)}" target="_blank" rel="noopener noreferrer">
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>

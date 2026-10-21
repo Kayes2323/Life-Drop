@@ -79,8 +79,8 @@ console.log('2. test-prices.html — loads fully static, no Firebase/network nee
   ok(cards > 15, `renders all seeded tests as cards (got ${cards})`);
   ok((await page.textContent('#count')).includes('টা পরীক্ষা'), 'result count shown');
   ok(await vis(page, '.gov-badge'), 'government-price badge visible');
-  ok(await vis(page, '.disclaimer'), 'disclaimer about re-verification visible');
-  ok((await page.$$eval('.status-badge', n => n.map(e => e.textContent))).every(t => t.includes('যাচাই')), 'every price row carries a needs-reverification badge (no price claimed as currently verified)');
+  ok((await page.textContent('.intro-note')).includes('নিশ্চিত'), 'subtle re-verification reminder visible (no loud disclaimer box)');
+  ok((await page.$$eval('.price-meta', n => n.map(e => e.textContent))).every(t => t.includes('সূত্রের তারিখ')), 'every price row shows its source date (honesty preserved, without an alarming badge)');
   ok(errs.length === 0, 'no console errors ' + JSON.stringify(errs));
 }
 
