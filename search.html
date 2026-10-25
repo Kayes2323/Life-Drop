@@ -1755,7 +1755,13 @@ document.getElementById('results-list').addEventListener('click', async e => {
 
   if (act === 'call') {
     const d = await ensurePrivate(btn.dataset.id);
-    if(!d || !d.phone){ showToast('নম্বর পাওয়া যায়নি'); return; }
+    // BUGFIX: hasPhone ফ্ল্যাগ true থাকা সত্ত্বেও donorsPrivate-এ phone না
+    // থাকলে (পুরনো একটা bug-এ profile edit-এর সময় এই দুটো লেখা একসাথে
+    // atomic হতো না — এখন ঠিক করা হয়েছে) এই সাধারণ বার্তাটা বিভ্রান্তিকর,
+    // তাই আলাদা করে জানানো হচ্ছে যাতে donor নিজের প্রোফাইল আবার সেভ করলে
+    // এটা ঠিক হয়ে যায়।
+    if(!d){ showToast('নম্বর পাওয়া যায়নি'); return; }
+    if(!d.phone){ showToast(d.hasPhone ? 'এই দাতার নম্বরে ডেটা সমস্যা আছে — দাতাকে প্রোফাইল আবার সেভ করতে বলুন' : 'নম্বর পাওয়া যায়নি'); return; }
     window.location.href = telLink(d.phone);
   } else if (act === 'wa') {
     const d = await ensurePrivate(btn.dataset.id);
@@ -1844,7 +1850,13 @@ document.getElementById('dp-body').addEventListener('click', async e => {
 
   if (act === 'call') {
     const d = await ensurePrivate(btn.dataset.id);
-    if(!d || !d.phone){ showToast('নম্বর পাওয়া যায়নি'); return; }
+    // BUGFIX: hasPhone ফ্ল্যাগ true থাকা সত্ত্বেও donorsPrivate-এ phone না
+    // থাকলে (পুরনো একটা bug-এ profile edit-এর সময় এই দুটো লেখা একসাথে
+    // atomic হতো না — এখন ঠিক করা হয়েছে) এই সাধারণ বার্তাটা বিভ্রান্তিকর,
+    // তাই আলাদা করে জানানো হচ্ছে যাতে donor নিজের প্রোফাইল আবার সেভ করলে
+    // এটা ঠিক হয়ে যায়।
+    if(!d){ showToast('নম্বর পাওয়া যায়নি'); return; }
+    if(!d.phone){ showToast(d.hasPhone ? 'এই দাতার নম্বরে ডেটা সমস্যা আছে — দাতাকে প্রোফাইল আবার সেভ করতে বলুন' : 'নম্বর পাওয়া যায়নি'); return; }
     window.location.href = telLink(d.phone);
   } else if (act === 'wa') {
     const d = await ensurePrivate(btn.dataset.id);

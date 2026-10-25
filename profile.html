@@ -285,7 +285,7 @@ body{min-height:100%;min-height:100dvh;font-family:'Inter','Hind Siliguri',sans-
 import { auth, db } from './firebase-config.js';
 import { esc, initials, isValidBdPhone, normalizeBdPhone, toBn, formatBnDate, eligibility } from './app.js';
 import { onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 let CU=null, UD=null, DD=null;
 
 onAuthStateChanged(auth, async user => {
@@ -604,11 +604,21 @@ window.saveEdit = async () => {
     // ফ্ল্যাগ পাবলিক ডকে অবশ্যই আপডেট করতে হবে — নাহলে search.html
     // ধরেই নেয় ফ্ল্যাগ "unknown" (legacy fallback), আর edit করা নম্বর
     // থাকা সত্ত্বেও ভুল ধরে নেয় কোন কন্ট্যাক্ট মেথড আছে/নেই।
-    await updateDoc(doc(db,'donors',CU.uid),{
+    //
+    // BUGFIX ২ (প্রমাণিত প্রোডাকশন সমস্যা): এই দুটো লেখা আগে আলাদা আলাদা
+    // updateDoc/setDoc হিসেবে হতো — প্রথমটা (hasPhone:true) সফল হয়ে দ্বিতীয়টা
+    // (আসল নম্বর donorsPrivate-এ লেখা) নেটওয়ার্ক সমস্যায় ব্যর্থ হলে, পাবলিক
+    // ডক বলতো donor-এর ফোন আছে (Call বাটন দেখাতো), অথচ আসল নম্বরটাই কোথাও
+    // সংরক্ষিত হতো না — search.html-এ ক্লিক করলে "নম্বর পাওয়া যায়নি" দেখাতো,
+    // যদিও ব্যবহারকারী ফর্মে নম্বর ঠিকই দিয়েছিলেন। এখন একটা atomic batch —
+    // হয় দুটোই লেখা হবে, নয়তো কোনোটাই না, কখনো অর্ধেক-লেখা অবস্থা তৈরি হবে না।
+    const batch = writeBatch(db);
+    batch.update(doc(db,'donors',CU.uid), {
       name, blood, donations, lastDonation:last||null, area,
       hasPhone: !!normPhone, hasWa: !!normWa
     });
-    await setDoc(doc(db,'donorsPrivate',CU.uid),{phone:normPhone,wa:normWa},{merge:true});
+    batch.set(doc(db,'donorsPrivate',CU.uid), {phone:normPhone,wa:normWa}, {merge:true});
+    await batch.commit();
     try{ await updateDoc(doc(db,'users',CU.uid),{name,blood}); }catch(e){}
     Object.assign(DD,{name,phone:normPhone,wa:normWa,blood,donations,lastDonation:last||null,area});
     closeEdit(); toast('প্রোফাইল আপডেট হয়েছে'); render();
