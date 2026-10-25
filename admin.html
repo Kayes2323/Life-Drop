@@ -237,11 +237,16 @@ window.loadDonors = async () => {
     // phone/wa এখন donorsPrivate-এ — admin হিসেবে প্রতিটার জন্য আলাদা read
     const rows = await Promise.all(snap.docs.map(async d => {
       const r = d.data();
+      // BUGFIX: আগে শুধু donorsPrivate-এ ফোন খোঁজা হতো — যে donor-দের
+      // migration এখনো হয়নি (নিচের legacyCount badge এই donor-দেরই দেখায়),
+      // তাদের donorsPrivate ডক এখনো তৈরিই হয়নি, তাই "—" দেখাতো, যদিও নম্বরটা
+      // ঠিক পাশেই "পাবলিক ডকে PII আছে" badge-এর জায়গা থেকেই পাওয়া যেত। এখন
+      // donorsPrivate-এ না পেলে পুরনো পাবলিক ডকের r.phone fallback হিসেবে দেখানো হয়।
       let phone = '—';
       try {
         const ps = await getDoc(doc(db,'donorsPrivate',d.id));
-        if(ps.exists()) phone = ps.data().phone || '—';
-      } catch(_) {}
+        phone = (ps.exists() && ps.data().phone) || r.phone || '—';
+      } catch(_) { phone = r.phone || '—'; }
       return `
       <div class="donor-row">
         <div class="d-avatar">${r.photo?`<img src="${esc(r.photo)}" alt=""/>`:esc(initials(r.name))}</div>
