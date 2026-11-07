@@ -18,7 +18,10 @@
 // সাইটের বাকি কিছুই ভাঙে না (api/storage.js-এর মতোই)।
 // ══════════════════════════════════════════════════════════
 
-const DEFAULT_MODEL = 'gemini-2.5-flash';
+// ROOT CAUSE পাওয়া গেছে (production log, ২০২৬-১১-০৭): gemini-2.5-flash নতুন
+// API key-এর জন্য বন্ধ হয়ে গেছে — Gemini নিজে generateContent-এ 404 দিয়ে
+// বলেছে "no longer available to new users... use models/gemini-3.8-flash"।
+const DEFAULT_MODEL = 'gemini-3.8-flash';
 const MAX_MESSAGES = 30;
 const MAX_CHARS_PER_MSG = 4000;
 const MAX_CHARS_TOTAL = 20000;
