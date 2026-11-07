@@ -305,7 +305,14 @@ function realDeps() {
             signal: ctrl.signal,
           });
           const data = await r.json().catch(() => ({}));
-          if (r.status === 404) await logAvailableModels();   // TEMP — উপরের নোট দেখুন
+          if (!r.ok) {
+            // TEMP ডায়াগনস্টিক: Google-এর নিজের error message-ই root cause বলে
+            // দেয় (model missing/quota/billing/permission — প্রতিটার আলাদা
+            // message) — এটা শুধু error-এর গঠন, কোনো medical/user content নয়,
+            // তাই log করা নিরাপদ। root cause নিশ্চিত হলে এই ব্লক সরানো হবে।
+            console.warn('[ai] gemini error body:', JSON.stringify(data).slice(0, 500));
+            if (r.status === 404) await logAvailableModels();
+          }
           return { ok: r.ok, status: r.status, data };
         } finally { clearTimeout(timer); }
       },
