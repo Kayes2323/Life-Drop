@@ -6,7 +6,7 @@
 // ══════════════════════════════════════════════════════════
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন।
-const CACHE_VERSION = 'sondhan-v56-ai';
+const CACHE_VERSION = 'sondhan-v57-ai-error-fix';
 const APP_SHELL = [
   './index.html',
   './search.html',
