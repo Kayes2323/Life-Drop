@@ -6,7 +6,7 @@
 // ══════════════════════════════════════════════════════════
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন।
-const CACHE_VERSION = 'sondhan-v57-ai-error-fix';
+const CACHE_VERSION = 'sondhan-v58-slow-net-timeout-fix';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -85,6 +85,14 @@ self.addEventListener('activate', event => {
 
 // plain fetch()-এর নিজস্ব timeout নেই; ঝুলে থাকা request-এ fallback চালু
 // করতে timeout লাগে।
+//
+// ROOT CAUSE (production-এ নিশ্চিত হয়েছে, ২০২৬-১১-০৭): একজন ব্যবহারকারীর
+// সংযোগ এতটাই ধীর (~৩ KB/s) ছিল যে পুরনো timeout (6s/8s) প্রতিবারই শেষ হয়ে
+// যেত — network আসলে কাজ করছিল, শুধু সময়মতো শেষ হচ্ছিল না। ফলে প্রতিবার
+// fallback হয়ে বহু আগের cache করা ai.js চলত, যতবারই server-side কোড ঠিক
+// করে deploy করা হোক না কেন (CACHE_VERSION বাড়ানো তাতে সাহায্য করেনি, কারণ
+// নতুন SW install করতেও সেই একই ধীর network লাগে)। তাই timeout বড় রাখা
+// হয়েছে — genuinely offline না হলে fallback-এ যাওয়ার দরকার নেই।
 function fetchWithTimeout(req, ms) {
   return new Promise((resolve, reject) => {
     const t = setTimeout(() => reject(new Error('sw-fetch-timeout')), ms);
@@ -113,7 +121,7 @@ self.addEventListener('fetch', event => {
   const isCode = req.mode === 'navigate' || /\.(?:html|js|css|json)$/.test(path) || path === '/' ;
   if (isCode) {
     event.respondWith(
-      fetchWithTimeout(req, req.mode === 'navigate' ? 6000 : 8000)
+      fetchWithTimeout(req, req.mode === 'navigate' ? 15000 : 20000)
         .then(res => { putInCache(req, res); return res; })
         .catch(async () => {
           const cached = await caches.match(req);

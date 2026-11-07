@@ -223,7 +223,7 @@ body{
   <div class="disclaimer">Sondhan AI ভুল করতে পারে। এটি চিকিৎসকের পরামর্শের বিকল্প নয় — জরুরি অবস্থায় ৯৯৯ বা নিকটস্থ হাসপাতালে যোগাযোগ করুন।</div>
 </div>
 
-<script type="module" src="ai.js?v=1"></script>
+<script type="module" src="ai.js?v=2"></script>
 <script>
 if ('serviceWorker' in navigator) {
   // নতুন SW চালু হলে পেজ একবার রিফ্রেশ — নাহলে পুরনো কোডে আটকে থাকে
@@ -231,7 +231,10 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('controllerchange', function () {
     if (swRefreshed) return; swRefreshed = true; window.location.reload();
   });
-  window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js').catch(function (e) { console.warn('SW register failed:', e); }); });
+  // updateViaCache:'none' — sw.js নিজে ফেচ করার সময়েও ব্রাউজারের HTTP cache
+  // এড়িয়ে যায়, যাতে নতুন ভার্সন আছে কিনা তা যাচাই করাটা কখনো পুরনো copy-র
+  // উপর নির্ভর না করে।
+  window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(function (e) { console.warn('SW register failed:', e); }); });
 }
 
 // সেফটি-নেট: মূল module (ai.js) কোনো কারণে লোড না হলে পেজটা নীরবে মরে
