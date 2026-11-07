@@ -273,6 +273,24 @@ function realDeps() {
     if (!admin.apps.length) admin.initializeApp({ credential: admin.credential.cert(JSON.parse(json)) });
     const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+    // TEMP ডায়াগনস্টিক (production-এ gemini status: 404 ধরা পড়েছে — model
+    // নামটাই ভুল/অস্তিত্বহীন বলে মনে হচ্ছে, কিন্তু এই sandbox থেকে
+    // generativelanguage.googleapis.com-এ পৌঁছানো যায় না, তাই অনুমান না করে
+    // সরাসরি ListModels থেকে আসল তালিকা log-এ আনছি — root cause নিশ্চিত হলে
+    // এই ব্লক সরিয়ে ফেলা হবে)।
+    let _modelsLogged = false;
+    const logAvailableModels = async () => {
+      if (_modelsLogged) return; _modelsLogged = true;
+      try {
+        const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models', { headers: { 'x-goog-api-key': key } });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) { console.warn('[ai] ListModels failed:', r.status, JSON.stringify(j).slice(0, 300)); return; }
+        const names = (j.models || [])
+          .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
+          .map(m => m.name);
+        console.warn('[ai] ListModels (generateContent-capable):', JSON.stringify(names));
+      } catch (e) { console.warn('[ai] ListModels error:', e && e.message); }
+    };
     _real = {
       verifyIdToken: t => admin.auth().verifyIdToken(t),
       now: () => Date.now(),
@@ -287,6 +305,7 @@ function realDeps() {
             signal: ctrl.signal,
           });
           const data = await r.json().catch(() => ({}));
+          if (r.status === 404) await logAvailableModels();   // TEMP — উপরের নোট দেখুন
           return { ok: r.ok, status: r.status, data };
         } finally { clearTimeout(timer); }
       },

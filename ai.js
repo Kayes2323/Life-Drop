@@ -135,6 +135,16 @@ const ERRORS = {
   'bad-token': 'লগইন মেয়াদ শেষ হয়ে গেছে — আবার লগইন করুন।',
   'conversation-too-long': 'কথোপকথন অনেক লম্বা হয়ে গেছে। "নতুন" চেপে নতুন করে শুরু করুন।',
   'message-too-long': 'বার্তাটি অনেক বড়। একটু ছোট করে লিখুন।',
+  // BUGFIX: এই reason-গুলো আগে ম্যাপ করা ছিল না, তাই সার্ভার-সাইড সমস্যাতেও
+  // (যেমন Gemini নিজেই ব্যর্থ হলে) ভুলভাবে "ইন্টারনেট দেখুন" দেখাতো —
+  // ব্যবহারকারীকে ভুল দিকে পাঠাতো। এখন প্রতিটা আসল কারণের নিজস্ব স্পষ্ট বার্তা।
+  'upstream-unreachable': 'Sondhan AI-এর সার্ভারে সাময়িক সমস্যা হচ্ছে। একটু পর আবার চেষ্টা করুন।',
+  'upstream-auth': 'Sondhan AI এই মুহূর্তে কনফিগার করা যায়নি। কিছুক্ষণ পর আবার চেষ্টা করুন।',
+  'upstream-error': 'উত্তর তৈরি করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।',
+  'empty-response': 'উত্তর তৈরি করা যায়নি। প্রশ্নটা একটু ভিন্নভাবে জিজ্ঞাসা করে দেখুন।',
+  'tool-loop-exhausted': 'উত্তর তৈরি করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।',
+  'server-error': 'একটা সমস্যা হয়েছে। আবার চেষ্টা করুন।',
+  'network': 'ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।',
 };
 
 function fillError(node, reason) {
@@ -144,7 +154,7 @@ function fillError(node, reason) {
   const box = document.createElement('div');
   box.className = 'err-box';
   const p = document.createElement('div');
-  p.textContent = ERRORS[reason] || 'উত্তর আনা যায়নি। ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।';
+  p.textContent = ERRORS[reason] || 'একটা সমস্যা হয়েছে। আবার চেষ্টা করুন।';
   box.appendChild(p);
   const btn = document.createElement('button');
   btn.textContent = 'আবার চেষ্টা করুন';
