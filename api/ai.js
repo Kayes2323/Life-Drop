@@ -26,7 +26,11 @@ const MAX_MESSAGES = 30;
 const MAX_CHARS_PER_MSG = 4000;
 const MAX_CHARS_TOTAL = 20000;
 const MAX_TOOL_ROUNDS = 3;          // অসীম tool-loop ঠেকাতে
-const UPSTREAM_TIMEOUT_MS = 30000;
+// ROOT CAUSE (production log, ২০২৬-১১-০৭): model বদলের পর 404 ঠিক হলেও
+// "upstream call failed: This operation was aborted" — gemini-3.8-flash
+// পুরনো 2.5-flash-এর চেয়ে ধীরে উত্তর দেয়, ৩০s-এর মধ্যে শেষ হচ্ছিল না। vercel.json-এ
+// এই function-এর নিজস্ব maxDuration (60s) বসানো হয়েছে, তাই এখানে safely বাড়ানো গেল।
+const UPSTREAM_TIMEOUT_MS = 55000;
 
 // ── Rate limit (best-effort) ──────────────────────────────
 // সতর্কতা: Vercel-এ প্রতিটা instance-এর নিজস্ব মেমরি, তাই এটা কঠোর
