@@ -6,7 +6,7 @@
 // ══════════════════════════════════════════════════════════
 
 // নতুন deploy-এ কোনো ফাইল বদলালে এই ভার্সন নাম্বার বাড়িয়ে দিন।
-const CACHE_VERSION = 'sondhan-v55-pricesubtle';
+const CACHE_VERSION = 'sondhan-v56-ai';
 const APP_SHELL = [
   './index.html',
   './search.html',
@@ -28,6 +28,7 @@ const APP_SHELL = [
   './test-prices.html',
   './diseases.html',
   './disease.html',
+  './ai.html',
   './offline.html',
   './style.css',
   './app.js',
@@ -35,6 +36,7 @@ const APP_SHELL = [
   './firebase-config-auth.js',
   './auth-guard.js',
   './notify.js',
+  './ai.js',
   './manifest.json',
   './sondhan-logo.png',
   './sondhan-logo-white.png',

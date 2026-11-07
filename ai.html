@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" type="image/png" href="sondhan-logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#c0392b"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>Sondhan AI — আপনার স্বাস্থ্যসেবা সহকারী</title>
+<meta name="description" content="Sondhan AI — বাংলায় স্বাস্থ্য সম্পর্কিত প্রশ্নের উত্তর, সরকারি হাসপাতালের পরীক্ষার যাচাইকৃত মূল্য ও মেডিকেল পরিভাষা সহজ ভাষায় বুঝে নিন।">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.sondhan.org/ai"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=2">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Inter','Hind Siliguri',sans-serif;background:#faf9f6;
+  max-width:480px;margin:0 auto;display:flex;flex-direction:column;
+  height:100dvh;overflow:hidden;color:#1a1a1a;
+}
+
+/* ── হেডার ── */
+.ai-head{
+  flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:#fff;border-bottom:1px solid #ecebe6;position:relative;z-index:20;
+}
+.ai-head .back{
+  color:#444;text-decoration:none;width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;
+}
+.ai-head .back:active{background:#f1efea}
+.ai-id{flex:1;min-width:0;display:flex;align-items:center;gap:8px}
+.ai-mark{
+  width:30px;height:30px;border-radius:9px;background:#c0392b;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.ai-mark svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ai-id-txt{min-width:0}
+.ai-id-txt b{display:block;font-size:14.5px;font-weight:800;letter-spacing:-.1px;line-height:1.2}
+.ai-id-txt span{display:block;font-family:'Hind Siliguri',sans-serif;font-size:10.5px;color:#9a948a;line-height:1.3;margin-top:1px}
+.ai-new{
+  flex-shrink:0;border:1px solid #e6e3dc;background:#fff;color:#666;border-radius:9px;
+  height:32px;padding:0 11px;font-family:'Hind Siliguri',sans-serif;font-size:12px;
+  font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;
+}
+.ai-new:active{background:#f6f4ef}
+.ai-new svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* ── বার্তার এলাকা ── */
+.ai-scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.ai-thread{display:flex;flex-direction:column;gap:20px;padding:18px 14px 8px}
+
+/* স্বাগত অবস্থা */
+.ai-welcome{padding:30px 16px 8px;text-align:center}
+.ai-welcome .big-mark{
+  width:58px;height:58px;border-radius:18px;background:#c0392b;margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(192,57,43,.22);
+}
+.ai-welcome .big-mark svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.ai-welcome h2{font-size:21px;font-weight:800;letter-spacing:-.3px}
+.ai-welcome p{
+  font-family:'Hind Siliguri',sans-serif;font-size:13px;color:#8c867c;
+  line-height:1.75;margin-top:7px;max-width:300px;margin-left:auto;margin-right:auto;
+}
+.sugg{display:flex;flex-direction:column;gap:8px;margin-top:22px;text-align:left}
+.sugg-btn{
+  width:100%;border:1px solid #eceae3;background:#fff;border-radius:14px;
+  padding:13px 14px;display:flex;align-items:center;gap:11px;cursor:pointer;
+  font-family:'Hind Siliguri',sans-serif;text-align:left;
+}
+.sugg-btn:active{background:#f8f6f1}
+.sugg-ic{
+  width:30px;height:30px;border-radius:9px;background:#fdecea;color:#c0392b;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.sugg-ic svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sugg-btn span{font-size:13px;color:#333;font-weight:600;line-height:1.45}
+
+/* বার্তা */
+.msg{display:flex;flex-direction:column;gap:6px}
+.msg.user{align-items:flex-end}
+.msg.user .bubble{
+  background:#c0392b;color:#fff;border-radius:18px 18px 5px 18px;
+  padding:11px 15px;max-width:85%;font-family:'Hind Siliguri',sans-serif;
+  font-size:14px;line-height:1.7;white-space:pre-wrap;word-break:break-word;
+}
+.msg.ai{align-items:flex-start}
+.ai-row{display:flex;gap:9px;align-items:flex-start;width:100%}
+.ai-av{
+  width:26px;height:26px;border-radius:8px;background:#c0392b;flex-shrink:0;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;
+}
+.ai-av svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.ai-body{
+  flex:1;min-width:0;font-family:'Hind Siliguri',sans-serif;
+  font-size:14px;line-height:1.85;color:#222;word-break:break-word;
+}
+.ai-body p{margin:0 0 10px}
+.ai-body p:last-child{margin-bottom:0}
+.ai-body h3{font-size:14.5px;font-weight:800;margin:14px 0 7px;color:#1a1a1a}
+.ai-body h3:first-child{margin-top:0}
+.ai-body ul,.ai-body ol{margin:0 0 10px;padding-left:19px}
+.ai-body li{margin-bottom:5px}
+.ai-body strong{font-weight:700;color:#111}
+.ai-body code{background:#f2f0ea;border-radius:5px;padding:1px 5px;font-size:12.5px;font-family:ui-monospace,monospace}
+.ai-body a{color:#2270C9;text-decoration:underline;word-break:break-all}
+
+/* যাচাইকৃত উৎসের ব্যাজ */
+.src-badge{
+  display:inline-flex;align-items:center;gap:5px;margin-top:9px;
+  background:#f0f7f4;color:#157a5b;border:1px solid #d9ece4;border-radius:999px;
+  padding:4px 10px;font-family:'Hind Siliguri',sans-serif;font-size:10.5px;font-weight:700;
+}
+.src-badge svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* টাইপিং */
+.dots{display:flex;gap:4px;padding:5px 0 2px}
+.dots i{width:6px;height:6px;border-radius:50%;background:#c9c3b8;animation:bl 1.3s infinite}
+.dots i:nth-child(2){animation-delay:.18s}
+.dots i:nth-child(3){animation-delay:.36s}
+@keyframes bl{0%,60%,100%{opacity:.3}30%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.6}}
+
+/* ত্রুটি */
+.err-box{
+  background:#fdecea;border:1px solid #f7d9d5;border-radius:14px;padding:12px 14px;
+  font-family:'Hind Siliguri',sans-serif;font-size:12.5px;color:#a33124;line-height:1.7;
+}
+.err-box button{
+  margin-top:9px;border:0;background:#c0392b;color:#fff;border-radius:9px;height:34px;
+  padding:0 15px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;
+}
+
+/* লগইন গেট */
+.gate{
+  margin:auto;padding:36px 22px;text-align:center;font-family:'Hind Siliguri',sans-serif;
+}
+.gate h3{font-size:16px;font-weight:800;color:#1a1a1a;margin-bottom:8px}
+.gate p{font-size:13px;color:#8c867c;line-height:1.75;margin-bottom:16px}
+.gate a{
+  display:inline-flex;align-items:center;justify-content:center;background:#c0392b;color:#fff;
+  text-decoration:none;border-radius:12px;height:44px;padding:0 24px;font-size:14px;font-weight:700;
+}
+
+/* ── ইনপুট ── */
+.composer-wrap{flex-shrink:0;background:#faf9f6;padding:8px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid #efede7}
+.composer{
+  display:flex;align-items:flex-end;gap:8px;background:#fff;border:1px solid #e4e1d9;
+  border-radius:22px;padding:6px 6px 6px 16px;box-shadow:0 1px 3px rgba(0,0,0,.03);
+}
+.composer:focus-within{border-color:#dcb8b2}
+.composer textarea{
+  flex:1;border:0;outline:0;resize:none;background:transparent;font-family:'Hind Siliguri',sans-serif;
+  font-size:14.5px;line-height:1.6;max-height:130px;padding:7px 0;color:#1a1a1a;
+}
+.composer textarea::placeholder{color:#b5afa4}
+.send-btn{
+  width:36px;height:36px;border-radius:50%;border:0;background:#c0392b;color:#fff;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+  transition:opacity .15s;
+}
+.send-btn:disabled{background:#ddd9d1;cursor:default}
+.send-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.disclaimer{
+  font-family:'Hind Siliguri',sans-serif;font-size:10px;color:#a8a299;text-align:center;
+  margin-top:7px;line-height:1.5;padding:0 6px;
+}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="ai-head">
+  <a href="index.html" class="back" aria-label="হোমে ফিরুন">←</a>
+  <div class="ai-id">
+    <div class="ai-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.4L12 3z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2z"/></svg>
+    </div>
+    <div class="ai-id-txt">
+      <b>Sondhan AI</b>
+      <span>আপনার স্বাস্থ্যসেবা সহকারী</span>
+    </div>
+  </div>
+  <button class="ai-new" id="btn-new" hidden>
+    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>নতুন
+  </button>
+</div>
+
+<div class="ai-scroll" id="scroll">
+  <!-- লগইন না থাকলে -->
+  <div class="gate" id="gate" hidden>
+    <h3>Sondhan AI ব্যবহার করতে লগইন করুন</h3>
+    <p>আপনার কথোপকথন শুধু আপনারই — তাই ব্যবহারের আগে একবার লগইন করে নিতে হয়।</p>
+    <a href="login.html?redirect=ai.html">লগইন করুন</a>
+  </div>
+
+  <!-- স্বাগত -->
+  <div class="ai-welcome" id="welcome" hidden>
+    <div class="big-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.4L12 3z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2z"/></svg>
+    </div>
+    <h2>Sondhan AI</h2>
+    <p>স্বাস্থ্য নিয়ে যা জানতে চান, বাংলায় জিজ্ঞাসা করুন। ইংরেজি বা Banglish-ও চলবে।</p>
+
+    <div class="sugg" id="sugg"></div>
+  </div>
+
+  <div class="ai-thread" id="thread"></div>
+</div>
+
+<div class="composer-wrap" id="composer-wrap" hidden>
+  <div class="composer">
+    <textarea id="input" rows="1" placeholder="স্বাস্থ্য নিয়ে কিছু জিজ্ঞাসা করুন..." enterkeyhint="send"></textarea>
+    <button class="send-btn" id="send" disabled aria-label="পাঠান">
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+  <div class="disclaimer">Sondhan AI ভুল করতে পারে। এটি চিকিৎসকের পরামর্শের বিকল্প নয় — জরুরি অবস্থায় ৯৯৯ বা নিকটস্থ হাসপাতালে যোগাযোগ করুন।</div>
+</div>
+
+<script type="module" src="ai.js?v=1"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  // নতুন SW চালু হলে পেজ একবার রিফ্রেশ — নাহলে পুরনো কোডে আটকে থাকে
+  var swRefreshed = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (swRefreshed) return; swRefreshed = true; window.location.reload();
+  });
+  window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js').catch(function (e) { console.warn('SW register failed:', e); }); });
+}
+
+// সেফটি-নেট: মূল module (ai.js) কোনো কারণে লোড না হলে পেজটা নীরবে মরে
+// থাকবে না — ইনপুট বক্সও দেখা যাবে না, তাই স্পষ্ট বার্তা দেখাই।
+setTimeout(function () {
+  if (window.__sondhanAiReady) return;
+  var gate = document.getElementById('gate');
+  var wel = document.getElementById('welcome');
+  if (gate) gate.hidden = true;
+  if (!wel) return;
+  wel.hidden = false;
+  wel.innerHTML = '<div style="padding:30px 10px;font-family:\'Hind Siliguri\',sans-serif">'
+    + '<p style="font-size:13.5px;color:#c0392b;line-height:1.8;margin-bottom:14px">পেজের স্ক্রিপ্ট লোড হয়নি — ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।</p>'
+    + '<button onclick="location.reload()" style="border:0;background:#c0392b;color:#fff;border-radius:11px;height:42px;padding:0 22px;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer">আবার চেষ্টা করুন</button>'
+    + '</div>';
+}, 8000);
+</script>
+</body>
+</html>

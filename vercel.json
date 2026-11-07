@@ -71,6 +71,10 @@
     {
       "source": "/diseases/:slug",
       "destination": "/disease.html"
+    },
+    {
+      "source": "/ai",
+      "destination": "/ai.html"
     }
   ],
   "headers": [
@@ -262,6 +266,11 @@
     {
       "source": "/diseases/:slug/",
       "destination": "/diseases/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/ai/",
+      "destination": "/ai",
       "permanent": true
     }
   ]
